@@ -44,6 +44,8 @@ Coriolis (latitude), spin drift and aerodynamic jump. Each tab keeps its scroll 
   reading is checked: the phone's own calibration status and heading accuracy, and the measured field
   against the Earth's field at the location. A warning suggests a figure-eight calibration away from steel.
 - **Latitude** from the phone's location with one tap.
+- **Pressure from a Garmin watch**: the barometer's station pressure, sent by a small Connect IQ watch
+  app through Garmin Connect. See [garmin](garmin/README.md) for installing it.
 - **Wind from the forecast**: the hourly forecast for the phone's location
   ([Open-Meteo](https://open-meteo.com), free for non-commercial use) averaged over a chosen window: mean
   speed, vector-mean direction, gusts and how steady the direction is. The 10 m forecast can be scaled to a
