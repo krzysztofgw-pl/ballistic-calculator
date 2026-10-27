@@ -120,3 +120,17 @@ class PhysicsTest {
         assertEquals(a.dropM, b.dropM, 0.02)
     }
 }
+
+class ScopeMountTest {
+    @Test
+    fun caliperMethodAddsRadii() {
+        // 10 mm gap, 18 mm bolt, 30 mm tube → 10 + 9 + 15 = 34 mm.
+        kotlin.test.assertEquals(0.034, ScopeMount.measuredSightHeightM(0.010, 0.018, 0.030), 1e-9)
+    }
+
+    @Test
+    fun largeObjectiveNeedsHighRings() {
+        // 56 mm objective → ~64 mm bell → 32 mm radius + 3 mm clearance.
+        kotlin.test.assertEquals(0.035, ScopeMount.minRingAxisHeightM(56.0), 1e-9)
+    }
+}

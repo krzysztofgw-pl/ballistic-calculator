@@ -10,10 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import pl.ballistics.app.Inputs
+import pl.ballistics.app.data.Conditions
 
 @Composable
-fun ConditionsScreen(i: Inputs, update: ((Inputs) -> Inputs) -> Unit, modifier: Modifier = Modifier) {
+fun ConditionsScreen(i: Conditions, update: ((Conditions) -> Conditions) -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier.verticalScroll(rememberScrollState()).padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
