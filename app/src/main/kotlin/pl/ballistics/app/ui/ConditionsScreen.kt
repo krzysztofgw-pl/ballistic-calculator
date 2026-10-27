@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -286,7 +288,24 @@ private fun LatitudeInput(i: Conditions, update: ((Conditions) -> Conditions) ->
     var status by remember { mutableStateOf<String?>(null) }
 
     val latitude = i.latitudeDeg.toNumber()
-    NumberField(stringResource(R.string.label_latitude), i.latitudeDeg, "°") { v -> update { it.copy(latitudeDeg = v) } }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        NumberField(stringResource(R.string.label_latitude), i.latitudeDeg, "°", Modifier.weight(1f)) { v -> update { it.copy(latitudeDeg = v) } }
+        IconButton(onClick = {
+            withPermission {
+                scope.launch {
+                    status = context.getString(R.string.location_reading)
+                    val location = DeviceSensors.location(context)
+                    status = if (location == null) {
+                        context.getString(R.string.location_unavailable)
+                    } else {
+                        val lat = String.format(Locale.US, "%.2f", location.latitude)
+                        update { it.copy(latitudeDeg = lat) }
+                        context.getString(R.string.location_result, lat, location.accuracy.roundToInt().toString())
+                    }
+                }
+            }
+        }) { Icon(Icons.Filled.LocationOn, stringResource(R.string.action_my_location)) }
+    }
     latitude?.takeIf { abs(it) <= 90 }?.let {
         val text = String.format(Locale.US, "%.2f", abs(it))
         Text(
@@ -294,20 +313,5 @@ private fun LatitudeInput(i: Conditions, update: ((Conditions) -> Conditions) ->
             style = MaterialTheme.typography.bodyMedium,
         )
     }
-    OutlinedButton(onClick = {
-        withPermission {
-            scope.launch {
-                status = context.getString(R.string.location_reading)
-                val location = DeviceSensors.location(context)
-                status = if (location == null) {
-                    context.getString(R.string.location_unavailable)
-                } else {
-                    val lat = String.format(Locale.US, "%.2f", location.latitude)
-                    update { it.copy(latitudeDeg = lat) }
-                    context.getString(R.string.location_result, lat, location.accuracy.roundToInt().toString())
-                }
-            }
-        }
-    }) { Text(stringResource(R.string.action_my_location)) }
     status?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
 }
