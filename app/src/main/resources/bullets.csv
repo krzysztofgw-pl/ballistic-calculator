@@ -1,0 +1,619 @@
+# Rifle bullet library. BCs in lb/in^2 as published by the manufacturers; length in inches;
+# twist = fastest recommended twist in inches per turn. Sources: Berger catalogue 2024;
+# ammolytics/projectiles open dataset (MIT, https://github.com/ammolytics/projectiles);
+# curated current manufacturer figures. Always check against the maker's current data.
+maker,name,diameter_in,weight_gr,g1,g7,length_in,twist_in,source
+Berger,FB Varmint,0.172,25,0.152,,0.565,10,Berger catalogue 2024
+Hornady,V-MAX,0.172,20,0.185,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.172,25,0.23,,,,ammolytics/projectiles (MIT)
+Hornady,Varmint,0.172,25,0.187,,,,ammolytics/projectiles (MIT)
+Barnes,Varmint Grenade,0.204,26,0.131,,,,ammolytics/projectiles (MIT)
+Barnes,Varmin-a-tor,0.204,32,0.159,,,,ammolytics/projectiles (MIT)
+Berger,FB Varmint,0.204,35,0.179,,0.596,14,Berger catalogue 2024
+Berger,BT Varmint,0.204,40,0.227,0.116,0.68,12,Berger catalogue 2024
+Hornady,NTX,0.204,24,0.17,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.204,32,0.21,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.204,40,0.275,,,,ammolytics/projectiles (MIT)
+Hornady,Varmint,0.204,45,0.245,,,,ammolytics/projectiles (MIT)
+Speer,TNT,0.204,39,0.202,,,,ammolytics/projectiles (MIT)
+Barnes,Varmint Grenade,0.224,30,0.101,,,,ammolytics/projectiles (MIT)
+Barnes,Varmint Grenade,0.224,36,0.149,,,,ammolytics/projectiles (MIT)
+Barnes,Varmin-a-tor,0.224,40,0.153,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.224,45,0.188,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.224,50,0.197,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.224,50,0.229,,,,ammolytics/projectiles (MIT)
+Barnes,Varmin-a-tor,0.224,50,0.192,,,,ammolytics/projectiles (MIT)
+Barnes,Varmint Grenade,0.224,50,0.183,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.224,52,0.224,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.224,53,0.204,,,,ammolytics/projectiles (MIT)
+Barnes,MPG LF Frangible,0.224,55,0.225,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-RRLP,0.224,55,0.225,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.224,55,0.209,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.224,55,0.209,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.224,55,0.272,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.224,62,0.287,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.224,62,0.287,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.224,62,0.294,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.224,69,0.339,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.224,70,0.314,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.224,70,0.314,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.224,85,0.41,,,,ammolytics/projectiles (MIT)
+Berger,FB Varmint,0.224,40,0.151,,0.609,15,Berger catalogue 2024
+Berger,FB Target,0.224,52,0.235,,0.714,14,Berger catalogue 2024
+Berger,FB Varmint,0.224,52,0.201,,0.717,14,Berger catalogue 2024
+Berger,FB Target,0.224,55,0.254,,0.749,14,Berger catalogue 2024
+Berger,FB Varmint,0.224,55,0.209,,0.753,14,Berger catalogue 2024
+Berger,FB Varmint,0.224,60,0.271,,0.81,12,Berger catalogue 2024
+Berger,VLD Target,0.224,70,0.374,0.191,0.961,9,Berger catalogue 2024
+Berger,BT Target,0.224,73,0.348,0.178,0.963,9,Berger catalogue 2024
+Berger,VLD Target,0.224,75,0.421,0.216,1.051,8,Berger catalogue 2024
+Berger,OTM Tactical,0.224,77,0.374,0.192,1.015,8,Berger catalogue 2024
+Berger,VLD Target,0.224,80,0.455,0.233,1.106,8,Berger catalogue 2024
+Berger,FULLBORE Target,0.224,80.5,0.441,0.226,1.091,8,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.224,85.5,0.524,0.268,1.167,8,Berger catalogue 2024
+Berger,VLD Target,0.224,90,0.534,0.274,1.254,7,Berger catalogue 2024
+Hornady,NTX,0.224,35,0.177,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.224,35,0.109,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.224,40,0.2,,,,ammolytics/projectiles (MIT)
+Hornady,Varmint,0.224,45,0.202,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.224,50,0.215,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.224,50,0.242,,,,ammolytics/projectiles (MIT)
+Hornady,Varmint,0.224,50,0.214,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.224,52,0.247,,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.224,52,0.229,,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.224,53,0.218,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.224,53,0.29,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.224,55,0.245,,,,ammolytics/projectiles (MIT)
+Hornady,Traditional,0.224,55,0.243,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.224,55,0.255,,,,ammolytics/projectiles (MIT)
+Hornady,Varmint,0.224,55,0.235,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.224,60,0.265,,,,ammolytics/projectiles (MIT)
+Hornady,Varmint,0.224,60,0.271,,,,ammolytics/projectiles (MIT)
+Hornady,Traditional,0.224,62,0.274,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.224,73,0.398,0.2,0.96,,"manufacturer, curated"
+Hornady,ELD Match,0.224,75,0.467,0.235,1,,"manufacturer, curated"
+Lapua,FMJ,0.224,55,0.235,,,,ammolytics/projectiles (MIT)
+Lapua,Soft Point,0.224,55,0.185,,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.224,69,0.341,0.171,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.224,69,0.341,0.171,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.224,77,0.386,0.193,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.224,77,0.386,0.193,,,ammolytics/projectiles (MIT)
+Sierra,MatchKing HPBT,0.224,77,0.372,,0.995,,"manufacturer, curated"
+Speer,TNT Green,0.224,30,0.091,,,,ammolytics/projectiles (MIT)
+Speer,Jacketed Hollow Point Rifle,0.224,33,0.079,,,,ammolytics/projectiles (MIT)
+Speer,Varmint Soft Point,0.224,40,0.144,,,,ammolytics/projectiles (MIT)
+Speer,TNT Green,0.224,43,0.15,,,,ammolytics/projectiles (MIT)
+Speer,Varmint Soft Point,0.224,45,0.167,,,,ammolytics/projectiles (MIT)
+Speer,Varmint Soft Point,0.224,46,0.094,,,,ammolytics/projectiles (MIT)
+Speer,TNT,0.224,50,0.228,,,,ammolytics/projectiles (MIT)
+Speer,Varmint Soft Point,0.224,50,0.231,,,,ammolytics/projectiles (MIT)
+Speer,Target Match Rifle,0.224,52,0.253,,,,ammolytics/projectiles (MIT)
+Speer,Varminter Hollow Point,0.224,52,0.168,,,,ammolytics/projectiles (MIT)
+Speer,Varmint Soft Point,0.224,55,0.212,,,,ammolytics/projectiles (MIT)
+Speer,Varmint Soft Point,0.224,70,0.214,,,,ammolytics/projectiles (MIT)
+Barnes,Varmin-a-tor,0.243,58,0.173,,,,ammolytics/projectiles (MIT)
+Barnes,Varmint Grenade,0.243,62,0.199,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.243,68,0.267,,,,ammolytics/projectiles (MIT)
+Barnes,Varmin-a-tor,0.243,72,0.208,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.243,80,0.331,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.243,85,0.333,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.243,105,0.511,,,,ammolytics/projectiles (MIT)
+Berger,BT Target,0.243,65,0.281,0.144,0.833,13,Berger catalogue 2024
+Berger,FB Target,0.243,68,0.255,,0.833,13,Berger catalogue 2024
+Berger,High BC FB Varmint,0.243,69,0.289,,0.919,12,Berger catalogue 2024
+Berger,FB Varmint,0.243,80,0.3,,0.913,12,Berger catalogue 2024
+Berger,VLD Hunting,0.243,87,0.427,0.219,1.042,10,Berger catalogue 2024
+Berger,High BC FB Varmint,0.243,88,0.38,,1.059,10,Berger catalogue 2024
+Berger,BT Target,0.243,90,0.409,0.21,1.05,10,Berger catalogue 2024
+Berger,Classic Hybrid Hunter,0.243,95,0.434,0.223,1.069,10,Berger catalogue 2024
+Berger,VLD Hunting,0.243,95,0.467,0.239,1.13,9,Berger catalogue 2024
+Berger,VLD Target,0.243,95,0.467,0.24,1.13,9,Berger catalogue 2024
+Berger,BT Target,0.243,105,0.494,0.253,1.189,8,Berger catalogue 2024
+Berger,Hybrid Target,0.243,105,0.536,0.275,1.256,8,Berger catalogue 2024
+Berger,VLD Hunting,0.243,105,0.545,0.278,1.223,8,Berger catalogue 2024
+Berger,VLD Target,0.243,105,0.517,0.265,1.222,8,Berger catalogue 2024
+Berger,BT Target,0.243,108,0.522,0.268,1.217,8,Berger catalogue 2024
+Berger,Elite Hunter,0.243,108,0.559,0.287,1.26,8,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.243,109,0.568,0.292,1.277,8,Berger catalogue 2024
+Berger,VLD Hunting,0.243,115,0.568,0.291,1.348,7,Berger catalogue 2024
+Berger,VLD Target,0.243,115,0.563,0.289,1.332,7,Berger catalogue 2024
+Hornady,ELD Match,0.243,108,0.536,0.27,1.24,,"manufacturer, curated"
+Lapua,Open Tip,0.243,77,0.319,,,,ammolytics/projectiles (MIT)
+Lapua,Naturalis,0.243,90,0.23,,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.243,90,0.434,0.216,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.243,90,0.434,0.216,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.243,105,0.472,0.236,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.243,105,0.472,0.236,,,ammolytics/projectiles (MIT)
+Speer,TNT,0.243,70,0.282,,,,ammolytics/projectiles (MIT)
+Speer,Varminter Hollow Point,0.243,75,0.234,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.243,85,0.38,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.243,90,0.365,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.243,100,0.446,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.243,100,0.351,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.257,80,0.316,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.257,100,0.336,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.257,100,0.357,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.257,115,0.335,,,,ammolytics/projectiles (MIT)
+Berger,VLD Hunting,0.257,115,0.483,0.247,1.188,10,Berger catalogue 2024
+Berger,Elite Hunter,0.257,133,0.613,0.315,1.407,8,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.257,135,0.65,0.334,1.416,8,Berger catalogue 2024
+Hornady,Varmint,0.257,60,0.101,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.257,75,0.29,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.257,90,0.29,,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.257,110,0.465,0.234,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.257,110,0.34,,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.257,110,0.39,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.257,117,0.391,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.257,117,0.39,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.257,87,0.3,,,,ammolytics/projectiles (MIT)
+Speer,TNT,0.257,87,0.31,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.257,100,0.393,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.257,100,0.369,,,,ammolytics/projectiles (MIT)
+Speer,Varminter Hollow Point,0.257,100,0.255,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.257,120,0.48,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.257,120,0.328,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.264,100,0.359,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.264,100,0.359,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.264,120,0.412,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.264,120,0.381,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.264,120,0.381,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.264,120,0.412,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.264,127,0.468,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.264,130,0.365,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.264,140,0.586,,,,ammolytics/projectiles (MIT)
+Berger,BT Target,0.264,120,0.468,0.24,1.219,9,Berger catalogue 2024
+Berger,AR Hybrid OTM Tactical,0.264,130,0.56,0.287,1.295,10,Berger catalogue 2024
+Berger,VLD Hunting,0.264,130,0.562,0.288,1.324,8,Berger catalogue 2024
+Berger,VLD Target,0.264,130,0.562,0.288,1.31,8,Berger catalogue 2024
+Berger,Classic Hybrid Hunter,0.264,135,0.584,0.303,1.325,8,Berger catalogue 2024
+Berger,Elite Hunter,0.264,140,0.606,0.31,1.403,8,Berger catalogue 2024
+Berger,Hybrid Target,0.264,140,0.607,0.311,1.407,8,Berger catalogue 2024
+Berger,Long Range BT Target,0.264,140,0.593,0.304,1.397,8,Berger catalogue 2024
+Berger,VLD Hunting,0.264,140,0.6,0.307,1.39,8,Berger catalogue 2024
+Berger,VLD Target,0.264,140,0.593,0.304,1.387,8,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.264,144,0.655,0.336,1.413,8,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.264,153.5,0.694,0.356,1.514,8,Berger catalogue 2024
+Berger,EOL Elite Hunter,0.264,156,0.679,0.347,1.512,8,Berger catalogue 2024
+Hornady,V-MAX,0.264,95,0.365,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.264,100,0.385,0.194,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.264,120,0.486,0.245,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.264,120,0.45,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.264,123,0.506,0.255,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.264,123,0.51,,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.264,129,0.485,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.264,129,0.445,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.264,129,0.485,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.264,130,0.554,0.279,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.264,140,0.646,0.326,1.39,,"manufacturer, curated"
+Hornady,InterLock,0.264,140,0.465,,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.264,140,0.58,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.264,140,0.52,,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.264,143,0.625,0.315,1.38,,"manufacturer, curated"
+Hornady,ELD Match,0.264,147,0.697,0.351,1.43,,"manufacturer, curated"
+Hornady,InterLock,0.264,160,0.283,,,,ammolytics/projectiles (MIT)
+Lapua,Cutting Edge FMJ,0.264,100,0.25,,,,ammolytics/projectiles (MIT)
+Lapua,FMJ,0.264,100,0.25,,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.264,100,0.424,0.212,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.264,108,0.465,0.231,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.264,120,0.497,0.246,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.264,123,0.527,0.263,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.264,136,0.545,0.274,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.264,139,0.578,0.29,,,ammolytics/projectiles (MIT)
+Lapua,Naturalis,0.264,140,0.201,,,,ammolytics/projectiles (MIT)
+Lapua,FMJ,0.264,144,0.636,,,,ammolytics/projectiles (MIT)
+Lapua,Mega,0.264,155,0.377,,,,ammolytics/projectiles (MIT)
+Speer,TNT,0.264,90,0.281,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.264,120,0.433,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.264,140,0.405,,,,ammolytics/projectiles (MIT)
+Hornady,Traditional,0.267,160,0.275,,,,ammolytics/projectiles (MIT)
+Barnes,MPG LF Frangible,0.277,85,0.229,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-RRLP,0.277,85,0.229,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.277,85,0.246,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.277,85,0.246,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.277,95,0.292,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.277,95,0.292,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.277,110,0.323,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.277,110,0.323,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.277,110,0.377,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.277,129,0.463,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.277,130,0.374,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.277,130,0.392,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.277,140,0.404,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.277,150,0.386,,,,ammolytics/projectiles (MIT)
+Berger,Classic Hybrid Hunter,0.277,130,0.49,0.251,1.21,10,Berger catalogue 2024
+Berger,VLD Hunting,0.277,130,0.462,0.236,1.173,11,Berger catalogue 2024
+Berger,Classic Hybrid Hunter,0.277,140,0.528,0.271,1.274,10,Berger catalogue 2024
+Berger,VLD Hunting,0.277,140,0.504,0.258,1.253,11,Berger catalogue 2024
+Berger,VLD Hunting,0.277,150,0.518,0.265,1.294,10,Berger catalogue 2024
+Berger,EOL Elite Hunter,0.277,170,0.662,0.339,1.49,9,Berger catalogue 2024
+Hornady,GMX,0.277,100,0.274,,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.277,110,0.36,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.277,110,0.37,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.277,120,0.4,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.277,130,0.46,,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.277,130,0.46,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.277,130,0.409,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.277,130,0.46,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.277,140,0.486,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.277,140,0.495,,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.277,145,0.536,0.27,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.277,150,0.525,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.277,150,0.462,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.277,150,0.525,,,,ammolytics/projectiles (MIT)
+Speer,TNT,0.277,90,0.275,,,,ammolytics/projectiles (MIT)
+Speer,Varminter Hollow Point,0.277,100,0.225,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.277,130,0.412,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.277,130,0.345,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.277,130,0.408,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.277,150,0.496,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.277,150,0.385,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.277,150,0.455,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.284,110,0.319,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.284,120,0.349,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.284,120,0.373,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.284,139,0.47,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.284,140,0.394,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.284,140,0.412,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.284,145,0.486,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.284,150,0.408,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.284,150,0.45,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.284,160,0.392,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.284,168,0.55,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.284,171,0.645,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.284,175,0.417,,,,ammolytics/projectiles (MIT)
+Berger,VLD Hunting,0.284,140,0.5,0.256,1.267,11,Berger catalogue 2024
+Berger,Classic Hunter,0.284,150,0.505,0.258,1.253,10,Berger catalogue 2024
+Berger,Classic Hybrid Hunter,0.284,168,0.566,0.29,1.372,10,Berger catalogue 2024
+Berger,VLD Hunting,0.284,168,0.618,0.316,1.433,10,Berger catalogue 2024
+Berger,VLD Target,0.284,168,0.628,0.322,1.431,10,Berger catalogue 2024
+Berger,Elite Hunter,0.284,175,0.656,0.336,1.502,9,Berger catalogue 2024
+Berger,Hybrid Target,0.284,180,0.68,0.349,1.527,9,Berger catalogue 2024
+Berger,VLD Hunting,0.284,180,0.673,0.345,1.506,9,Berger catalogue 2024
+Berger,VLD Target,0.284,180,0.683,0.35,1.52,9,Berger catalogue 2024
+Berger,F-Open Hybrid Target,0.284,184,0.695,0.356,1.575,9,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.284,190,0.751,0.384,1.601,9,Berger catalogue 2024
+Berger,EOL Elite Hunter,0.284,195,0.755,0.387,1.648,9,Berger catalogue 2024
+Hornady,V-MAX,0.284,120,0.365,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.284,139,0.486,,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.284,139,0.486,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.284,139,0.453,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.284,139,0.486,,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.284,150,0.574,0.289,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.284,154,0.525,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.284,154,0.433,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.284,154,0.525,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.284,162,0.67,0.338,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.284,162,0.63,0.315,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.284,162,0.514,,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.284,162,0.61,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.284,162,0.55,,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.284,175,0.689,0.347,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.284,175,0.462,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.284,180,0.796,0.401,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.284,150,0.526,0.26,,,ammolytics/projectiles (MIT)
+Lapua,Naturalis,0.284,156,0.28,,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.284,180,0.661,0.332,,,ammolytics/projectiles (MIT)
+Speer,TNT,0.284,110,0.338,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.284,130,0.424,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.284,130,0.394,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.284,145,0.472,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.284,145,0.327,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.284,145,0.457,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.284,160,0.519,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.284,160,0.389,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.284,160,0.504,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.284,175,0.465,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.308,110,0.295,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.308,110,0.264,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.308,110,0.264,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.308,110,0.295,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.308,120,0.358,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.308,130,0.34,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.308,130,0.35,,,,ammolytics/projectiles (MIT)
+Barnes,MPG LF Frangible,0.308,150,0.357,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-RRLP,0.308,150,0.357,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.308,150,0.369,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.308,150,0.369,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.308,150,0.42,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.308,155,0.467,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.308,165,0.398,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.308,165,0.442,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.308,168,0.47,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.308,168,0.404,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.308,168,0.404,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.308,168,0.47,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.308,175,0.508,,,,ammolytics/projectiles (MIT)
+Barnes,Match Burners,0.308,175,0.521,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.308,180,0.453,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.308,180,0.484,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.308,200,0.546,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.308,200,0.423,,,,ammolytics/projectiles (MIT)
+Berger,FB Target,0.308,115,0.289,,0.94,19,Berger catalogue 2024
+Berger,FB Target,0.308,150,0.393,,1.155,15,Berger catalogue 2024
+Berger,Hybrid Target,0.308,155,0.478,0.245,1.271,12,Berger catalogue 2024
+Berger,VLD Hunting,0.308,155,0.464,0.238,1.223,14,Berger catalogue 2024
+Berger,FULLBORE Target,0.308,155.5,0.473,0.242,1.226,13,Berger catalogue 2024
+Berger,Classic Hybrid Hunter,0.308,168,0.489,0.251,1.228,13,Berger catalogue 2024
+Berger,Hybrid Target,0.308,168,0.515,0.264,1.287,12,Berger catalogue 2024
+Berger,VLD Hunting,0.308,168,0.498,0.255,1.261,13,Berger catalogue 2024
+Berger,VLD Target,0.308,168,0.507,0.26,1.251,13,Berger catalogue 2024
+Berger,Long Range BT Target,0.308,175,0.512,0.262,1.314,13,Berger catalogue 2024
+Berger,OTM Tactical,0.308,175,0.512,0.263,1.261,13,Berger catalogue 2024
+Berger,VLD Hunting,0.308,175,0.518,0.265,1.328,13,Berger catalogue 2024
+Berger,VLD Target,0.308,175,0.512,0.262,1.342,13,Berger catalogue 2024
+Berger,Elite Hunter,0.308,180,0.576,0.295,1.375,12,Berger catalogue 2024
+Berger,Classic Hybrid Hunter,0.308,185,0.533,0.273,1.314,12,Berger catalogue 2024
+Berger,Hybrid Target,0.308,185,0.576,0.295,1.418,11,Berger catalogue 2024
+Berger,Juggernaut OTM Tactical,0.308,185,0.552,0.283,1.355,12,Berger catalogue 2024
+Berger,Juggernaut Target,0.308,185,0.555,0.284,1.344,12,Berger catalogue 2024
+Berger,VLD Hunting,0.308,185,0.558,0.286,1.366,12,Berger catalogue 2024
+Berger,VLD Target,0.308,185,0.543,0.278,1.383,12,Berger catalogue 2024
+Berger,VLD Hunting,0.308,190,0.566,0.29,1.371,12,Berger catalogue 2024
+Berger,.20X Hybrid Target,0.308,200,0.64,0.328,1.508,11,Berger catalogue 2024
+Berger,Hybrid Target,0.308,200,0.616,0.316,1.489,11,Berger catalogue 2024
+Berger,Elite Hunter,0.308,205,0.631,0.324,1.487,11,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.308,208,0.689,0.354,1.575,10,Berger catalogue 2024
+Berger,VLD Hunting,0.308,210,0.625,0.32,1.47,11,Berger catalogue 2024
+Berger,VLD Target,0.308,210,0.621,0.318,1.46,11,Berger catalogue 2024
+Berger,Hybrid Target,0.308,215,0.691,0.354,1.598,10,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.308,220,0.717,0.369,1.597,10,Berger catalogue 2024
+Berger,Hybrid OTM Tactical,0.308,230,0.71,0.364,1.608,10,Berger catalogue 2024
+Berger,Hybrid Target,0.308,230,0.717,0.368,1.668,10,Berger catalogue 2024
+Berger,EOL Elite Hunter,0.308,245,0.807,0.413,1.775,9,Berger catalogue 2024
+Berger,Long Range Hybrid Target,0.308,245,0.846,0.433,1.775,9,Berger catalogue 2024
+Hornady,Varmint,0.308,100,0.152,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.308,110,0.305,,,,ammolytics/projectiles (MIT)
+Hornady,Traditional,0.308,110,0.178,,,,ammolytics/projectiles (MIT)
+Hornady,V-MAX,0.308,110,0.29,,,,ammolytics/projectiles (MIT)
+Hornady,Varmint,0.308,110,0.256,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.308,125,0.295,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.308,125,0.305,,,,ammolytics/projectiles (MIT)
+Hornady,Traditional,0.308,125,0.32,,,,ammolytics/projectiles (MIT)
+Hornady,Varmint,0.308,130,0.295,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.308,135,0.274,,,,ammolytics/projectiles (MIT)
+Hornady,MonoFlex,0.308,140,0.335,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.308,150,0.415,,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.308,150,0.415,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.308,150,0.186,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.308,150,0.37,,,,ammolytics/projectiles (MIT)
+Hornady,Traditional,0.308,150,0.398,,,,ammolytics/projectiles (MIT)
+Hornady,A-MAX,0.308,155,0.435,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.308,155,0.461,0.232,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.308,155,0.405,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.308,160,0.395,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.308,165,0.447,,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.308,165,0.447,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.308,165,0.435,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.308,165,0.447,,,,ammolytics/projectiles (MIT)
+Hornady,A-MAX,0.308,168,0.475,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.308,168,0.523,0.263,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.308,168,0.45,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.308,170,0.189,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.308,178,0.547,0.275,1.34,,"manufacturer, curated"
+Hornady,ELD-X,0.308,178,0.552,0.278,1.36,,"manufacturer, curated"
+Hornady,Match,0.308,178,0.53,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.308,180,0.485,,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.308,180,0.48,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.308,180,0.241,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.308,180,0.48,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.308,195,0.584,0.294,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.308,195,0.55,,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.308,200,0.597,0.301,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.308,208,0.67,0.337,1.48,,"manufacturer, curated"
+Hornady,Match,0.308,208,0.62,0.311,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.308,212,0.673,0.336,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.308,220,0.65,0.325,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.308,220,0.3,,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.308,225,0.777,0.391,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.308,225,0.67,0.336,,,ammolytics/projectiles (MIT)
+Lapua,Cutting Edge OT,0.308,100,0.17,,,,ammolytics/projectiles (MIT)
+Lapua,FMJ,0.308,123,0.27,,,,ammolytics/projectiles (MIT)
+Lapua,Lock Base,0.308,150,0.434,0.217,,,ammolytics/projectiles (MIT)
+Lapua,Mega,0.308,150,0.33,,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.308,155,0.46,0.23,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.308,155,0.46,0.23,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.308,167,0.446,0.223,,,ammolytics/projectiles (MIT)
+Lapua,Lock Base,0.308,170,0.498,0.249,,,ammolytics/projectiles (MIT)
+Lapua,Naturalis,0.308,170,0.354,0.177,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.308,175,0.49,0.247,,,ammolytics/projectiles (MIT)
+Lapua,D46,0.308,185,0.506,0.254,,,ammolytics/projectiles (MIT)
+Lapua,Mega,0.308,185,0.319,,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.308,185,0.482,0.242,,,ammolytics/projectiles (MIT)
+Lapua,Mega,0.308,200,0.344,,,,ammolytics/projectiles (MIT)
+Lapua,Subsonic,0.308,200,0.518,0.235,,,ammolytics/projectiles (MIT)
+Lapua,Scenar-L,0.308,220,0.647,0.324,,,ammolytics/projectiles (MIT)
+Sierra,MatchKing HPBT,0.308,168,0.462,0.218,1.215,,"manufacturer, curated"
+Sierra,MatchKing HPBT,0.308,175,0.505,0.243,1.24,,"manufacturer, curated"
+Speer,TMJ Rifle,0.308,110,0.179,,,,ammolytics/projectiles (MIT)
+Speer,TNT,0.308,125,0.341,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.308,130,0.248,,,,ammolytics/projectiles (MIT)
+Speer,Varminter Hollow Point,0.308,130,0.263,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.308,150,0.417,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.308,150,0.295,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.308,150,0.389,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.308,165,0.52,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.308,165,0.393,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.308,165,0.433,,,,ammolytics/projectiles (MIT)
+Speer,Target Match Rifle,0.308,168,0.534,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.308,170,0.298,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.308,180,0.54,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.308,180,0.374,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.308,180,0.441,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.308,200,0.556,,,,ammolytics/projectiles (MIT)
+Barnes,MPG LF Frangible,0.31,108,0.243,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-RRLP,0.31,108,0.243,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.31,123,0.275,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.31,123,0.275,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.31,123,0.252,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.31,123,0.295,,,,ammolytics/projectiles (MIT)
+Lapua,D166,0.31,200,0.448,0.224,,,ammolytics/projectiles (MIT)
+Hornady,Traditional,0.3105,174,0.47,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.311,150,0.322,,,,ammolytics/projectiles (MIT)
+Lapua,FMJ,0.311,123,0.257,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.311,150,0.328,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.311,180,0.328,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.312,150,0.361,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.312,174,0.262,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.321,165,0.31,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.321,170,0.249,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.321,170,0.297,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.323,160,0.4,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.323,180,0.381,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.323,200,0.421,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.323,150,0.29,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.323,170,0.217,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.323,170,0.445,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.323,180,0.42,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.323,195,0.41,,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.323,196,0.525,,,,ammolytics/projectiles (MIT)
+Lapua,Naturalis,0.323,180,0.357,0.179,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.323,150,0.369,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.323,170,0.354,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.323,200,0.411,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.338,160,0.342,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.338,185,0.352,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.338,185,0.432,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.338,210,0.404,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.338,210,0.482,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.338,225,0.514,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.338,225,0.386,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.338,225,0.514,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.338,250,0.602,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.338,250,0.425,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.338,265,0.575,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.338,265,0.575,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.338,280,0.667,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.338,285,0.585,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.338,285,0.585,,,,ammolytics/projectiles (MIT)
+Berger,Elite Hunter,0.338,250,0.685,0.351,1.627,12,Berger catalogue 2024
+Berger,Hybrid OTM Tactical,0.338,250,0.682,0.349,1.635,12,Berger catalogue 2024
+Berger,Elite Hunter,0.338,300,0.814,0.417,1.816,10,Berger catalogue 2024
+Berger,Hybrid OTM Tactical,0.338,300,0.822,0.421,1.819,10,Berger catalogue 2024
+Hornady,GMX,0.338,185,0.42,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.338,200,0.43,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.338,200,0.455,,,,ammolytics/projectiles (MIT)
+Hornady,InterBond,0.338,225,0.515,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.338,225,0.397,,,,ammolytics/projectiles (MIT)
+Hornady,SST,0.338,225,0.515,,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.338,230,0.616,0.31,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.338,250,0.431,,,,ammolytics/projectiles (MIT)
+Hornady,Match,0.338,250,0.67,,,,ammolytics/projectiles (MIT)
+Hornady,ELD-X,0.338,270,0.757,0.381,,,ammolytics/projectiles (MIT)
+Hornady,ELD Match,0.338,285,0.789,0.399,1.74,,"manufacturer, curated"
+Hornady,Match,0.338,285,0.756,0.352,,,ammolytics/projectiles (MIT)
+Lapua,Naturalis,0.338,231,0.373,,,,ammolytics/projectiles (MIT)
+Lapua,Lock Base,0.338,250,0.625,0.31,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.338,250,0.648,0.322,,,ammolytics/projectiles (MIT)
+Lapua,Scenar,0.338,300,0.736,0.368,,,ammolytics/projectiles (MIT)
+Sierra,MatchKing HPBT,0.338,300,0.768,,1.7,,"manufacturer, curated"
+Speer,Hot-Cor Rifle,0.338,200,0.448,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.338,225,0.484,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.338,250,0.431,,,,ammolytics/projectiles (MIT)
+Barnes,Originals,0.348,220,0.301,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.348,200,0.32,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.348,200,0.246,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.358,180,0.295,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.358,200,0.284,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.358,200,0.369,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.358,225,0.359,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.358,200,0.3,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.358,200,0.195,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.358,250,0.375,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.358,180,0.245,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.358,220,0.286,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.358,250,0.422,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.366,250,0.214,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.366,250,0.361,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.366,250,0.44,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.366,286,0.247,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.366,286,0.411,,,,ammolytics/projectiles (MIT)
+Hornady,GMX,0.366,250,0.36,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.366,286,0.4,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.366,300,0.28,,,,ammolytics/projectiles (MIT)
+Lapua,Naturalis,0.366,250,0.419,0.215,,,ammolytics/projectiles (MIT)
+Lapua,Mega,0.366,285,0.339,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.366,270,0.361,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.375,235,0.27,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.375,250,0.424,,,,ammolytics/projectiles (MIT)
+Barnes,Originals,0.375,255,0.29,,,,ammolytics/projectiles (MIT)
+Barnes,LRX Long Range Hunting,0.375,270,0.449,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.375,270,0.326,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.375,300,0.357,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.375,350,0.425,,,,ammolytics/projectiles (MIT)
+Berger,ELR Match Solid,0.375,379,0.951,0.487,2.236,8,Berger catalogue 2024
+Berger,ELR Match Solid,0.375,407,1.022,0.523,2.347,8,Berger catalogue 2024
+Berger,Hybrid Target,0.375,410,0.928,0.475,2.037,11.5,Berger catalogue 2024
+Hornady,GMX,0.375,250,0.43,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.375,270,0.38,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.375,300,0.275,,,,ammolytics/projectiles (MIT)
+Hornady,DGX Bonded,0.375,300,0.275,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.375,235,0.317,,,,ammolytics/projectiles (MIT)
+Speer,Boat-Tail Rifle,0.375,270,0.429,,,,ammolytics/projectiles (MIT)
+Speer,Grand Slam Rifle,0.375,285,0.354,,,,ammolytics/projectiles (MIT)
+Barnes,Originals,0.377,255,0.29,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.41,400,0.325,,,,ammolytics/projectiles (MIT)
+Hornady,DGX Bonded,0.41,400,0.325,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.411,300,0.281,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.411,300,0.25,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.416,300,0.298,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.416,350,0.217,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.416,350,0.345,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.416,350,0.444,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.416,400,0.261,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.416,400,0.392,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.416,400,0.319,,,,ammolytics/projectiles (MIT)
+Hornady,DGX Bonded,0.416,400,0.319,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.416,350,0.332,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.422,400,0.261,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.422,400,0.378,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.423,400,0.315,,,,ammolytics/projectiles (MIT)
+Hornady,DGX Bonded,0.423,400,0.315,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.43,265,0.225,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.43,265,0.189,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.451,275,0.215,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.452,250,0.21,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.458,250,0.136,,,,ammolytics/projectiles (MIT)
+Barnes,Originals,0.458,300,0.227,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-TX,0.458,300,0.236,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.458,300,0.163,,,,ammolytics/projectiles (MIT)
+Barnes,Tipped TSX Hunting,0.458,300,0.236,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.458,350,0.278,,,,ammolytics/projectiles (MIT)
+Barnes,Originals,0.458,400,0.302,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.458,450,0.369,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.458,500,0.412,,,,ammolytics/projectiles (MIT)
+Hornady,MonoFlex,0.458,250,0.175,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.458,300,0.197,,,,ammolytics/projectiles (MIT)
+Hornady,FTX,0.458,325,0.23,,,,ammolytics/projectiles (MIT)
+Hornady,InterLock,0.458,350,0.195,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.458,480,0.285,,,,ammolytics/projectiles (MIT)
+Hornady,DGX Bonded,0.458,480,0.285,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.458,500,0.295,,,,ammolytics/projectiles (MIT)
+Hornady,DGX Bonded,0.458,500,0.295,,,,ammolytics/projectiles (MIT)
+Speer,Jacketed Hollow Point Rifle,0.458,300,0.206,,,,ammolytics/projectiles (MIT)
+Speer,Hot-Cor Rifle,0.458,350,0.232,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.474,500,0.243,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.474,500,0.363,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.474,500,0.29,,,,ammolytics/projectiles (MIT)
+Hornady,DGX Bonded,0.474,500,0.29,,,,ammolytics/projectiles (MIT)
+Lapua,Bullex-N,0.5,750,0.96,,,,ammolytics/projectiles (MIT)
+Lapua,Bullex-N,0.5,800,0.98,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.504,525,0.267,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.505,525,0.32,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.505,525,0.27,,,,ammolytics/projectiles (MIT)
+Hornady,DGX,0.505,525,0.27,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.509,570,0.243,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.509,570,0.369,,,,ammolytics/projectiles (MIT)
+Barnes,Originals,0.51,300,0.183,,,,ammolytics/projectiles (MIT)
+Barnes,Originals,0.51,450,0.274,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.51,535,0.238,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-X,0.51,647,0.572,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.51,647,0.572,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.51,750,1.07,,,,ammolytics/projectiles (MIT)
+Barnes,TAC-LR,0.51,750,0.766,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.51,800,1.095,,,,ammolytics/projectiles (MIT)
+Hornady,DGS,0.51,570,0.295,,,,ammolytics/projectiles (MIT)
+Hornady,DGX Bonded,0.51,570,0.295,,,,ammolytics/projectiles (MIT)
+Hornady,A-MAX,0.51,750,1.05,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.583,750,0.257,,,,ammolytics/projectiles (MIT)
+Barnes,TSX Hunting,0.583,750,0.402,,,,ammolytics/projectiles (MIT)
+Barnes,Banded Solids,0.618,900,0.38,,,,ammolytics/projectiles (MIT)

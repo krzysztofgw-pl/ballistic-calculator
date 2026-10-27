@@ -111,7 +111,9 @@
     <string name="title_bullets">Bullets</string>
     <string name="title_factory_loads">Factory loads</string>
     <string name="factory_load_velocity">%1$d fps (manufacturer test barrel)</string>
-    <string name="hint_library_disclaimer">Manufacturer catalogue data; check BC and velocity against the current catalogue and your chronograph.</string>
+    <string name="hint_library_disclaimer">Manufacturer catalogue data; check BC and velocity against the current catalogue and your chronograph. Search by maker, name or caliber, e.g. \"308 hybrid\".</string>
+    <string name="bullet_length">%1$.3f″</string>
+    <string name="bullet_twist">1:%1$s″ twist</string>
 
     <!-- Conditions -->
     <string name="section_atmosphere">Atmosphere</string>

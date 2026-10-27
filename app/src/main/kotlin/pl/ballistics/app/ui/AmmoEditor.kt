@@ -111,7 +111,14 @@ fun AmmoEditor(
             title = stringResource(R.string.title_bullets),
             options = BulletLibrary.bullets,
             label = { it.label },
-            detail = { b -> listOfNotNull(b.g1?.let { "G1 $it" }, b.g7?.let { "G7 $it" }, "${b.diameterIn}\" cal").joinToString(" · ") },
+            detail = { b ->
+                listOfNotNull(
+                    b.g1?.let { "G1 $it" },
+                    b.g7?.let { "G7 $it" },
+                    b.lengthIn?.let { stringResource(R.string.bullet_length, it) },
+                    b.twistIn?.let { stringResource(R.string.bullet_twist, if (it % 1.0 == 0.0) it.toInt() else it) },
+                ).joinToString(" · ")
+            },
             onPick = { a = a.withBullet(it); picker = null },
             onDismiss = { picker = null },
         )
@@ -137,7 +144,8 @@ private fun <T> LibraryDialog(
     onDismiss: () -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
-    val filtered = options.filter { label(it).contains(query.trim(), ignoreCase = true) }
+    val words = query.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+    val filtered = options.filter { o -> label(o).let { l -> words.all { l.contains(it, ignoreCase = true) } } }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },

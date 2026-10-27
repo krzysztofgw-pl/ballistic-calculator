@@ -18,8 +18,10 @@ your scope's reticle, and syncs everything to the cloud.
 - **Sight height helper**: compute it from a caliper measurement, or estimate it from the objective diameter,
   ring height and rail.
 - **Loads**: muzzle velocity, powder temperature sensitivity, bullet weight, diameter, length and twist,
-  drag model and BC. Start from the built-in library (Hornady, Sierra and Berger bullets and factory loads)
-  or enter custom data, including a full Cd(Mach) curve.
+  drag model and BC. Start from the built-in library or enter custom data, including a full Cd(Mach) curve.
+- **Bullet library**: over 600 rifle bullets from Barnes, Berger, Hornady, Lapua, Sierra and Speer with
+  published G1 and G7 BCs (Berger with length and twist), searchable by maker, name and caliber, plus common
+  factory loads. See [tools/bullet-library](tools/bullet-library/README.md) for sources and how to update it.
 
 ### Conditions
 Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction (clock), look angle,
