@@ -5,6 +5,7 @@ import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AngularUnit
 import pl.ballistics.app.data.Conditions
 import pl.ballistics.app.data.DragType
+import pl.ballistics.app.data.STANDARD_POWDER_SENSITIVITY
 import pl.ballistics.app.data.WeaponProfile
 import pl.ballistics.core.Ammunition
 import pl.ballistics.core.Atmosphere
@@ -70,8 +71,11 @@ object Calculator {
         val ammo = Ammunition(
             projectile = Projectile(drag, massKg, diameterM, lengthM),
             muzzleVelocityMps = num(w.muzzleVelocityFor(a), R.string.field_muzzle_velocity, true),
-            powderSensitivityMpsPerC = num(a.powderSensitivity, R.string.field_powder_sensitivity),
-            powderReferenceTempC = num(a.powderReferenceTemp, R.string.field_powder_reference_temp),
+            powderSensitivityMpsPerC = a.powderSensitivity.takeIf { it.isNotBlank() }
+                ?.let { num(it, R.string.field_powder_sensitivity) }?.takeIf { it != 0.0 }
+                ?: STANDARD_POWDER_SENSITIVITY,
+            powderReferenceTempC = a.powderReferenceTemp.takeIf { it.isNotBlank() }
+                ?.let { num(it, R.string.field_powder_reference_temp) } ?: 21.0,
         )
         val rifle = Rifle(
             sightHeightM = num(w.sightHeightCm, R.string.field_sight_height) / 100,

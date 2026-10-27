@@ -70,7 +70,12 @@ fun AmmoProfile.withFactoryLoad(load: FactoryLoad): AmmoProfile =
         cartridge = load.cartridge,
         muzzleVelocity = num(load.muzzleVelocityMps, 0),
         testBarrelCm = fmt(Math.round(load.testBarrelCm * 10) / 10.0),
+        powderReferenceTemp = "21",
     )
+
+/** A bullet for a handload: the velocity of a factory load it replaces no longer applies. */
+fun AmmoProfile.withHandloadBullet(bullet: Bullet): AmmoProfile =
+    withBullet(bullet).let { if (testBarrelCm.isNotBlank()) it.copy(muzzleVelocity = "", testBarrelCm = "") else it }
 
 object BulletLibrary {
     /** All rifle bullets from `bullets.csv`, ordered by caliber, maker and weight. */

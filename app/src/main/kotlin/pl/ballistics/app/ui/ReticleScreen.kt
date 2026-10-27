@@ -98,7 +98,7 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         ReticleChoice(stringResource(R.string.label_reticle), reticle, reticle.unit, {
-            if (it.family == own.family) stringResource(R.string.reticle_own, stringResource(it.family)) else stringResource(it.family)
+            stringResource(it.family)
         }) {
             previewId = it.id
         }
@@ -108,10 +108,7 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
             )
         }
-        Text(
-            if (sfp) stringResource(R.string.sfp_note, calMag.magFmt()) else stringResource(R.string.ffp_note),
-            style = MaterialTheme.typography.bodySmall,
-        )
+        if (sfp) Text(stringResource(R.string.sfp_note, calMag.magFmt()), style = MaterialTheme.typography.bodySmall)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(R.string.magnification_value, magnification.toDouble().magFmt()),
@@ -159,7 +156,6 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
                 }
             },
         )
-        Text(stringResource(R.string.hint_pinch_zoom), style = MaterialTheme.typography.bodySmall)
 
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             points.forEach { p ->

@@ -22,6 +22,9 @@ enum class DragType { G1, G7, G2, G5, G6, G8, GI, GS, RA4, CUSTOM }
 
 fun newId(): String = UUID.randomUUID().toString()
 
+/** Typical change of muzzle velocity with powder temperature, used when a load gives none. */
+const val STANDARD_POWDER_SENSITIVITY = 1.0
+
 /*
  * Numeric fields are kept as text so the editors can hold half-typed values
  * ("0," while typing "0,5"). They are parsed by Calculator.
@@ -84,8 +87,10 @@ data class AmmoProfile(
     /** Reference velocity: from the box, or a chronograph, in a barrel of [testBarrelCm]. */
     val muzzleVelocity: String = "800",
     val testBarrelCm: String = "",
-    val powderSensitivity: String = "0",
-    val powderReferenceTemp: String = "15",
+    /** m/s per °C; empty (or the old default 0) uses [STANDARD_POWDER_SENSITIVITY]. */
+    val powderSensitivity: String = "",
+    /** Temperature the reference velocity was measured at; factory data is for 21 °C (SAAMI, CIP). */
+    val powderReferenceTemp: String = "21",
     val notes: String = "",
 )
 

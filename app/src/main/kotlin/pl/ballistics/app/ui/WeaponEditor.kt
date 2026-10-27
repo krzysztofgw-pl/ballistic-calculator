@@ -54,7 +54,7 @@ fun WeaponEditor(
     ) {
         Section(stringResource(R.string.section_rifle)) {
             TextInput(stringResource(R.string.label_name), w.name) { w = w.copy(name = it) }
-            CaliberField(stringResource(R.string.label_caliber), w.caliber, null, stringResource(R.string.caliber_rifle_empty)) {
+            CaliberField(stringResource(R.string.label_caliber), w.caliber, null) {
                 w = w.copy(caliber = it)
             }
             FieldRow { m ->

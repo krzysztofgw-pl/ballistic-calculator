@@ -45,12 +45,14 @@ fun NumberField(
     unit: String,
     modifier: Modifier = Modifier,
     optional: Boolean = false,
+    placeholder: String? = null,
     onChange: (String) -> Unit,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
         label = { Text(label) },
+        placeholder = placeholder?.let { { Text(it) } },
         suffix = { Text(unit) },
         singleLine = true,
         isError = !(optional && value.isBlank()) && value.toNumber() == null,
