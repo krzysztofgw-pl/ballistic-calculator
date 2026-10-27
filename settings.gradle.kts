@@ -14,7 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ballistic-calculator"
+rootProject.name = "ballistics-calculator"
 include(":core")
 
 // The Android app needs an Android SDK. Without one (e.g. a plain JVM box)
