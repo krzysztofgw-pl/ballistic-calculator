@@ -142,11 +142,10 @@
     <string name="label_humidity">Humidity</string>
     <string name="label_pressure_qnh">Pressure (QNH)</string>
     <string name="label_pressure_station">Station pressure</string>
-    <string name="label_pressure_is_qnh">Pressure is sea-level corrected (from a forecast)</string>
+    <string name="label_pressure_is_qnh">Pressure is QNH (sea-level corrected, as in forecasts); off: station pressure</string>
     <string name="label_altitude">Altitude</string>
     <string name="unit_m_asl">m ASL</string>
     <string name="label_wind_speed">Speed</string>
-    <string name="label_wind_from">Direction (from)</string>
     <string name="action_forecast_wind">Suggest from the weather forecast</string>
     <string name="title_forecast">Forecast wind</string>
     <string name="forecast_loading">Getting your location and the forecast…</string>
@@ -166,9 +165,6 @@
     <string name="forecast_suggestion">Suggested: %1$s m/s from %2$d° relative to the line of fire (shot azimuth %3$d°).</string>
     <string name="label_forecast_atmosphere">Also fill temperature, humidity and pressure</string>
     <string name="forecast_attribution">Weather data by Open-Meteo.com (CC BY 4.0). Speed is the mean of the hourly values, direction the mean wind vector. A forecast is a starting point; read the wind on the range.</string>
-    <string name="label_wind_north_up">North-up dial (forecast direction)</string>
-    <string name="wind_center_relative">%1$s°\n%2$s o\'clock</string>
-    <string name="wind_center_true">%1$s°\n%2$s</string>
     <string name="wind_true_bearing">From the line of fire: %1$s° (%2$s o\'clock). True bearing: %3$s° %4$s, with the shot azimuth %5$s°.</string>
     <string name="label_look_angle">Shot angle</string>
     <string name="label_cant">Cant</string>
@@ -178,14 +174,12 @@
     <string name="label_aero_jump">Aerodynamic jump from crosswind</string>
     <string name="label_coriolis">Coriolis and Eötvös effects</string>
     <string name="label_latitude">Latitude</string>
-    <string name="label_azimuth">Shot azimuth</string>
     <string name="action_phone_compass">Use phone compass</string>
     <string name="action_my_location">Use my location</string>
     <string name="compass_reading">Reading the compass: hold the phone along the line of fire, flat or upright with the camera to the target.</string>
     <string name="compass_true">Phone heading %1$s° (magnetic declination %2$s° applied).</string>
     <string name="compass_magnetic">Phone heading %1$s° magnetic: no location, so declination is not applied.</string>
     <string name="compass_unavailable">This phone has no compass sensor.</string>
-    <string name="hint_compass">Phone compasses are disturbed by steel and magnets, including the rifle and scope; check against a map when it matters.</string>
     <string name="location_reading">Getting your location…</string>
     <string name="location_result">%1$s, from your location (± %2$s m).</string>
     <string name="location_unavailable">No location: allow location access and turn on location services, or type the latitude.</string>
@@ -275,8 +269,8 @@
     <string name="label_target_distance">Distance</string>
     <string name="action_closer">1 m closer</string>
     <string name="action_farther">1 m farther</string>
+    <string name="label_moving_target">Moving target</string>
     <string name="label_target_speed">Target speed</string>
-    <string name="label_target_direction">Moving to (90° = right)</string>
     <string name="moving_hold">Moving: hold %2$s %5$s %1$s, %4$s %5$s %3$s (lead %6$s %7$s m)</string>
     <string name="target_out_of_reach">The bullet does not reach %1$d m.</string>
     <string name="chart_wind_speed">Wind correction (%1$s) by wind speed (m/s)</string>
@@ -320,7 +314,7 @@
     <string name="label_wind_uncertainty">Wind known to ±</string>
     <string name="label_range_uncertainty">Distance known to ±</string>
     <string name="assumed">(assumed)</string>
-    <string name="hit_inputs">Velocity SD %1$s m/s, group %2$s MOA, target %3$s × %4$s cm</string>
+    <string name="hit_inputs">Velocity SD %1$s m/s, group %2$s MOA</string>
     <string name="hit_result">First-round hit: %1$d%%</string>
     <string name="hit_breakdown">Vertical spread %1$s cm (velocity %2$s, distance %3$s, rifle %4$s). Horizontal %5$s cm (wind %6$s, rifle %7$s).</string>
     <string name="section_ranging">Ranging with the reticle</string>
@@ -332,4 +326,17 @@
     <string name="left_short">L</string>
     <string name="label_velocity_sd">Velocity SD</string>
     <string name="label_group">5-shot group</string>
+    <string name="label_target_course">Course</string>
+    <string name="label_north_up">North up</string>
+    <string name="dial_edit_wind">Wind</string>
+    <string name="dial_edit_azimuth">Azimuth</string>
+    <string name="center_wind_true">Wind %1$s° %2$s</string>
+    <string name="center_wind_clock">Wind %1$s h</string>
+    <string name="center_azimuth">Az %1$s°</string>
+    <string name="compass_uncalibrated">The phone reports its compass as poorly calibrated. Move the phone in a figure-eight a few times, away from the rifle and other steel, then read again.</string>
+    <string name="compass_inaccurate">The phone estimates its heading only to ±%1$d°. Calibrate it with a figure-eight motion, away from steel, then read again.</string>
+    <string name="compass_disturbed">The phone measures a magnetic field of %1$d µT where the Earth\'s is %2$d µT: the compass is badly calibrated or something magnetic is close. Move away from the rifle and vehicles, make a figure-eight with the phone, then read again.</string>
+    <string name="section_measurements">Measurements and location</string>
+    <string name="label_location_latitude">Location sets the latitude</string>
+    <string name="label_location_altitude">Forecast sets the altitude (terrain height)</string>
 </resources>

@@ -24,6 +24,7 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 /** One-shot readings of the phone's position and heading for the conditions screen. */
 object DeviceSensors {
@@ -92,21 +93,61 @@ object DeviceSensors {
     }
 
     /**
+     * One compass reading with what is needed to judge it.
+     *
+     * @param headingAccuracyDeg the sensor's own estimate of the heading error, when it gives one.
+     * @param fieldMicroTesla strength of the magnetic field the phone measured.
+     * @param magnetometerStatus SensorManager.SENSOR_STATUS_*; low or unreliable means it wants calibrating.
+     */
+    data class CompassReading(
+        val headingDeg: Double,
+        val headingAccuracyDeg: Double?,
+        val fieldMicroTesla: Double?,
+        val magnetometerStatus: Int?,
+    ) {
+        /**
+         * Why the reading cannot be trusted, or null. [expectedMicroTesla] is the Earth's field at the
+         * location; a much stronger or weaker field means a badly calibrated compass or metal nearby.
+         */
+        fun problem(expectedMicroTesla: Double?): CompassProblem? = when {
+            magnetometerStatus != null && magnetometerStatus <= SensorManager.SENSOR_STATUS_ACCURACY_LOW -> CompassProblem.UNCALIBRATED
+            headingAccuracyDeg != null && headingAccuracyDeg > 15 -> CompassProblem.INACCURATE
+            expectedMicroTesla != null && fieldMicroTesla != null && abs(fieldMicroTesla / expectedMicroTesla - 1) > 0.25 ->
+                CompassProblem.DISTURBED
+            else -> null
+        }
+    }
+
+    enum class CompassProblem { UNCALIBRATED, INACCURATE, DISTURBED }
+
+    /**
      * The magnetic heading the phone points along, averaged over half a second: the top edge
      * when the phone lies flat, the back camera when it is held upright. Null without a compass.
      */
-    suspend fun magneticHeadingDeg(context: Context): Double? {
+    suspend fun magneticHeading(context: Context): CompassReading? {
         val sm = context.getSystemService(SensorManager::class.java) ?: return null
         val sensor = sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) ?: return null
+        val magnetometer = sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         return withTimeoutOrNull(3_000) {
             suspendCancellableCoroutine { cont ->
                 var sumSin = 0.0
                 var sumCos = 0.0
                 var count = 0
+                var accuracy: Double? = null
+                var field: Double? = null
+                var status: Int? = null
                 val r = FloatArray(9)
                 val listener = object : SensorEventListener {
                     override fun onSensorChanged(event: SensorEvent) {
+                        if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
+                            val v = event.values
+                            field = sqrt((v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).toDouble())
+                            status = event.accuracy
+                            return
+                        }
                         SensorManager.getRotationMatrixFromVector(r, event.values)
+                        // The fifth value, when present, is the estimated heading accuracy in radians.
+                        if (event.values.size > 4 && event.values[4] >= 0) accuracy = Math.toDegrees(event.values[4].toDouble())
                         // Columns of r are the phone's axes in east-north-up coordinates.
                         val flat = abs(r[7]) < abs(r[8])
                         val east = if (flat) r[1] else -r[2]
@@ -115,7 +156,8 @@ object DeviceSensors {
                         sumSin += sin(a); sumCos += cos(a); count++
                         if (count >= 25) {
                             sm.unregisterListener(this)
-                            if (cont.isActive) cont.resume(Math.toDegrees(atan2(sumSin, sumCos)).mod(360.0))
+                            val heading = Math.toDegrees(atan2(sumSin, sumCos)).mod(360.0)
+                            if (cont.isActive) cont.resume(CompassReading(heading, accuracy, field, status))
                         }
                     }
 
@@ -123,9 +165,19 @@ object DeviceSensors {
                 }
                 cont.invokeOnCancellation { sm.unregisterListener(listener) }
                 sm.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_GAME)
+                magnetometer?.let { sm.registerListener(listener, it, SensorManager.SENSOR_DELAY_GAME) }
             }
         }
     }
+
+    /** Strength of the Earth's magnetic field at [location], in microtesla. */
+    fun expectedFieldMicroTesla(location: Location): Double =
+        GeomagneticField(
+            location.latitude.toFloat(),
+            location.longitude.toFloat(),
+            location.altitude.toFloat(),
+            System.currentTimeMillis(),
+        ).fieldStrength / 1000.0
 
     /** Magnetic declination (east positive) at [location] now. */
     fun declinationDeg(location: Location): Double =

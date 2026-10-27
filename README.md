@@ -33,28 +33,34 @@ Muzzle velocity follows the air temperature (taken as the powder temperature) wi
 standard 1.0 m/s per °C when none is entered; factory velocities are referenced to 21 °C (SAAMI, CIP).
 
 ### Conditions
-Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction, look angle, cant,
-Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table range and step.
+Wind first (it changes most), then temperature, pressure, altitude and humidity, look angle and cant, and
+Coriolis (latitude), spin drift and aerodynamic jump. Each tab keeps its scroll position.
 
-- **Wind dial**: a 360° dial with labels every 30° (degrees and clock hours); tap or drag to where the wind
-  blows from. It can also be shown north-up, to enter a forecast direction, with the shot azimuth marked.
-- **Azimuth dial**: a north-up 360° dial for the line of fire, which can be read from the phone's compass
-  (corrected for magnetic declination when the location is known).
+- **Wind and azimuth dial**: one 360° dial for both, with a switch for which one a tap or drag sets.
+  North up it reads like a map: the shot goes out along the azimuth and the wind comes in from its true
+  bearing. Otherwise the line of fire points up, the wind reads as a clock and a north marker shows the
+  azimuth. Moving the azimuth keeps the wind where it is in the frame shown.
+- **Phone compass** for the azimuth, corrected for magnetic declination when the location is known. Each
+  reading is checked: the phone's own calibration status and heading accuracy, and the measured field
+  against the Earth's field at the location. A warning suggests a figure-eight calibration away from steel.
 - **Latitude** from the phone's location with one tap.
 - **Wind from the forecast**: the hourly forecast for the phone's location
   ([Open-Meteo](https://open-meteo.com), free for non-commercial use) averaged over a chosen window: mean
   speed, vector-mean direction, gusts and how steady the direction is. The 10 m forecast can be scaled to a
   ~2 m line of fire, and the direction is converted to the line of fire with the shot azimuth. Temperature,
-  humidity and pressure can be filled in from the same forecast.
+  humidity and pressure can be filled in from the same forecast. Settings decide whether a location fix
+  also sets the latitude and whether the forecast sets the altitude (terrain height at the location).
 
 ### Table
 For each range: drop, elevation and clicks, wind drift and windage correction, velocity, energy, time of
-flight and Mach. The range column stays in place while the other columns scroll sideways.
+flight and Mach. The range column stays in place while the other columns scroll sideways. The table's
+range and step are set below it.
 
 ### Target
-Pick a distance to the metre with the slider, the arrows or by typing it, and get the hold and the dial
-correction for it.
-- Moving target: its speed and the direction it moves (90° = to the right). The lead uses the time of
+Pick a distance to the metre with the slider, the arrows or by typing it (all in one row), and get the
+hold and the dial correction for it.
+- Moving target, switched on with a checkbox: its speed and its course on a small dial (up = away,
+  right = to the right). The lead uses the time of
   flight to where the target will be, and its hold point is drawn on the reticle in blue.
 - Impact points drawn on the scope's reticle, with a magnification slider; the same holds can be
   previewed on any other reticle.
@@ -68,14 +74,15 @@ correction for it.
 - Range error: vertical miss when the distance is off by up to ±50 m, and the error that still hits a
   target of the given height.
 - Temperature: muzzle velocity and elevation 10 °C colder and warmer.
-- Hit probability: chance of a first-round hit on the target from the velocity SD (load), the 5-shot
+- Hit probability: chance of a first-round hit on the target (its width and height are set here) from the velocity SD (load), the 5-shot
   group (rifle) and how well the wind and the distance are known. Each source's spread comes from the
   full solution; a 5-shot group is taken as three standard deviations.
 - Ranging with the reticle: distance from the target size and its reading in the reticle.
 
 ### Settings
 The gear in the top bar: light, dark or system theme; keep the screen on; tabs and sub-tabs at the top
-or the bottom; sync and backup.
+or the bottom; QNH (default) or station pressure; whether location sets the latitude and the altitude;
+sync and backup.
 
 ### Sync and backup
 - Google sign-in with live sync through Cloud Firestore (newer change wins).

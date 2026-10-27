@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,9 +30,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,13 +44,13 @@ import pl.ballistics.app.R
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.WeaponProfile
 
-private data class MainTab(@StringRes val title: Int, val icon: ImageVector)
+private data class MainTab(@StringRes val title: Int, val icon: @Composable () -> ImageVector)
 
 private val tabs = listOf(
-    MainTab(R.string.tab_profiles, Icons.Filled.Person),
-    MainTab(R.string.tab_conditions, Icons.Filled.Place),
-    MainTab(R.string.tab_table, Icons.AutoMirrored.Filled.List),
-    MainTab(R.string.tab_target, Icons.Filled.Search),
+    MainTab(R.string.tab_profiles) { Icons.Filled.Person },
+    MainTab(R.string.tab_conditions) { Icons.Filled.Place },
+    MainTab(R.string.tab_table) { Icons.AutoMirrored.Filled.List },
+    MainTab(R.string.tab_target) { ImageVector.vectorResource(R.drawable.ic_tab_target) },
 )
 
 /** What is open on top of the tabs. */
@@ -69,6 +70,7 @@ fun App(vm: MainViewModel = viewModel()) {
     val sync by vm.syncState.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(2) }
     var editor by remember { mutableStateOf<Editor?>(null) }
+    val saved = rememberSaveableStateHolder()
 
     when (val e = editor) {
         is Editor.Weapon -> {
@@ -100,6 +102,8 @@ fun App(vm: MainViewModel = viewModel()) {
             SettingsScreen(
                 ui = data.ui,
                 onUi = vm::updateUi,
+                pressureIsQnh = data.conditions.pressureIsQnh,
+                onPressureIsQnh = { v -> vm.updateConditions { it.copy(pressureIsQnh = v) } },
                 sync = sync,
                 onSignIn = vm::signIn,
                 onSignOut = vm::signOut,
@@ -146,7 +150,7 @@ fun App(vm: MainViewModel = viewModel()) {
                                 selected = tab == index,
                                 onClick = { tab = index },
                                 text = { Text(stringResource(t.title)) },
-                                icon = { Icon(t.icon, contentDescription = null) },
+                                icon = { Icon(t.icon(), contentDescription = null) },
                             )
                         }
                     }
@@ -164,7 +168,7 @@ fun App(vm: MainViewModel = viewModel()) {
                             NavigationBarItem(
                                 selected = tab == index,
                                 onClick = { tab = index },
-                                icon = { Icon(t.icon, contentDescription = null) },
+                                icon = { Icon(t.icon(), contentDescription = null) },
                                 label = { Text(stringResource(t.title)) },
                             )
                         }
@@ -176,6 +180,8 @@ fun App(vm: MainViewModel = viewModel()) {
         },
     ) { padding ->
         val modifier = Modifier.padding(padding)
+        // Each tab keeps its scroll position while another one is open.
+        saved.SaveableStateProvider(tab) {
         when (tab) {
             0 -> ProfilesScreen(
                 data = data,
@@ -184,9 +190,10 @@ fun App(vm: MainViewModel = viewModel()) {
                 onEditAmmo = { editor = Editor.Ammo(it) },
                 modifier = modifier,
             )
-            1 -> ConditionsScreen(data.conditions, vm::updateConditions, modifier)
-            2 -> TableScreen(result, modifier)
+            1 -> ConditionsScreen(data.conditions, data.ui, vm::updateConditions, modifier)
+            2 -> TableScreen(result, data.conditions, vm::updateConditions, modifier)
             else -> TargetScreen(result, data.conditions, vm::updateConditions, modifier)
+        }
         }
     }
 }

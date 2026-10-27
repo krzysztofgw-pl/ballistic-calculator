@@ -1,6 +1,7 @@
 package pl.ballistics.app.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -34,6 +37,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import pl.ballistics.app.R
 import androidx.compose.ui.geometry.Offset
@@ -89,7 +93,7 @@ fun TargetScreen(
     modifier: Modifier = Modifier,
 ) {
     if (result !is CalcResult.Ok) {
-        TableScreen(result, modifier)
+        TableScreen(result, modifier = modifier)
         return
     }
     val weapon = result.weapon
@@ -113,11 +117,12 @@ fun TargetScreen(
     val maxDistance = points.lastOrNull()?.rangeM ?: 1000.0
     // While the slider is dragged the distance lives here and is saved when the finger lifts.
     var dragged by remember { mutableStateOf<Float?>(null) }
+    var typed by remember { mutableStateOf<String?>(null) }
     val distance = dragged?.roundToInt()?.toDouble()
         ?: conditions.targetRangeM.toNumber()?.takeIf { it > 0 }
         ?: points.getOrNull(points.size / 2)?.rangeM ?: 0.0
     fun setDistance(m: Double) = update { it.copy(targetRangeM = m.coerceIn(1.0, maxDistance).roundToInt().toString()) }
-    val targetSpeed = conditions.targetSpeedMps.toNumber()?.takeIf { it > 0 }
+    val targetSpeed = conditions.targetSpeedMps.toNumber()?.takeIf { it > 0 && conditions.targetMoving }
     val targetDirection = conditions.targetDirectionDeg.toNumber() ?: 90.0
 
     val inputs = TargetInputs(
@@ -169,40 +174,61 @@ fun TargetScreen(
         modifier.verticalScroll(rememberScrollState()).padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        // The typed distance and the slider share one row; the arrows step a metre either way.
         Row(verticalAlignment = Alignment.CenterVertically) {
+            // Focusing the field empties it for a fresh entry; the last distance stays as the placeholder.
+            NumberField(
+                stringResource(R.string.label_target_distance),
+                dragged?.roundToInt()?.toString() ?: typed ?: distance.roundToInt().toString(),
+                "m",
+                Modifier.width(116.dp).onFocusChanged { f ->
+                    if (f.isFocused && typed == null) typed = "" else if (!f.isFocused) typed = null
+                },
+                optional = true,
+                placeholder = distance.roundToInt().toString(),
+            ) { v ->
+                typed = v
+                if ((v.toNumber() ?: 0.0) > 0) update { it.copy(targetRangeM = v) }
+            }
             IconButton(onClick = { setDistance(distance - 1) }) {
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, stringResource(R.string.action_closer))
             }
-            NumberField(
-                stringResource(R.string.label_target_distance),
-                dragged?.roundToInt()?.toString() ?: conditions.targetRangeM.ifBlank { distance.roundToInt().toString() },
-                "m",
-                Modifier.weight(1f),
-            ) { v -> update { it.copy(targetRangeM = v) } }
+            Slider(
+                value = distance.toFloat().coerceIn(1f, maxDistance.toFloat()),
+                onValueChange = { dragged = it },
+                onValueChangeFinished = { dragged?.let { setDistance(it.toDouble()) }; dragged = null },
+                valueRange = 1f..maxDistance.toFloat(),
+                modifier = Modifier.weight(1f),
+            )
             IconButton(onClick = { setDistance(distance + 1) }) {
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, stringResource(R.string.action_farther))
             }
         }
-        Slider(
-            value = distance.toFloat().coerceIn(1f, maxDistance.toFloat()),
-            onValueChange = { dragged = it },
-            onValueChangeFinished = { dragged?.let { setDistance(it.toDouble()) }; dragged = null },
-            valueRange = 1f..maxDistance.toFloat(),
-        )
-        FieldRow { m ->
-            NumberField(stringResource(R.string.label_target_speed), conditions.targetSpeedMps, "m/s", m) { v ->
-                update { it.copy(targetSpeedMps = v) }
-            }
-            NumberField(stringResource(R.string.label_target_direction), conditions.targetDirectionDeg, "°", m) { v ->
-                update { it.copy(targetDirectionDeg = v) }
-            }
+        Row(
+            Modifier.fillMaxWidth().clickable { update { it.copy(targetMoving = !it.targetMoving) } },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(conditions.targetMoving, onCheckedChange = { v -> update { it.copy(targetMoving = v) } })
+            Text(stringResource(R.string.label_moving_target))
         }
-        FieldRow { m ->
-            NumberField(stringResource(R.string.label_target_width), conditions.targetWidthCm, "cm", m) { v ->
-                update { it.copy(targetWidthCm = v) }
-            }
-            NumberField(stringResource(R.string.label_target_height), conditions.targetHeightCm, "cm", m) { v ->
-                update { it.copy(targetHeightCm = v) }
+        if (conditions.targetMoving) {
+            // The course is set on a small dial: up is away from the shooter, right is to the right.
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                NumberField(stringResource(R.string.label_target_speed), conditions.targetSpeedMps, "m/s", Modifier.weight(1f)) { v ->
+                    update { it.copy(targetSpeedMps = v) }
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CompassDial(
+                        markers = listOf(DialMarker(targetDirection, DialArrow.OUTWARD, MaterialTheme.colorScheme.primary, true)),
+                        onChange = { v -> update { it.copy(targetDirectionDeg = v.roundToInt().mod(360).toString()) } },
+                        centerText = "${targetDirection.roundToInt().mod(360)}°",
+                        outerLabel = null,
+                        stepDeg = 15.0,
+                        maxSize = 112.dp,
+                        modifier = Modifier.width(112.dp),
+                    )
+                    Text(stringResource(R.string.label_target_course), style = MaterialTheme.typography.labelMedium)
+                }
             }
         }
 

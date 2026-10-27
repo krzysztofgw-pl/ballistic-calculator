@@ -46,6 +46,8 @@ import java.time.LocalDate
 fun SettingsScreen(
     ui: UiSettings,
     onUi: ((UiSettings) -> UiSettings) -> Unit,
+    pressureIsQnh: Boolean,
+    onPressureIsQnh: (Boolean) -> Unit,
     sync: SyncState,
     onSignIn: suspend (Context) -> String?,
     onSignOut: () -> Unit,
@@ -101,6 +103,16 @@ fun SettingsScreen(
             Section(stringResource(R.string.section_layout)) {
                 Placement(stringResource(R.string.label_tabs), ui.tabsAtTop) { v -> onUi { it.copy(tabsAtTop = v) } }
                 Placement(stringResource(R.string.label_sub_tabs), ui.subTabsAtTop) { v -> onUi { it.copy(subTabsAtTop = v) } }
+            }
+
+            Section(stringResource(R.string.section_measurements)) {
+                SwitchRow(stringResource(R.string.label_pressure_is_qnh), pressureIsQnh, onPressureIsQnh)
+                SwitchRow(stringResource(R.string.label_location_latitude), ui.locationSetsLatitude) { v ->
+                    onUi { it.copy(locationSetsLatitude = v) }
+                }
+                SwitchRow(stringResource(R.string.label_location_altitude), ui.locationSetsAltitude) { v ->
+                    onUi { it.copy(locationSetsAltitude = v) }
+                }
             }
 
             Section(stringResource(R.string.section_sync)) {
