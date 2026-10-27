@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import pl.ballistics.app.CalcResult
 import pl.ballistics.app.R
 import pl.ballistics.app.asString
+import pl.ballistics.app.data.Conditions
 import pl.ballistics.core.TrajectoryPoint
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -36,22 +37,27 @@ private val columns = listOf(
 )
 
 @Composable
-fun TableScreen(result: CalcResult?, modifier: Modifier = Modifier) {
+fun TableScreen(
+    result: CalcResult?,
+    conditions: Conditions? = null,
+    update: ((Conditions) -> Conditions) -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
     when (result) {
         null -> Column(modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(Modifier.padding(32.dp))
         }
-        is CalcResult.Error -> Text(
-            result.message.asString(),
-            color = MaterialTheme.colorScheme.error,
-            modifier = modifier.padding(16.dp),
-        )
-        is CalcResult.Ok -> Table(result, modifier)
+        is CalcResult.Error -> Column(modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(result.message.asString(), color = MaterialTheme.colorScheme.error)
+            // A bad range or step is fixed here, so the fields stay reachable.
+            conditions?.let { TableExtent(it, update) }
+        }
+        is CalcResult.Ok -> Table(result, conditions, update, modifier)
     }
 }
 
 @Composable
-private fun Table(result: CalcResult.Ok, modifier: Modifier) {
+private fun Table(result: CalcResult.Ok, conditions: Conditions?, update: ((Conditions) -> Conditions) -> Unit, modifier: Modifier) {
     val s = result.solution
     val unit = result.angularUnit
     val click = result.clickValue
@@ -84,14 +90,26 @@ private fun Table(result: CalcResult.Ok, modifier: Modifier) {
                 rest.forEach { (title, w) -> Cell(stringResource(title), w, bold = true) }
             }
         }
-        Row(Modifier.verticalScroll(rememberScrollState())) {
-            Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))) {
-                s.points.forEach { p -> Cell(p.rangeM.roundToInt().toString(), rangeColumn.second, bold = true) }
+        Column(Modifier.verticalScroll(rememberScrollState())) {
+            Row {
+                Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))) {
+                    s.points.forEach { p -> Cell(p.rangeM.roundToInt().toString(), rangeColumn.second, bold = true) }
+                }
+                Column(Modifier.horizontalScroll(sideways)) {
+                    s.points.forEach { p -> PointRow(p, unit.radians, click) }
+                }
             }
-            Column(Modifier.horizontalScroll(sideways)) {
-                s.points.forEach { p -> PointRow(p, unit.radians, click) }
-            }
+            // The table's extent sits under it, where its effect shows.
+            conditions?.let { Column(Modifier.padding(12.dp)) { TableExtent(it, update) } }
         }
+    }
+}
+
+@Composable
+private fun TableExtent(c: Conditions, update: ((Conditions) -> Conditions) -> Unit) {
+    FieldRow { m ->
+        NumberField(stringResource(R.string.label_table_range), c.maxRangeM, "m", m) { v -> update { it.copy(maxRangeM = v) } }
+        NumberField(stringResource(R.string.label_table_step), c.stepM, "m", m) { v -> update { it.copy(stepM = v) } }
     }
 }
 

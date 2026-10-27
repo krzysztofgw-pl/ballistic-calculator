@@ -57,17 +57,24 @@ object WindForecast {
         "&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,relative_humidity_2m,pressure_msl" +
         "&wind_speed_unit=ms&timeformat=unixtime&forecast_days=2"
 
-    suspend fun fetch(latitude: Double, longitude: Double): List<ForecastHour> = withContext(Dispatchers.IO) {
+    /** The hourly forecast and the terrain height (m above sea level) Open-Meteo reports for the point. */
+    data class Result(val hours: List<ForecastHour>, val elevationM: Double?)
+
+    suspend fun fetch(latitude: Double, longitude: Double): Result = withContext(Dispatchers.IO) {
         val connection = URL(String.format(Locale.US, URL_FORMAT, latitude, longitude)).openConnection() as HttpURLConnection
         connection.connectTimeout = 10_000
         connection.readTimeout = 15_000
         try {
             if (connection.responseCode != 200) throw java.io.IOException("HTTP ${connection.responseCode}")
-            parse(connection.inputStream.bufferedReader().use { it.readText() })
+            val text = connection.inputStream.bufferedReader().use { it.readText() }
+            Result(parse(text), elevation(text))
         } finally {
             connection.disconnect()
         }
     }
+
+    fun elevation(text: String): Double? =
+        runCatching { Json.parseToJsonElement(text).jsonObject["elevation"]?.jsonPrimitive?.doubleOrNull }.getOrNull()
 
     fun parse(text: String): List<ForecastHour> {
         val hourly = Json.parseToJsonElement(text).jsonObject["hourly"]?.jsonObject ?: return emptyList()

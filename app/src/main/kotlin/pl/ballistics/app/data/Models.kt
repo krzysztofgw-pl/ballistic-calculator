@@ -203,6 +203,10 @@ data class UiSettings(
     val tabsAtTop: Boolean = false,
     val subTabsAtTop: Boolean = false,
     val keepScreenOn: Boolean = false,
+    /** A location fix (forecast, compass) also sets the latitude for Coriolis. */
+    val locationSetsLatitude: Boolean = true,
+    /** The forecast also sets the altitude, from the terrain height at the location. */
+    val locationSetsAltitude: Boolean = false,
 )
 
 /** Everything the app stores; also the export/import file format. */

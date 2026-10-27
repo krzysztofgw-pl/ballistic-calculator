@@ -2,11 +2,16 @@ package pl.ballistics.app.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -15,7 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -23,17 +30,29 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import pl.ballistics.app.R
 import pl.ballistics.app.data.Conditions
+import pl.ballistics.app.data.UiSettings
 import pl.ballistics.app.toNumber
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
-fun ConditionsScreen(i: Conditions, update: ((Conditions) -> Conditions) -> Unit, modifier: Modifier = Modifier) {
+fun ConditionsScreen(
+    i: Conditions,
+    ui: UiSettings,
+    update: ((Conditions) -> Conditions) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier.verticalScroll(rememberScrollState()).padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        // Wind changes most, so it comes first.
+        Section(stringResource(R.string.section_wind)) {
+            NumberField(stringResource(R.string.label_wind_speed), i.windSpeed, "m/s") { v -> update { it.copy(windSpeed = v) } }
+            WindAndAzimuthDial(i, ui, update)
+        }
+
         Section(stringResource(R.string.section_atmosphere)) {
             FieldRow { m ->
                 NumberField(stringResource(R.string.label_temperature), i.temperatureC, "°C", m) { v -> update { it.copy(temperatureC = v) } }
@@ -48,15 +67,6 @@ fun ConditionsScreen(i: Conditions, update: ((Conditions) -> Conditions) -> Unit
                     update { it.copy(altitudeM = v) }
                 }
             }
-            SwitchRow(stringResource(R.string.label_pressure_is_qnh), i.pressureIsQnh) { v -> update { it.copy(pressureIsQnh = v) } }
-        }
-
-        Section(stringResource(R.string.section_wind)) {
-            FieldRow { m ->
-                NumberField(stringResource(R.string.label_wind_speed), i.windSpeed, "m/s", m) { v -> update { it.copy(windSpeed = v) } }
-                NumberField(stringResource(R.string.label_wind_from), i.windDirectionDeg, "°", m) { v -> update { it.copy(windFromDeg = v) } }
-            }
-            WindDial(i, update)
         }
 
         Section(stringResource(R.string.section_shot)) {
@@ -64,11 +74,6 @@ fun ConditionsScreen(i: Conditions, update: ((Conditions) -> Conditions) -> Unit
                 NumberField(stringResource(R.string.label_look_angle), i.lookAngleDeg, "°", m) { v -> update { it.copy(lookAngleDeg = v) } }
                 NumberField(stringResource(R.string.label_cant), i.cantDeg, "°", m) { v -> update { it.copy(cantDeg = v) } }
             }
-            FieldRow { m ->
-                NumberField(stringResource(R.string.label_table_range), i.maxRangeM, "m", m) { v -> update { it.copy(maxRangeM = v) } }
-                NumberField(stringResource(R.string.label_table_step), i.stepM, "m", m) { v -> update { it.copy(stepM = v) } }
-            }
-            AzimuthDial(i, update)
         }
 
         Section(stringResource(R.string.section_advanced)) {
@@ -89,53 +94,152 @@ private fun clockHour(deg: Double): String {
     return if (v % 1.0 == 0.0) v.toInt().toString() else String.format(Locale.US, "%.1f", v)
 }
 
-@Composable
-private fun WindDial(i: Conditions, update: ((Conditions) -> Conditions) -> Unit) {
-    val relative = i.windDirectionDeg.toNumber()
-    val azimuth = i.azimuthDeg.toNumber() ?: 0.0
-    SwitchRow(stringResource(R.string.label_wind_north_up), i.windDialNorthUp) { v -> update { it.copy(windDialNorthUp = v) } }
-    if (i.windDialNorthUp) {
-        val bearing = relative?.let { (it + azimuth).mod(360.0) }
-        CompassDial(
-            valueDeg = bearing,
-            onChange = { v -> update { it.copy(windFromDeg = deg(v - (it.azimuthDeg.toNumber() ?: 0.0))) } },
-            arrow = DialArrow.INWARD,
-            centerText = bearing?.let { stringResource(R.string.wind_center_true, deg(it), compassPoint(it)) } ?: "–",
-            outerLabel = { "$it°" },
-            innerLabel = { cardinal(it) },
-            referenceDeg = azimuth,
-            stepDeg = 5.0,
-        )
-    } else {
-        CompassDial(
-            valueDeg = relative,
-            onChange = { v -> update { it.copy(windFromDeg = deg(v)) } },
-            arrow = DialArrow.INWARD,
-            centerText = relative?.let { stringResource(R.string.wind_center_relative, deg(it), clockHour(it)) } ?: "–",
-            outerLabel = { "$it°" },
-            innerLabel = { if (it == 0) "12" else (it / 30).toString() },
-            stepDeg = 5.0,
-        )
-    }
-    relative?.let {
-        val bearing = (it + azimuth).mod(360.0)
-        Text(
-            stringResource(R.string.wind_true_bearing, deg(it), clockHour(it), deg(bearing), compassPoint(bearing), deg(azimuth)),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-    }
-    val withPermission = rememberWithLocationPermission()
-    var forecast by remember { mutableStateOf(false) }
-    OutlinedButton(onClick = { withPermission { forecast = true } }) { Text(stringResource(R.string.action_forecast_wind)) }
-    if (forecast) ForecastDialog(i, update) { forecast = false }
-}
-
 private fun cardinal(deg: Int): String? = when (deg) {
     0 -> "N"
     90 -> "E"
     180 -> "S"
     270 -> "W"
     else -> null
+}
+
+/** What a tap or drag on the dial sets. */
+private enum class DialEdit { WIND, AZIMUTH }
+
+/**
+ * One dial for the wind and the direction of fire. North-up it reads like a map: the shot goes out
+ * along the azimuth and the wind comes in from its true bearing. Otherwise the line of fire points up,
+ * the wind reads as a clock and a north marker shows the azimuth. Moving the azimuth keeps the wind
+ * where it is in the frame shown: its true bearing north-up, its clock direction otherwise.
+ */
+@Composable
+private fun WindAndAzimuthDial(i: Conditions, ui: UiSettings, update: ((Conditions) -> Conditions) -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val withPermission = rememberWithLocationPermission()
+    var editing by rememberSaveable { mutableStateOf(DialEdit.WIND) }
+    var status by remember { mutableStateOf<String?>(null) }
+    var warning by remember { mutableStateOf<String?>(null) }
+    var forecast by remember { mutableStateOf(false) }
+
+    val relative = i.windDirectionDeg.toNumber()
+    val azimuth = i.azimuthDeg.toNumber() ?: 0.0
+    val bearing = relative?.let { (it + azimuth).mod(360.0) }
+    val wind = MaterialTheme.colorScheme.primary
+    val shot = MaterialTheme.colorScheme.tertiary
+
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            Modifier.weight(1f).clickable { update { it.copy(windDialNorthUp = !it.windDialNorthUp) } },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(i.windDialNorthUp, onCheckedChange = { v -> update { it.copy(windDialNorthUp = v) } })
+            Text(stringResource(R.string.label_north_up))
+        }
+        FilterChip(editing == DialEdit.WIND, { editing = DialEdit.WIND }, label = { Text(stringResource(R.string.dial_edit_wind)) })
+        FilterChip(editing == DialEdit.AZIMUTH, { editing = DialEdit.AZIMUTH }, label = { Text(stringResource(R.string.dial_edit_azimuth)) })
+    }
+
+    val windLine = if (i.windDialNorthUp) {
+        bearing?.let { stringResource(R.string.center_wind_true, deg(it), compassPoint(it)) }
+    } else {
+        relative?.let { stringResource(R.string.center_wind_clock, clockHour(it)) }
+    } ?: "–"
+    val center = windLine + "\n" + stringResource(R.string.center_azimuth, deg(azimuth))
+
+    if (i.windDialNorthUp) {
+        CompassDial(
+            markers = listOfNotNull(
+                DialMarker(azimuth, DialArrow.OUTWARD, shot, editing == DialEdit.AZIMUTH),
+                bearing?.let { DialMarker(it, DialArrow.INWARD, wind, editing == DialEdit.WIND) },
+            ),
+            onChange = { v ->
+                when (editing) {
+                    DialEdit.WIND -> update { it.copy(windFromDeg = deg(v - (it.azimuthDeg.toNumber() ?: 0.0))) }
+                    DialEdit.AZIMUTH -> update { c ->
+                        val keep = c.windDirectionDeg.toNumber()?.let { it + (c.azimuthDeg.toNumber() ?: 0.0) }
+                        c.copy(azimuthDeg = deg(v), windFromDeg = keep?.let { deg(it - v) } ?: c.windFromDeg)
+                    }
+                }
+            },
+            centerText = center,
+            outerLabel = { "$it°" },
+            innerLabel = { cardinal(it) },
+            stepDeg = if (editing == DialEdit.WIND) 5.0 else 1.0,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    } else {
+        CompassDial(
+            markers = listOfNotNull(
+                DialMarker(0.0, DialArrow.OUTWARD, shot, false),
+                DialMarker((-azimuth).mod(360.0), DialArrow.OUTWARD, shot, editing == DialEdit.AZIMUTH, label = "N"),
+                relative?.let { DialMarker(it, DialArrow.INWARD, wind, editing == DialEdit.WIND) },
+            ),
+            onChange = { v ->
+                when (editing) {
+                    DialEdit.WIND -> update { it.copy(windFromDeg = deg(v)) }
+                    // The dial shows where north is; the azimuth is the line of fire seen from north.
+                    DialEdit.AZIMUTH -> update { it.copy(azimuthDeg = deg(-v)) }
+                }
+            },
+            centerText = center,
+            outerLabel = { "$it°" },
+            innerLabel = { if (it == 0) "12" else (it / 30).toString() },
+            stepDeg = if (editing == DialEdit.WIND) 5.0 else 1.0,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+    relative?.let {
+        Text(
+            stringResource(R.string.wind_true_bearing, deg(it), clockHour(it), deg(bearing!!), compassPoint(bearing), deg(azimuth)),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedButton(onClick = { withPermission { forecast = true } }) { Text(stringResource(R.string.action_forecast_wind)) }
+        OutlinedButton(onClick = {
+            withPermission {
+                scope.launch {
+                    warning = null
+                    status = context.getString(R.string.compass_reading)
+                    val reading = DeviceSensors.magneticHeading(context)
+                    if (reading == null) {
+                        status = context.getString(R.string.compass_unavailable)
+                        return@launch
+                    }
+                    val location = DeviceSensors.lastKnown(context)
+                    val magnetic = reading.headingDeg
+                    if (location != null) {
+                        val declination = DeviceSensors.declinationDeg(location)
+                        val heading = magnetic + declination
+                        update { c ->
+                            val lat = String.format(Locale.US, "%.2f", location.latitude)
+                            c.copy(azimuthDeg = deg(heading)).let { if (ui.locationSetsLatitude) it.copy(latitudeDeg = lat) else it }
+                        }
+                        status = context.getString(R.string.compass_true, deg(heading), String.format(Locale.US, "%+.1f", declination))
+                    } else {
+                        update { it.copy(azimuthDeg = deg(magnetic)) }
+                        status = context.getString(R.string.compass_magnetic, deg(magnetic))
+                    }
+                    val expected = location?.let { DeviceSensors.expectedFieldMicroTesla(it) }
+                    warning = when (reading.problem(expected)) {
+                        DeviceSensors.CompassProblem.UNCALIBRATED -> context.getString(R.string.compass_uncalibrated)
+                        DeviceSensors.CompassProblem.INACCURATE ->
+                            context.getString(R.string.compass_inaccurate, reading.headingAccuracyDeg?.roundToInt() ?: 0)
+                        DeviceSensors.CompassProblem.DISTURBED -> context.getString(
+                            R.string.compass_disturbed,
+                            reading.fieldMicroTesla?.roundToInt() ?: 0,
+                            expected?.roundToInt() ?: 0,
+                        )
+                        null -> null
+                    }
+                }
+            }
+        }) { Text(stringResource(R.string.action_phone_compass)) }
+    }
+    status?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+    warning?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium) }
+    if (forecast) ForecastDialog(i, ui, update) { forecast = false }
 }
 
 /** Runs [action] once location permission has been asked for (granted or not). */
@@ -155,49 +259,6 @@ private fun rememberWithLocationPermission(): (() -> Unit) -> Unit {
             launcher.launch(DeviceSensors.locationPermissions)
         }
     }
-}
-
-@Composable
-private fun AzimuthDial(i: Conditions, update: ((Conditions) -> Conditions) -> Unit) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val withPermission = rememberWithLocationPermission()
-    var status by remember { mutableStateOf<String?>(null) }
-
-    val azimuth = i.azimuthDeg.toNumber()
-    NumberField(stringResource(R.string.label_azimuth), i.azimuthDeg, "°") { v -> update { it.copy(azimuthDeg = v) } }
-    CompassDial(
-        valueDeg = azimuth,
-        onChange = { v -> update { it.copy(azimuthDeg = deg(v)) } },
-        arrow = DialArrow.OUTWARD,
-        centerText = azimuth?.let { "${deg(it)}°\n${compassPoint(it)}" } ?: "–",
-        outerLabel = { "$it°" },
-        innerLabel = { cardinal(it) },
-    )
-    OutlinedButton(onClick = {
-        withPermission {
-            scope.launch {
-                status = context.getString(R.string.compass_reading)
-                val magnetic = DeviceSensors.magneticHeadingDeg(context)
-                if (magnetic == null) {
-                    status = context.getString(R.string.compass_unavailable)
-                    return@launch
-                }
-                val location = DeviceSensors.lastKnown(context)
-                if (location != null) {
-                    val declination = DeviceSensors.declinationDeg(location)
-                    val heading = magnetic + declination
-                    update { it.copy(azimuthDeg = deg(heading)) }
-                    status = context.getString(R.string.compass_true, deg(heading), String.format(Locale.US, "%+.1f", declination))
-                } else {
-                    update { it.copy(azimuthDeg = deg(magnetic)) }
-                    status = context.getString(R.string.compass_magnetic, deg(magnetic))
-                }
-            }
-        }
-    }) { Text(stringResource(R.string.action_phone_compass)) }
-    status?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-    Text(stringResource(R.string.hint_compass), style = MaterialTheme.typography.bodySmall)
 }
 
 @Composable

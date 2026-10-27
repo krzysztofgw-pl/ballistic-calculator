@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -69,6 +70,7 @@ fun App(vm: MainViewModel = viewModel()) {
     val sync by vm.syncState.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(2) }
     var editor by remember { mutableStateOf<Editor?>(null) }
+    val saved = rememberSaveableStateHolder()
 
     when (val e = editor) {
         is Editor.Weapon -> {
@@ -100,6 +102,8 @@ fun App(vm: MainViewModel = viewModel()) {
             SettingsScreen(
                 ui = data.ui,
                 onUi = vm::updateUi,
+                pressureIsQnh = data.conditions.pressureIsQnh,
+                onPressureIsQnh = { v -> vm.updateConditions { it.copy(pressureIsQnh = v) } },
                 sync = sync,
                 onSignIn = vm::signIn,
                 onSignOut = vm::signOut,
@@ -176,6 +180,8 @@ fun App(vm: MainViewModel = viewModel()) {
         },
     ) { padding ->
         val modifier = Modifier.padding(padding)
+        // Each tab keeps its scroll position while another one is open.
+        saved.SaveableStateProvider(tab) {
         when (tab) {
             0 -> ProfilesScreen(
                 data = data,
@@ -184,9 +190,10 @@ fun App(vm: MainViewModel = viewModel()) {
                 onEditAmmo = { editor = Editor.Ammo(it) },
                 modifier = modifier,
             )
-            1 -> ConditionsScreen(data.conditions, vm::updateConditions, modifier)
-            2 -> TableScreen(result, modifier)
+            1 -> ConditionsScreen(data.conditions, data.ui, vm::updateConditions, modifier)
+            2 -> TableScreen(result, data.conditions, vm::updateConditions, modifier)
             else -> TargetScreen(result, data.conditions, vm::updateConditions, modifier)
+        }
         }
     }
 }

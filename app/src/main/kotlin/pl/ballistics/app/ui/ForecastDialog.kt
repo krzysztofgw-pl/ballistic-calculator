@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.R
 import pl.ballistics.app.data.Conditions
+import pl.ballistics.app.data.UiSettings
 import pl.ballistics.app.data.ForecastHour
 import pl.ballistics.app.data.WindForecast
 import pl.ballistics.app.data.WindHeight
@@ -37,7 +38,7 @@ import kotlin.math.roundToInt
 private sealed interface ForecastState {
     data object Loading : ForecastState
     data class Failed(val message: String) : ForecastState
-    data class Ready(val hours: List<ForecastHour>) : ForecastState
+    data class Ready(val hours: List<ForecastHour>, val latitude: Double, val elevationM: Double?) : ForecastState
 }
 
 private fun one(v: Double) = String.format(Locale.US, "%.1f", v)
@@ -47,7 +48,12 @@ private fun one(v: Double) = String.format(Locale.US, "%.1f", v)
  * window, converted to the line of fire with the current shot azimuth.
  */
 @Composable
-fun ForecastDialog(conditions: Conditions, onApply: ((Conditions) -> Conditions) -> Unit, onDismiss: () -> Unit) {
+fun ForecastDialog(
+    conditions: Conditions,
+    ui: UiSettings,
+    onApply: ((Conditions) -> Conditions) -> Unit,
+    onDismiss: () -> Unit,
+) {
     val context = LocalContext.current
     var state by remember { mutableStateOf<ForecastState>(ForecastState.Loading) }
     var startHours by remember { mutableStateOf(0) }
@@ -62,7 +68,8 @@ fun ForecastDialog(conditions: Conditions, onApply: ((Conditions) -> Conditions)
             ForecastState.Failed(noLocation)
         } else {
             try {
-                ForecastState.Ready(WindForecast.fetch(location.latitude, location.longitude))
+                val forecast = WindForecast.fetch(location.latitude, location.longitude)
+                ForecastState.Ready(forecast.hours, location.latitude, forecast.elevationM)
             } catch (e: Exception) {
                 ForecastState.Failed(context.getString(R.string.forecast_failed, e.message ?: e.javaClass.simpleName))
             }
@@ -166,6 +173,10 @@ fun ForecastDialog(conditions: Conditions, onApply: ((Conditions) -> Conditions)
                             windMaxMps = one(s.maxSpeedMps * height.factor),
                             windFromDeg = (s.fromDeg - az).mod(360.0).roundToInt().mod(360).toString(),
                         )
+                        ready?.let { r ->
+                            if (ui.locationSetsLatitude) next = next.copy(latitudeDeg = String.format(Locale.US, "%.2f", r.latitude))
+                            if (ui.locationSetsAltitude) r.elevationM?.let { next = next.copy(altitudeM = it.roundToInt().toString()) }
+                        }
                         if (fillAtmosphere) {
                             s.temperatureC?.let { next = next.copy(temperatureC = one(it)) }
                             s.humidityPct?.let { next = next.copy(humidityPct = it.roundToInt().toString()) }

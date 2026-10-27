@@ -93,7 +93,7 @@ fun TargetScreen(
     modifier: Modifier = Modifier,
 ) {
     if (result !is CalcResult.Ok) {
-        TableScreen(result, modifier)
+        TableScreen(result, modifier = modifier)
         return
     }
     val weapon = result.weapon
@@ -212,12 +212,22 @@ fun TargetScreen(
             Text(stringResource(R.string.label_moving_target))
         }
         if (conditions.targetMoving) {
-            FieldRow { m ->
-                NumberField(stringResource(R.string.label_target_speed), conditions.targetSpeedMps, "m/s", m) { v ->
+            // The course is set on a small dial: up is away from the shooter, right is to the right.
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                NumberField(stringResource(R.string.label_target_speed), conditions.targetSpeedMps, "m/s", Modifier.weight(1f)) { v ->
                     update { it.copy(targetSpeedMps = v) }
                 }
-                NumberField(stringResource(R.string.label_target_direction), conditions.targetDirectionDeg, "°", m) { v ->
-                    update { it.copy(targetDirectionDeg = v) }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CompassDial(
+                        markers = listOf(DialMarker(targetDirection, DialArrow.OUTWARD, MaterialTheme.colorScheme.primary, true)),
+                        onChange = { v -> update { it.copy(targetDirectionDeg = v.roundToInt().mod(360).toString()) } },
+                        centerText = "${targetDirection.roundToInt().mod(360)}°",
+                        outerLabel = null,
+                        stepDeg = 15.0,
+                        maxSize = 112.dp,
+                        modifier = Modifier.width(112.dp),
+                    )
+                    Text(stringResource(R.string.label_target_course), style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
