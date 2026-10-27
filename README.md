@@ -22,6 +22,9 @@ your scope's reticle, and syncs everything to the cloud.
 - **Velocity per rifle**: each rifle stores the muzzle velocity measured with it for each load, which the
   solver uses instead of the load's reference velocity. The app shows the load's test barrel length and how
   it differs from your barrel; it does not guess a velocity for a different barrel.
+- **Calibers**: rifles and loads name their cartridge, picked from a list of common ones or typed. Loads are
+  grouped by caliber, and a rifle offers only the loads that fit it (same cartridge, or same bullet diameter
+  when a load names none), with a switch to show the rest.
 - **Bullet library**: over 600 rifle bullets from Barnes, Berger, Hornady, Lapua, Sierra and Speer with
   published G1 and G7 BCs (Berger with length and twist), searchable by maker, name and caliber, plus common
   factory loads with their test barrel lengths. See [tools/bullet-library](tools/bullet-library/README.md) for sources and how to update it.

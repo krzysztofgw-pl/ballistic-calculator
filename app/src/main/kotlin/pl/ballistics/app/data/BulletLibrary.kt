@@ -67,6 +67,7 @@ fun AmmoProfile.withBullet(bullet: Bullet): AmmoProfile {
 fun AmmoProfile.withFactoryLoad(load: FactoryLoad): AmmoProfile =
     withBullet(load.bullet).copy(
         name = load.label,
+        cartridge = load.cartridge,
         muzzleVelocity = num(load.muzzleVelocityMps, 0),
         testBarrelCm = fmt(Math.round(load.testBarrelCm * 10) / 10.0),
     )

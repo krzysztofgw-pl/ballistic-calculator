@@ -24,6 +24,9 @@ import pl.ballistics.app.data.AngularUnit
 import pl.ballistics.app.data.FocalPlane
 import pl.ballistics.app.data.RailPlatform
 import pl.ballistics.app.data.WeaponProfile
+import pl.ballistics.app.data.caliberGroup
+import pl.ballistics.app.data.diameterInOrMax
+import pl.ballistics.app.data.fits
 import pl.ballistics.app.reticle.Reticles
 import pl.ballistics.app.toNumber
 import pl.ballistics.core.ScopeMount
@@ -40,6 +43,7 @@ fun WeaponEditor(
 ) {
     var w by remember { mutableStateOf(initial) }
     var mountHelper by remember { mutableStateOf(false) }
+    var showAllLoads by remember { mutableStateOf(false) }
 
     EditorScaffold(
         title = if (isNew) stringResource(R.string.title_new_rifle) else w.name,
@@ -50,7 +54,9 @@ fun WeaponEditor(
     ) {
         Section(stringResource(R.string.section_rifle)) {
             TextInput(stringResource(R.string.label_name), w.name) { w = w.copy(name = it) }
-            TextInput(stringResource(R.string.label_caliber), w.caliber) { w = w.copy(caliber = it) }
+            CaliberField(stringResource(R.string.label_caliber), w.caliber, null, stringResource(R.string.caliber_rifle_empty)) {
+                w = w.copy(caliber = it)
+            }
             FieldRow { m ->
                 NumberField(stringResource(R.string.label_barrel_length), w.barrelLengthCm, "cm", m, optional = true) { w = w.copy(barrelLengthCm = it) }
                 NumberField(stringResource(R.string.label_twist), w.twistIn, "in", m, optional = true) { w = w.copy(twistIn = it) }
@@ -84,12 +90,22 @@ fun WeaponEditor(
         }
 
         Section(stringResource(R.string.section_zero)) {
+            val fitting = ammo.filter { it.fits(w) }
+            val selected = ammo.find { it.id == w.ammoId }
+            val shown = (if (showAllLoads) ammo else fitting + listOfNotNull(selected?.takeIf { it !in fitting }))
+                .sortedWith(compareBy({ it.diameterInOrMax() }, { it.caliberGroup() }, { it.name }))
             Choice(
                 stringResource(R.string.label_load),
-                ammo.find { it.id == w.ammoId },
-                listOf<AmmoProfile?>(null) + ammo,
+                selected,
+                listOf<AmmoProfile?>(null) + shown,
                 { it?.name ?: stringResource(R.string.choose) },
             ) { w = w.copy(ammoId = it?.id) }
+            if (fitting.isEmpty() && w.caliber.isNotBlank()) {
+                Text(stringResource(R.string.no_fitting_loads, w.caliber), style = MaterialTheme.typography.bodySmall)
+            }
+            if (fitting.size < ammo.size) {
+                SwitchRow(stringResource(R.string.show_other_calibers, ammo.size - fitting.size), showAllLoads) { showAllLoads = it }
+            }
             ammo.find { it.id == w.ammoId }?.let { load ->
                 NumberField(stringResource(R.string.label_rifle_velocity), w.muzzleVelocities[load.id].orEmpty(), "m/s", optional = true) {
                     w = w.withMeasuredVelocity(load, it)

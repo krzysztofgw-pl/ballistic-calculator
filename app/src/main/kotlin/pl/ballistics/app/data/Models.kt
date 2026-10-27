@@ -70,6 +70,8 @@ data class WeaponProfile(
 data class AmmoProfile(
     val id: String = newId(),
     val name: String = "New load",
+    /** Cartridge name such as "6.5 Creedmoor"; empty means any cartridge with this bullet diameter. */
+    val cartridge: String = "",
     val dragType: DragType = DragType.G7,
     /** BC for [dragType]; a number for one drag model is meaningless for another. */
     val bc: String = "0.25",
