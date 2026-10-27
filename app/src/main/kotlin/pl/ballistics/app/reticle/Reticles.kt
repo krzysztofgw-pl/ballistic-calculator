@@ -32,7 +32,7 @@ data class Reticle(
 
 object Reticles {
     val all: List<Reticle> by lazy {
-        listOf(mradHash(), mradTree(), milDot(), moaHash(), moaTree(), duplex())
+        listOf(mradHash(), mradTree(), milDot(), moaHash(), moaTree(), duplex(), dls1(), dls2(), dls3())
     }
 
     fun byId(id: String): Reticle = all.find { it.id == id } ?: all.first()
@@ -130,6 +130,37 @@ object Reticles {
         add(Mark.Line(30.0, 0.0, 40.0, 0.0, Weight.HEAVY))
         add(Mark.Line(-30.0, 0.0, -40.0, 0.0, Weight.HEAVY))
         add(Mark.Line(0.0, 20.0, 0.0, 40.0, Weight.HEAVY))
+    })
+
+    /**
+     * Delta Optical Stryker HD DLS-1: MRAD, second focal plane, calibrated at 40x.
+     * Delta publishes 0.2 and 1 MRAD markings, 0.005 MRAD lines and a 0.03 MRAD
+     * centre point; the extent of the scale is drawn to the published diagram.
+     */
+    private fun dls1() = Reticle("dls-1", R.string.reticle_dls_1, AngularUnit.MRAD, 12.0, buildList<Mark> {
+        tickedCross(10.0, 10.0, 10.0, 5.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 5.0, tick = 0.25)
+        add(Mark.Dot(0.0, 0.0, 0.015))
+        add(Mark.Line(10.0, 0.0, 12.0, 0.0, Weight.HEAVY))
+        add(Mark.Line(-10.0, 0.0, -12.0, 0.0, Weight.HEAVY))
+        add(Mark.Line(0.0, -10.0, 0.0, -12.0, Weight.HEAVY))
+        add(Mark.Line(0.0, 5.0, 0.0, 12.0, Weight.HEAVY))
+    })
+
+    /** DLS-2: the same scope with a plain fine cross and an illuminated centre point. */
+    private fun dls2() = Reticle("dls-2", R.string.reticle_dls_2, AngularUnit.MRAD, 12.0, buildList<Mark> {
+        add(Mark.Line(-10.0, 0.0, 10.0, 0.0))
+        add(Mark.Line(0.0, -10.0, 0.0, 10.0))
+        add(Mark.Dot(0.0, 0.0, 0.015))
+    })
+
+    /** DLS-3: the DLS-1 layout scaled in MOA, with 1 and 5 MOA markings. */
+    private fun dls3() = Reticle("dls-3", R.string.reticle_dls_3, AngularUnit.MOA, 40.0, buildList<Mark> {
+        tickedCross(34.0, 34.0, 34.0, 17.0, minor = 1.0, half = 5.0, major = 5.0, labelEvery = 10.0, tick = 0.9)
+        add(Mark.Dot(0.0, 0.0, 0.05))
+        add(Mark.Line(34.0, 0.0, 40.0, 0.0, Weight.HEAVY))
+        add(Mark.Line(-34.0, 0.0, -40.0, 0.0, Weight.HEAVY))
+        add(Mark.Line(0.0, -34.0, 0.0, -40.0, Weight.HEAVY))
+        add(Mark.Line(0.0, 17.0, 0.0, 40.0, Weight.HEAVY))
     })
 
     /** Classic hunting duplex: fine centre, heavy outer posts. */
