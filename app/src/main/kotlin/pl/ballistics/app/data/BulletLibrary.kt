@@ -50,6 +50,10 @@ fun AmmoProfile.withBullet(bullet: Bullet): AmmoProfile {
         name = bullet.label,
         dragType = if (useG7) DragType.G7 else DragType.G1,
         bc = num(if (useG7) bullet.g7!! else bullet.g1!!, 3),
+        bcByModel = listOfNotNull(
+            bullet.g1?.let { DragType.G1 to num(it, 3) },
+            bullet.g7?.let { DragType.G7 to num(it, 3) },
+        ).toMap(),
         massGr = fmt(bullet.massGr),
         diameterMm = num(bullet.diameterIn * Units.INCH * 1000, 2),
         lengthMm = bullet.lengthIn?.let { num(it * Units.INCH * 1000, 1) } ?: "",

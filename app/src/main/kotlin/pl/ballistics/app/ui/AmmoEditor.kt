@@ -65,7 +65,7 @@ fun AmmoEditor(
         Section(stringResource(R.string.section_bullet)) {
             TextInput(stringResource(R.string.label_name), a.name) { a = a.copy(name = it) }
             Choice(stringResource(R.string.label_drag_model), a.dragType, DragType.entries, { if (it == DragType.CUSTOM) stringResource(R.string.drag_custom) else it.name }) {
-                a = a.copy(dragType = it)
+                a = a.withDragType(it)
             }
             if (a.dragType == DragType.CUSTOM) {
                 Text(
@@ -80,6 +80,10 @@ fun AmmoEditor(
                 )
             } else {
                 NumberField(stringResource(R.string.label_bc, a.dragType.name), a.bc, "lb/in²") { a = a.copy(bc = it) }
+                Text(
+                    stringResource(R.string.hint_bc_model, a.dragType.name),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
             FieldRow { m ->
                 NumberField(stringResource(R.string.label_mass), a.massGr, "gr", m) { a = a.copy(massGr = it) }
