@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AngularUnit
+import pl.ballistics.app.data.FocalPlane
 import pl.ballistics.app.data.RailPlatform
 import pl.ballistics.app.data.WeaponProfile
+import pl.ballistics.app.reticle.Reticles
 import pl.ballistics.app.toNumber
 import pl.ballistics.core.ScopeMount
 import java.util.Locale
@@ -57,6 +59,16 @@ fun WeaponEditor(
                 w = w.copy(angularUnit = v, clickValue = if (v == AngularUnit.MRAD) "0.1" else "0.25")
             }
             NumberField("Wartość kliku", w.clickValue, w.angularUnit.label) { w = w.copy(clickValue = it) }
+            Choice("Siatka", Reticles.byId(w.reticleId), Reticles.all, { it.name }) { w = w.copy(reticleId = it.id) }
+            Choice("Płaszczyzna siatki", w.focalPlane, FocalPlane.entries, { it.label }) { w = w.copy(focalPlane = it) }
+            FieldRow { m ->
+                if (w.focalPlane == FocalPlane.SFP) {
+                    NumberField("Podziałka prawdziwa przy", w.calibratedMagnification, "×", m) {
+                        w = w.copy(calibratedMagnification = it)
+                    }
+                }
+                NumberField("Maks. powiększenie", w.maxMagnification, "×", m) { w = w.copy(maxMagnification = it) }
+            }
             NumberField("Wysokość osi lunety nad osią lufy", w.sightHeightCm, "cm") { w = w.copy(sightHeightCm = it) }
             TextButton(onClick = { mountHelper = true }) { Text("Pomóż wyznaczyć wysokość") }
         }

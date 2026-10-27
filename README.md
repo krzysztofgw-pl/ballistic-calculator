@@ -31,6 +31,9 @@ Aplikacja w Kotlinie i Jetpack Compose, solver jako osobny moduł w czystym Kotl
   Pomocnik wysokości montażu liczy ją z pomiaru suwmiarką albo szacuje z obiektywu, pierścieni i szyny.
 - **Profile amunicji**: z biblioteki danych katalogowych (pociski Hornady, Sierra, Berger i amunicja fabryczna)
   albo własne, w tym krzywa Cd(Mach).
+- **Siatki celownicze**: punkty trzymania dla każdej odległości narysowane na siatce lunety (MRAD 0,2, drzewko MRAD,
+  Mil-Dot, MOA, drzewko MOA, Duplex), z obsługą pierwszej i drugiej płaszczyzny (dla SFP suwak powiększenia)
+  oraz podglądem tych samych poprawek na innej siatce.
 - **Synchronizacja**: eksport/import wszystkich profili do pliku JSON (np. na Dysk Google) oraz automatyczna
   kopia zapasowa Androida na koncie Google.
 

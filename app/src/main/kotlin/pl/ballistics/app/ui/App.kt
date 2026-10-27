@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -34,6 +35,7 @@ private val tabs = listOf(
     Tab("Profile", Icons.Filled.Person),
     Tab("Warunki", Icons.Filled.Place),
     Tab("Tabela", Icons.AutoMirrored.Filled.List),
+    Tab("Siatka", Icons.Filled.Search),
 )
 
 /** What is open on top of the tabs. */
@@ -104,7 +106,8 @@ fun App(vm: MainViewModel = viewModel()) {
                 modifier = modifier,
             )
             1 -> ConditionsScreen(data.conditions, vm::updateConditions, modifier)
-            else -> TableScreen(result, modifier)
+            2 -> TableScreen(result, modifier)
+            else -> ReticleScreen(result, modifier)
         }
     }
 }

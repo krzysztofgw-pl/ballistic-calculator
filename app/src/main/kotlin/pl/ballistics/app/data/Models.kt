@@ -4,6 +4,11 @@ import kotlinx.serialization.Serializable
 import pl.ballistics.core.Units
 import java.util.UUID
 
+enum class FocalPlane(val label: String) {
+    FFP("Pierwsza (FFP)"),
+    SFP("Druga (SFP)"),
+}
+
 enum class AngularUnit(val label: String, val radians: Double) {
     MRAD("MRAD", Units.MRAD),
     MOA("MOA", Units.MOA),
@@ -32,6 +37,11 @@ data class WeaponProfile(
     val angularUnit: AngularUnit = AngularUnit.MRAD,
     val clickValue: String = "0.1",
     val sightHeightCm: String = "4.5",
+    val reticleId: String = "mrad-hash",
+    val focalPlane: FocalPlane = FocalPlane.FFP,
+    /** SFP only: magnification at which the reticle subtensions are true. */
+    val calibratedMagnification: String = "10",
+    val maxMagnification: String = "25",
 
     val zeroRangeM: String = "100",
     val zeroTemperatureC: String = "15",
