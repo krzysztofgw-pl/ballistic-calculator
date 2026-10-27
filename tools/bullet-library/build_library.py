@@ -48,9 +48,11 @@ CURATED = [
     ('Sierra', 'MatchKing HPBT', 0.308, 168, 0.462, 0.218, 1.215),
     ('Sierra', 'MatchKing HPBT', 0.308, 175, 0.505, 0.243, 1.240),
     ('Sierra', 'MatchKing HPBT', 0.338, 300, 0.768, None, 1.70),
+    # From the box of S&B 6.5 Creedmoor No. 2890; its V100-V300 table matches these BCs within 0.5 m/s.
+    ('Sellier & Bellot', 'HPBT', 0.264, 142, 0.553, 0.278, None, 8),
 ]
-for maker, name, dia, wt, g1, g7, length in CURATED:
-    add(maker, name, dia, wt, g1, g7, length, source='manufacturer, curated')
+for maker, name, dia, wt, g1, g7, length, *twist in CURATED:
+    add(maker, name, dia, wt, g1, g7, length, twist[0] if twist else None, source='manufacturer, curated')
 
 def f(v, d):
     return '' if v is None else (f'{v:.{d}f}'.rstrip('0').rstrip('.') if d else str(v))

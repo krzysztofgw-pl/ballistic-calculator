@@ -3,6 +3,7 @@ package pl.ballistics.app.data
 import androidx.annotation.StringRes
 import kotlinx.serialization.Serializable
 import pl.ballistics.app.R
+import pl.ballistics.app.toNumber
 import pl.ballistics.core.Units
 import java.util.UUID
 
@@ -34,6 +35,7 @@ data class WeaponProfile(
     val caliber: String = "",
     val twistIn: String = "10",
     val rightHandTwist: Boolean = true,
+    val barrelLengthCm: String = "",
 
     val scopeName: String = "",
     val angularUnit: AngularUnit = AngularUnit.MRAD,
@@ -52,12 +54,24 @@ data class WeaponProfile(
 
     /** Ammunition this rifle is zeroed with. */
     val ammoId: String? = null,
-)
+    /** Muzzle velocity measured with this rifle, by ammo id; it overrides the load's reference velocity. */
+    val muzzleVelocities: Map<String, String> = emptyMap(),
+) {
+    fun measuredVelocity(ammo: AmmoProfile): String? = muzzleVelocities[ammo.id]?.takeIf { it.isNotBlank() }
+
+    /** The velocity the solver uses: measured with this rifle if known, else the load's reference velocity. */
+    fun muzzleVelocityFor(ammo: AmmoProfile): String = measuredVelocity(ammo) ?: ammo.muzzleVelocity
+
+    fun withMeasuredVelocity(ammo: AmmoProfile, mps: String): WeaponProfile =
+        copy(muzzleVelocities = if (mps.isBlank()) muzzleVelocities - ammo.id else muzzleVelocities + (ammo.id to mps))
+}
 
 @Serializable
 data class AmmoProfile(
     val id: String = newId(),
     val name: String = "New load",
+    /** Cartridge name such as "6.5 Creedmoor"; empty means any cartridge with this bullet diameter. */
+    val cartridge: String = "",
     val dragType: DragType = DragType.G7,
     /** BC for [dragType]; a number for one drag model is meaningless for another. */
     val bc: String = "0.25",
@@ -67,7 +81,9 @@ data class AmmoProfile(
     val massGr: String = "175",
     val diameterMm: String = "7.82",
     val lengthMm: String = "",
+    /** Reference velocity: from the box, or a chronograph, in a barrel of [testBarrelCm]. */
     val muzzleVelocity: String = "800",
+    val testBarrelCm: String = "",
     val powderSensitivity: String = "0",
     val powderReferenceTemp: String = "15",
     val notes: String = "",
@@ -93,7 +109,12 @@ data class Conditions(
     val altitudeM: String = "0",
     val humidityPct: String = "50",
     val windSpeed: String = "0",
+    /** Legacy clock direction, read only when [windFromDeg] is not set. */
     val windClock: String = "3",
+    /** Where the wind blows from, degrees clockwise from the line of fire (0 = from the target). */
+    val windFromDeg: String? = null,
+    /** The wind dial is shown north-up, as in weather forecasts; the stored value stays relative. */
+    val windDialNorthUp: Boolean = false,
     val lookAngleDeg: String = "0",
     val cantDeg: String = "0",
     val coriolis: Boolean = false,
@@ -103,7 +124,11 @@ data class Conditions(
     val aerodynamicJump: Boolean = true,
     val maxRangeM: String = "1000",
     val stepM: String = "50",
-)
+) {
+    /** Wind direction in degrees from the line of fire, converted from the clock for older data. */
+    val windDirectionDeg: String
+        get() = windFromDeg ?: windClock.toNumber()?.let { (it * 30).let { d -> if (d % 1.0 == 0.0) d.toInt().toString() else d.toString() } } ?: windClock
+}
 
 /** Everything the app stores; also the export/import file format. */
 @Serializable

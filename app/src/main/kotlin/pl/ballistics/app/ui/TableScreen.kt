@@ -64,6 +64,7 @@ private fun Table(result: CalcResult.Ok, modifier: Modifier) {
                 s.stabilityFactor?.let { add(stringResource(R.string.summary_stability, it)) }
             }
             Text(summary.joinToString("  ·  "), style = MaterialTheme.typography.bodyMedium)
+            Text(velocitySource(result.weapon, result.ammo), style = MaterialTheme.typography.bodySmall)
             s.stabilityFactor?.let {
                 if (it < 1.0) Warning(stringResource(R.string.warning_unstable))
                 else if (it < 1.4) Warning(stringResource(R.string.warning_marginal))

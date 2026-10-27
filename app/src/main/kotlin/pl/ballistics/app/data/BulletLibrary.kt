@@ -31,8 +31,12 @@ data class FactoryLoad(
     val maker: String,
     val cartridge: String,
     val bullet: Bullet,
+    /** Velocity as published, measured in the manufacturer's test barrel. */
     val muzzleVelocityFps: Double,
+    val testBarrelCm: Double,
 ) {
+    val muzzleVelocityMps: Double get() = muzzleVelocityFps * Units.FPS
+
     val label: String get() = "$maker $cartridge ${bullet.name} ${fmt(bullet.massGr)} gr"
 }
 
@@ -63,7 +67,9 @@ fun AmmoProfile.withBullet(bullet: Bullet): AmmoProfile {
 fun AmmoProfile.withFactoryLoad(load: FactoryLoad): AmmoProfile =
     withBullet(load.bullet).copy(
         name = load.label,
-        muzzleVelocity = num(load.muzzleVelocityFps * Units.FPS, 0),
+        cartridge = load.cartridge,
+        muzzleVelocity = num(load.muzzleVelocityMps, 0),
+        testBarrelCm = fmt(Math.round(load.testBarrelCm * 10) / 10.0),
     )
 
 object BulletLibrary {
@@ -115,21 +121,25 @@ object BulletLibrary {
     private fun bullet(maker: String, name: String, diameterIn: Double, massGr: Double): Bullet =
         bullets.first { it.maker == maker && it.name == name && it.diameterIn == diameterIn && it.massGr == massGr }
 
+    /** Hornady and Federal publish velocities from a 24" test barrel. */
+    private const val IN24 = 24 * 2.54
+
     val factoryLoads: List<FactoryLoad> by lazy {
         listOf(
-            FactoryLoad("Hornady Match", ".223 Rem", bullet("Hornady", "ELD Match", 0.224, 73.0), 2790.0),
-            FactoryLoad("Federal Gold Medal Match", ".223 Rem", bullet("Sierra", "MatchKing HPBT", 0.224, 77.0), 2720.0),
-            FactoryLoad("Hornady Match", "6mm Creedmoor", bullet("Hornady", "ELD Match", 0.243, 108.0), 2960.0),
-            FactoryLoad("Hornady Match", "6.5 Creedmoor", bullet("Hornady", "ELD Match", 0.264, 140.0), 2710.0),
-            FactoryLoad("Hornady Match", "6.5 Creedmoor", bullet("Hornady", "ELD Match", 0.264, 147.0), 2695.0),
-            FactoryLoad("Hornady Precision Hunter", "6.5 Creedmoor", bullet("Hornady", "ELD-X", 0.264, 143.0), 2700.0),
-            FactoryLoad("Hornady Match", "6.5 PRC", bullet("Hornady", "ELD Match", 0.264, 147.0), 2910.0),
-            FactoryLoad("Federal Gold Medal Match", ".308 Win", bullet("Sierra", "MatchKing HPBT", 0.308, 168.0), 2650.0),
-            FactoryLoad("Federal Gold Medal Match", ".308 Win", bullet("Sierra", "MatchKing HPBT", 0.308, 175.0), 2600.0),
-            FactoryLoad("Hornady Match", ".308 Win", bullet("Hornady", "ELD Match", 0.308, 178.0), 2600.0),
-            FactoryLoad("Hornady Precision Hunter", ".308 Win", bullet("Hornady", "ELD-X", 0.308, 178.0), 2600.0),
-            FactoryLoad("Hornady Match", ".300 PRC", bullet("Hornady", "ELD Match", 0.308, 225.0), 2810.0),
-            FactoryLoad("Hornady Match", ".338 Lapua Mag", bullet("Hornady", "ELD Match", 0.338, 285.0), 2745.0),
+            FactoryLoad("Hornady Match", ".223 Rem", bullet("Hornady", "ELD Match", 0.224, 73.0), 2790.0, IN24),
+            FactoryLoad("Federal Gold Medal Match", ".223 Rem", bullet("Sierra", "MatchKing HPBT", 0.224, 77.0), 2720.0, IN24),
+            FactoryLoad("Hornady Match", "6mm Creedmoor", bullet("Hornady", "ELD Match", 0.243, 108.0), 2960.0, IN24),
+            FactoryLoad("Hornady Match", "6.5 Creedmoor", bullet("Hornady", "ELD Match", 0.264, 140.0), 2710.0, IN24),
+            FactoryLoad("Hornady Match", "6.5 Creedmoor", bullet("Hornady", "ELD Match", 0.264, 147.0), 2695.0, IN24),
+            FactoryLoad("Hornady Precision Hunter", "6.5 Creedmoor", bullet("Hornady", "ELD-X", 0.264, 143.0), 2700.0, IN24),
+            FactoryLoad("Sellier & Bellot", "6.5 Creedmoor", bullet("Sellier & Bellot", "HPBT", 0.264, 142.0), 800 / Units.FPS, 60.0),
+            FactoryLoad("Hornady Match", "6.5 PRC", bullet("Hornady", "ELD Match", 0.264, 147.0), 2910.0, IN24),
+            FactoryLoad("Federal Gold Medal Match", ".308 Win", bullet("Sierra", "MatchKing HPBT", 0.308, 168.0), 2650.0, IN24),
+            FactoryLoad("Federal Gold Medal Match", ".308 Win", bullet("Sierra", "MatchKing HPBT", 0.308, 175.0), 2600.0, IN24),
+            FactoryLoad("Hornady Match", ".308 Win", bullet("Hornady", "ELD Match", 0.308, 178.0), 2600.0, IN24),
+            FactoryLoad("Hornady Precision Hunter", ".308 Win", bullet("Hornady", "ELD-X", 0.308, 178.0), 2600.0, IN24),
+            FactoryLoad("Hornady Match", ".300 PRC", bullet("Hornady", "ELD Match", 0.308, 225.0), 2810.0, IN24),
+            FactoryLoad("Hornady Match", ".338 Lapua Mag", bullet("Hornady", "ELD Match", 0.338, 285.0), 2745.0, IN24),
         )
     }
 }

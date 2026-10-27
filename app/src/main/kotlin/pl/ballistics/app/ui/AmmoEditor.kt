@@ -27,16 +27,21 @@ import pl.ballistics.app.R
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.BulletLibrary
+import pl.ballistics.app.data.Cartridges
+import pl.ballistics.app.toNumber
 import pl.ballistics.app.data.DragType
+import pl.ballistics.app.data.WeaponProfile
 import pl.ballistics.app.data.withBullet
 import pl.ballistics.app.data.withDragType
 import pl.ballistics.app.data.withFactoryLoad
+import kotlin.math.roundToInt
 
 private enum class Picker { BULLET, FACTORY }
 
 @Composable
 fun AmmoEditor(
     initial: AmmoProfile,
+    weapons: List<WeaponProfile>,
     isNew: Boolean,
     onSave: (AmmoProfile) -> Unit,
     onDelete: () -> Unit,
@@ -65,6 +70,12 @@ fun AmmoEditor(
 
         Section(stringResource(R.string.section_bullet)) {
             TextInput(stringResource(R.string.label_name), a.name) { a = a.copy(name = it) }
+            CaliberField(
+                stringResource(R.string.label_cartridge),
+                a.cartridge,
+                a.diameterMm.toNumber()?.div(25.4),
+                stringResource(R.string.cartridge_any),
+            ) { a = a.copy(cartridge = it) }
             Choice(stringResource(R.string.label_drag_model), a.dragType, DragType.entries, { if (it == DragType.CUSTOM) stringResource(R.string.drag_custom) else it.name }) {
                 a = a.withDragType(it)
             }
@@ -94,7 +105,20 @@ fun AmmoEditor(
         }
 
         Section(stringResource(R.string.section_velocity)) {
-            NumberField(stringResource(R.string.label_muzzle_velocity), a.muzzleVelocity, "m/s") { a = a.copy(muzzleVelocity = it) }
+            FieldRow { m ->
+                NumberField(stringResource(R.string.label_muzzle_velocity), a.muzzleVelocity, "m/s", m) { a = a.copy(muzzleVelocity = it) }
+                NumberField(stringResource(R.string.label_test_barrel), a.testBarrelCm, "cm", m, optional = true) { a = a.copy(testBarrelCm = it) }
+            }
+            Text(
+                stringResource(R.string.hint_reference_velocity),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            weapons.mapNotNull { w -> w.measuredVelocity(a)?.let { w to it } }.forEach { (w, mv) ->
+                Text(
+                    stringResource(R.string.measured_in_rifle, w.name, mv),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             FieldRow { m ->
                 NumberField(stringResource(R.string.label_powder_sensitivity), a.powderSensitivity, "m/s/°C", m) { a = a.copy(powderSensitivity = it) }
                 NumberField(stringResource(R.string.label_at_temperature), a.powderReferenceTemp, "°C", m) { a = a.copy(powderReferenceTemp = it) }
@@ -116,6 +140,8 @@ fun AmmoEditor(
             title = stringResource(R.string.title_bullets),
             options = BulletLibrary.bullets,
             label = { it.label },
+            group = { Cartridges.boreLabel(it.diameterIn) },
+            initialGroup = Cartridges.find(a.cartridge)?.let { Cartridges.boreLabel(it.bulletDiameterIn) },
             detail = { b ->
                 listOfNotNull(
                     b.g1?.let { "G1 $it" },
@@ -129,9 +155,19 @@ fun AmmoEditor(
         )
         Picker.FACTORY -> LibraryDialog(
             title = stringResource(R.string.title_factory_loads),
-            options = BulletLibrary.factoryLoads,
+            options = BulletLibrary.factoryLoads.sortedWith(compareBy({ it.bullet.diameterIn }, { it.cartridge })),
             label = { it.label },
-            detail = { stringResource(R.string.factory_load_velocity, it.muzzleVelocityFps.toInt()) },
+            group = { it.cartridge },
+            initialGroup = Cartridges.find(a.cartridge)?.name,
+            detail = {
+                stringResource(
+                    R.string.factory_load_velocity,
+                    it.muzzleVelocityMps.roundToInt(),
+                    it.muzzleVelocityFps.roundToInt(),
+                    it.testBarrelCm.roundToInt(),
+                    (it.testBarrelCm / 2.54).roundToInt(),
+                )
+            },
             onPick = { a = a.withFactoryLoad(it); picker = null },
             onDismiss = { picker = null },
         )
@@ -144,26 +180,45 @@ private fun <T> LibraryDialog(
     title: String,
     options: List<T>,
     label: (T) -> String,
+    group: (T) -> String,
+    initialGroup: String?,
     detail: @Composable (T) -> String,
     onPick: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
+    val groups = remember(options) { options.map(group).distinct() }
+    var selectedGroup by remember { mutableStateOf(initialGroup?.takeIf { it in groups }) }
     val words = query.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
-    val filtered = options.filter { o -> label(o).let { l -> words.all { l.contains(it, ignoreCase = true) } } }
+    val filtered = options.filter { o ->
+        (selectedGroup == null || group(o) == selectedGroup) && label(o).let { l -> words.all { l.contains(it, ignoreCase = true) } }
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Choice(stringResource(R.string.label_library_caliber), selectedGroup, listOf<String?>(null) + groups, {
+                    it ?: stringResource(R.string.all_calibers)
+                }) { selectedGroup = it }
                 OutlinedTextField(query, { query = it }, label = { Text(stringResource(R.string.action_search)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 LazyColumn(Modifier.heightIn(max = 400.dp)) {
-                    items(filtered) { item ->
-                        Column(Modifier.fillMaxWidth().clickable { onPick(item) }.padding(vertical = 8.dp)) {
-                            Text(label(item), style = MaterialTheme.typography.bodyMedium)
-                            Text(detail(item), style = MaterialTheme.typography.bodySmall)
+                    filtered.groupBy(group).forEach { (name, rows) ->
+                        item(key = "group:$name") {
+                            Text(
+                                name,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+                            )
                         }
-                        HorizontalDivider()
+                        items(rows) { item ->
+                            Column(Modifier.fillMaxWidth().clickable { onPick(item) }.padding(vertical = 8.dp)) {
+                                Text(label(item), style = MaterialTheme.typography.bodyMedium)
+                                Text(detail(item), style = MaterialTheme.typography.bodySmall)
+                            }
+                            HorizontalDivider()
+                        }
                     }
                 }
                 Text(

@@ -13,19 +13,36 @@ your scope's reticle, and syncs everything to the cloud.
 ## Features
 
 ### Profiles
-- **Rifles**: name, scope (turret unit MRAD or MOA, click value, reticle, first or second focal plane,
+- **Rifles**: name, barrel length, scope (turret unit MRAD or MOA, click value, reticle, first or second focal plane,
   calibration and maximum magnification), sight height, zero range and the load it is zeroed with.
 - **Sight height helper**: compute it from a caliper measurement, or estimate it from the objective diameter,
   ring height and rail.
-- **Loads**: muzzle velocity, powder temperature sensitivity, bullet weight, diameter, length and twist,
+- **Loads**: reference muzzle velocity with the barrel length it was measured in, powder temperature sensitivity, bullet weight, diameter, length and twist,
   drag model and BC. Start from the built-in library or enter custom data, including a full Cd(Mach) curve.
+- **Velocity per rifle**: each rifle stores the muzzle velocity measured with it for each load, which the
+  solver uses instead of the load's reference velocity. The app shows the load's test barrel length and how
+  it differs from your barrel; it does not guess a velocity for a different barrel.
+- **Calibers**: rifles and loads name their cartridge, picked from a list of common ones or typed. Loads are
+  grouped by caliber, and a rifle offers only the loads that fit it (same cartridge, or same bullet diameter
+  when a load names none), with a switch to show the rest.
 - **Bullet library**: over 600 rifle bullets from Barnes, Berger, Hornady, Lapua, Sierra and Speer with
   published G1 and G7 BCs (Berger with length and twist), searchable by maker, name and caliber, plus common
-  factory loads. See [tools/bullet-library](tools/bullet-library/README.md) for sources and how to update it.
+  factory loads with their test barrel lengths. See [tools/bullet-library](tools/bullet-library/README.md) for sources and how to update it.
 
 ### Conditions
-Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction (clock), look angle,
-cant, Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table range and step.
+Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction, look angle, cant,
+Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table range and step.
+
+- **Wind dial**: a 360° dial with labels every 30° (degrees and clock hours); tap or drag to where the wind
+  blows from. It can also be shown north-up, to enter a forecast direction, with the shot azimuth marked.
+- **Azimuth dial**: a north-up 360° dial for the line of fire, which can be read from the phone's compass
+  (corrected for magnetic declination when the location is known).
+- **Latitude** from the phone's location with one tap.
+- **Wind from the forecast**: the hourly forecast for the phone's location
+  ([Open-Meteo](https://open-meteo.com), free for non-commercial use) averaged over a chosen window: mean
+  speed, vector-mean direction, gusts and how steady the direction is. The 10 m forecast can be scaled to a
+  ~2 m line of fire, and the direction is converted to the line of fire with the shot azimuth. Temperature,
+  humidity and pressure can be filled in from the same forecast.
 
 ### Table
 For each range: drop, elevation and clicks, wind drift and windage correction, velocity, energy, time of

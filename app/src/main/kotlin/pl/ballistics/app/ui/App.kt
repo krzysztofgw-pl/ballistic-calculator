@@ -73,6 +73,7 @@ fun App(vm: MainViewModel = viewModel()) {
             BackHandler { editor = null }
             AmmoEditor(
                 initial = e.profile,
+                weapons = data.weapons,
                 isNew = data.ammo.none { it.id == e.profile.id },
                 onSave = { vm.saveAmmo(it); editor = null },
                 onDelete = { vm.deleteAmmo(e.profile.id); editor = null },

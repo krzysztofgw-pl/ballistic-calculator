@@ -35,6 +35,8 @@ import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AppData
 import pl.ballistics.app.data.SyncState
 import pl.ballistics.app.data.WeaponProfile
+import pl.ballistics.app.data.caliberGroup
+import pl.ballistics.app.data.diameterInOrMax
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -92,15 +94,25 @@ fun ProfilesScreen(
         }
 
         Section(stringResource(R.string.section_loads)) {
-            data.ammo.forEach { a ->
-                ProfileRow(
-                    title = a.name,
-                    subtitle = "${a.dragType.name} ${a.bc} · ${a.massGr} gr · ${a.muzzleVelocity} m/s",
-                    selected = null,
-                    onSelect = { onEditAmmo(a) },
-                    onEdit = { onEditAmmo(a) },
-                )
-            }
+            data.ammo
+                .sortedWith(compareBy({ it.diameterInOrMax() }, { it.caliberGroup() }, { it.name }))
+                .groupBy { it.caliberGroup() }
+                .forEach { (group, loads) ->
+                    Text(
+                        group.ifBlank { stringResource(R.string.caliber_unknown_group) },
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    loads.forEach { a ->
+                        ProfileRow(
+                            title = a.name,
+                            subtitle = "${a.dragType.name} ${a.bc} · ${a.massGr} gr · ${a.muzzleVelocity} m/s",
+                            selected = null,
+                            onSelect = { onEditAmmo(a) },
+                            onEdit = { onEditAmmo(a) },
+                        )
+                    }
+                }
             TextButton(onClick = { onEditAmmo(AmmoProfile()) }) {
                 Icon(Icons.Filled.Add, null)
                 Text(stringResource(R.string.action_add_load))
