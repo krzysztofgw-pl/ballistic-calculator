@@ -37,6 +37,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import pl.ballistics.app.R
 import androidx.compose.ui.geometry.Offset
@@ -116,6 +117,7 @@ fun TargetScreen(
     val maxDistance = points.lastOrNull()?.rangeM ?: 1000.0
     // While the slider is dragged the distance lives here and is saved when the finger lifts.
     var dragged by remember { mutableStateOf<Float?>(null) }
+    var typed by remember { mutableStateOf<String?>(null) }
     val distance = dragged?.roundToInt()?.toDouble()
         ?: conditions.targetRangeM.toNumber()?.takeIf { it > 0 }
         ?: points.getOrNull(points.size / 2)?.rangeM ?: 0.0
@@ -174,12 +176,20 @@ fun TargetScreen(
     ) {
         // The typed distance and the slider share one row; the arrows step a metre either way.
         Row(verticalAlignment = Alignment.CenterVertically) {
+            // Focusing the field empties it for a fresh entry; the last distance stays as the placeholder.
             NumberField(
                 stringResource(R.string.label_target_distance),
-                dragged?.roundToInt()?.toString() ?: conditions.targetRangeM.ifBlank { distance.roundToInt().toString() },
+                typed ?: dragged?.roundToInt()?.toString() ?: distance.roundToInt().toString(),
                 "m",
-                Modifier.width(116.dp),
-            ) { v -> update { it.copy(targetRangeM = v) } }
+                Modifier.width(116.dp).onFocusChanged { f ->
+                    if (f.isFocused && typed == null) typed = "" else if (!f.isFocused) typed = null
+                },
+                optional = true,
+                placeholder = distance.roundToInt().toString(),
+            ) { v ->
+                typed = v
+                if ((v.toNumber() ?: 0.0) > 0) update { it.copy(targetRangeM = v) }
+            }
             IconButton(onClick = { setDistance(distance - 1) }) {
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, stringResource(R.string.action_closer))
             }
