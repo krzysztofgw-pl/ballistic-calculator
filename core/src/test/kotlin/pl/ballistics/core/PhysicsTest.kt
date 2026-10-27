@@ -18,6 +18,18 @@ class PhysicsTest {
         Solver(options).solve(r, ammo, conditions).points.last()
 
     @Test
+    fun reusedZeroGivesTheSamePoint() {
+        val conditions = ShotConditions(winds = listOf(Wind.fromClock(4.0, 3.0)))
+        val full = Solver(plain).solve(rifle, ammo, conditions)
+        val single = Solver(plain.copy(maxRangeM = 637.0, stepM = 637.0))
+            .solve(rifle, ammo, conditions, zeroElevationRad = full.zeroElevationRad).points.last()
+        assertEquals(637.0, single.rangeM, 1e-9)
+        val before = full.points.first { it.rangeM == 600.0 }
+        val after = full.points.first { it.rangeM == 700.0 }
+        assertTrue(single.dropM < before.dropM && single.dropM > after.dropM)
+    }
+
+    @Test
     fun icaoSeaLevel() {
         val a = Atmosphere.icao()
         assertEquals(1.225, a.density, 0.001)

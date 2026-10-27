@@ -41,9 +41,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun update(transform: (AppData) -> AppData) {
-        _data.value = transform(_data.value).copy(modifiedAt = System.currentTimeMillis())
+        val before = _data.value
+        _data.value = transform(before).copy(modifiedAt = System.currentTimeMillis())
         repository.save(_data.value)
-        recalculate(debounce = true)
+        // The target settings are solved on the target screen; the table does not depend on them.
+        val onlyTarget = before.copy(conditions = before.conditions.withoutTarget(), modifiedAt = 0) ==
+            _data.value.copy(conditions = _data.value.conditions.withoutTarget(), modifiedAt = 0)
+        if (!onlyTarget) recalculate(debounce = true)
         pushJob?.cancel()
         pushJob = viewModelScope.launch {
             delay(1500)

@@ -38,7 +38,7 @@ private val tabs = listOf(
     Tab(R.string.tab_profiles, Icons.Filled.Person),
     Tab(R.string.tab_conditions, Icons.Filled.Place),
     Tab(R.string.tab_table, Icons.AutoMirrored.Filled.List),
-    Tab(R.string.tab_reticle, Icons.Filled.Search),
+    Tab(R.string.tab_target, Icons.Filled.Search),
 )
 
 /** What is open on top of the tabs. */
@@ -115,7 +115,7 @@ fun App(vm: MainViewModel = viewModel()) {
             )
             1 -> ConditionsScreen(data.conditions, vm::updateConditions, modifier)
             2 -> TableScreen(result, modifier)
-            else -> ReticleScreen(result, modifier)
+            else -> TargetScreen(result, data.conditions, vm::updateConditions, modifier)
         }
     }
 }

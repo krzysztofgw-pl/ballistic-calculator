@@ -129,7 +129,15 @@ data class Conditions(
     val aerodynamicJump: Boolean = true,
     val maxRangeM: String = "1000",
     val stepM: String = "50",
+    /** The distance picked on the target screen; blank picks the middle of the table. */
+    val targetRangeM: String = "",
+    /** Moving target: its speed and the direction it moves, degrees from the line of fire (90 = to the right). */
+    val targetSpeedMps: String = "0",
+    val targetDirectionDeg: String = "90",
 ) {
+    /** Everything the table depends on; the target settings are solved on the target screen. */
+    fun withoutTarget() = copy(targetRangeM = "", targetSpeedMps = "0", targetDirectionDeg = "90")
+
     /** Wind direction in degrees from the line of fire, converted from the clock for older data. */
     val windDirectionDeg: String
         get() = windFromDeg ?: windClock.toNumber()?.let { (it * 30).let { d -> if (d % 1.0 == 0.0) d.toInt().toString() else d.toString() } } ?: windClock

@@ -49,12 +49,19 @@ Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table ran
 
 ### Table
 For each range: drop, elevation and clicks, wind drift and windage correction, velocity, energy, time of
-flight and Mach.
+flight and Mach. The range column stays in place while the other columns scroll sideways.
 
-### Reticle
-Impact points for every range drawn on the scope's reticle: MRAD 0.2 hash, MRAD tree, Mil-Dot, MOA hash,
-MOA tree and Duplex. Second-focal-plane reticles get a magnification slider, and the same holds can be
-previewed on any other reticle.
+### Target
+Pick a distance to the metre with the slider, the arrows or by typing it, and get the hold and the dial
+correction for it.
+- Moving target: its speed and the direction it moves (90° = to the right). The lead uses the time of
+  flight to where the target will be, and its hold point is drawn on the reticle in blue.
+- Impact points drawn on the scope's reticle, with a magnification slider; the same holds can be
+  previewed on any other reticle.
+- Charts at that distance: windage correction by wind speed (one line per wind direction) and by wind
+  direction (one line per wind speed), each solved with the full model, so spin drift and aerodynamic
+  jump are included.
+- Spin drift correction by distance.
 
 ### Sync and backup
 - Google sign-in with live sync through Cloud Firestore (newer change wins).
@@ -102,7 +109,7 @@ uninstall the old app, then import them.
 | `app/` | Android app in Jetpack Compose (Material 3) |
 | `app/.../data/` | Profiles, bullet library, local storage, Firebase sync |
 | `app/.../reticle/` | Reticle definitions |
-| `app/.../ui/` | Screens: Profiles, Conditions, Table, Reticle, editors |
+| `app/.../ui/` | Screens: Profiles, Conditions, Table, Target, editors |
 | `.github/workflows/build.yml` | CI: solver tests and signed release APK |
 
 All UI text lives in `app/src/main/res/values/strings.xml`; translations are added as `values-xx` folders.

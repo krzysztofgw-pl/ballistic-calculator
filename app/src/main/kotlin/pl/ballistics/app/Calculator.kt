@@ -27,6 +27,7 @@ sealed interface CalcResult {
         val solution: Solution,
         val weapon: WeaponProfile,
         val ammo: AmmoProfile,
+        val setup: Setup,
     ) : CalcResult {
         val angularUnit: AngularUnit get() = weapon.angularUnit
         val clickValue: Double? get() = weapon.clickValue.toNumber()?.takeIf { it > 0 }
@@ -45,7 +46,8 @@ object Calculator {
     fun calculate(weapon: WeaponProfile?, ammo: AmmoProfile?, conditions: Conditions): CalcResult = try {
         if (weapon == null) throw InputError(UiText.Res(R.string.error_no_weapon))
         if (ammo == null) throw InputError(UiText.Res(R.string.error_no_ammo, listOf(weapon.name)))
-        CalcResult.Ok(solve(weapon, ammo, conditions), weapon, ammo)
+        val setup = setup(weapon, ammo, conditions)
+        CalcResult.Ok(Solver(setup.options).solve(setup.rifle, setup.ammo, setup.conditions, setup.zeroAtmosphere), weapon, ammo, setup)
     } catch (e: InputError) {
         CalcResult.Error(e.text)
     } catch (e: IllegalArgumentException) {
@@ -59,7 +61,7 @@ object Calculator {
         return v
     }
 
-    private fun solve(w: WeaponProfile, a: AmmoProfile, c: Conditions): Solution {
+    private fun setup(w: WeaponProfile, a: AmmoProfile, c: Conditions): Setup {
         val massKg = num(a.massGr, R.string.field_bullet_mass, true) * Units.GRAIN
         val diameterM = num(a.diameterMm, R.string.field_diameter, true) / 1000
         val lengthM = a.lengthMm.toNumber()?.takeIf { it > 0 }?.div(1000)
@@ -120,7 +122,7 @@ object Calculator {
             aerodynamicJump = c.aerodynamicJump,
             coriolis = c.coriolis,
         )
-        return Solver(options).solve(rifle, ammo, conditions, zeroAtmosphere)
+        return Setup(rifle, ammo, conditions, zeroAtmosphere, options)
     }
 
     /** One "Mach Cd" pair per line; separators: space, tab, semicolon, or comma between numbers. */

@@ -6,7 +6,7 @@
     <string name="tab_profiles">Profiles</string>
     <string name="tab_conditions">Conditions</string>
     <string name="tab_table">Table</string>
-    <string name="tab_reticle">Reticle</string>
+    <string name="tab_target">Target</string>
 
     <!-- Actions -->
     <string name="action_back">Back</string>
@@ -274,4 +274,19 @@
     <string name="field_azimuth">azimuth</string>
     <string name="field_table_range">table range</string>
     <string name="field_table_step">table step</string>
+    <string name="label_target_distance">Distance</string>
+    <string name="action_closer">1 m closer</string>
+    <string name="action_farther">1 m farther</string>
+    <string name="label_target_speed">Target speed</string>
+    <string name="label_target_direction">Moving to (90° = right)</string>
+    <string name="moving_hold">Moving: hold %2$s %5$s %1$s, %4$s %5$s %3$s (lead %6$s %7$s m)</string>
+    <string name="target_out_of_reach">The bullet does not reach %1$d m.</string>
+    <string name="chart_wind_speed">Wind correction (%1$s) by wind speed (m/s)</string>
+    <string name="chart_wind_direction">Wind correction (%1$s) by wind direction (o\'clock)</string>
+    <string name="chart_spin_drift">Spin drift correction (%1$s) by distance (m)</string>
+    <string name="wind_from_clock">%1$s o\'clock</string>
+    <string name="wind_speed_series">%1$d m/s</string>
+    <string name="spin_drift_at">Spin drift at %1$d m: %2$s cm, correct %3$s %4$s</string>
+    <string name="spin_drift_needs_data">Spin drift needs the bullet length and the barrel twist.</string>
+    <string name="spin_drift_off">Spin drift is off in Conditions.</string>
 </resources>
