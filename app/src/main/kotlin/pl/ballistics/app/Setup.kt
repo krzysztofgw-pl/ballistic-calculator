@@ -18,9 +18,18 @@ data class Setup(
     val zeroAtmosphere: Atmosphere,
     val options: SolverOptions,
 ) {
-    /** The point at exactly [rangeM]; [zeroElevationRad] from an earlier solution skips zeroing. */
-    fun pointAt(rangeM: Double, zeroElevationRad: Double, winds: List<Wind> = conditions.winds): TrajectoryPoint? =
+    /**
+     * The point at exactly [rangeM]; [zeroElevationRad] from an earlier solution skips zeroing.
+     * [winds] replace those of [conditions].
+     */
+    fun pointAt(
+        rangeM: Double,
+        zeroElevationRad: Double,
+        winds: List<Wind>? = null,
+        conditions: ShotConditions = this.conditions,
+        ammo: Ammunition = this.ammo,
+    ): TrajectoryPoint? =
         Solver(options.copy(maxRangeM = rangeM, stepM = rangeM))
-            .solve(rifle, ammo, conditions.copy(winds = winds), zeroAtmosphere, zeroElevationRad)
+            .solve(rifle, ammo, conditions.copy(winds = winds ?: conditions.winds), zeroAtmosphere, zeroElevationRad)
             .points.lastOrNull()?.takeIf { abs(it.rangeM - rangeM) < 1e-6 }
 }

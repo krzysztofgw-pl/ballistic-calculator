@@ -62,6 +62,20 @@ correction for it.
   direction (one line per wind speed), each solved with the full model, so spin drift and aerodynamic
   jump are included.
 - Spin drift correction by distance.
+- Range card: targets saved as sub-tabs (distance, look angle, azimuth, motion and size). Changes made
+  while a target is open are saved to it.
+- Wind bracket: corrections for the lightest and the strongest expected wind; the forecast fills both in.
+- Range error: vertical miss when the distance is off by up to ±50 m, and the error that still hits a
+  target of the given height.
+- Temperature: muzzle velocity and elevation 10 °C colder and warmer.
+- Hit probability: chance of a first-round hit on the target from the velocity SD (load), the 5-shot
+  group (rifle) and how well the wind and the distance are known. Each source's spread comes from the
+  full solution; a 5-shot group is taken as three standard deviations.
+- Ranging with the reticle: distance from the target size and its reading in the reticle.
+
+### Settings
+The gear in the top bar: light, dark or system theme; keep the screen on; tabs and sub-tabs at the top
+or the bottom; sync and backup.
 
 ### Sync and backup
 - Google sign-in with live sync through Cloud Firestore (newer change wins).

@@ -1,9 +1,5 @@
 package pl.ballistics.app.ui
 
-import android.content.Context
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,31 +11,24 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import pl.ballistics.app.R
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AppData
 import pl.ballistics.app.data.Cartridges
-import pl.ballistics.app.data.SyncState
 import pl.ballistics.app.data.WeaponProfile
 import pl.ballistics.app.data.caliberGroup
 import pl.ballistics.app.data.diameterInOrMax
-import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.util.Locale
 
 @Composable
@@ -48,30 +37,8 @@ fun ProfilesScreen(
     onSelectWeapon: (String) -> Unit,
     onEditWeapon: (WeaponProfile) -> Unit,
     onEditAmmo: (AmmoProfile) -> Unit,
-    onExport: () -> String,
-    onImport: (String) -> Boolean,
-    sync: SyncState,
-    onSignIn: suspend (Context) -> String?,
-    onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        val ok = runCatching {
-            context.contentResolver.openOutputStream(uri)?.use { it.write(onExport().toByteArray()) } != null
-        }.getOrDefault(false)
-        Toast.makeText(context, context.getString(if (ok) R.string.toast_exported else R.string.toast_export_failed), Toast.LENGTH_SHORT).show()
-    }
-    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        val text = runCatching {
-            context.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() }
-        }.getOrNull()
-        val ok = text != null && onImport(text)
-        Toast.makeText(context, context.getString(if (ok) R.string.toast_imported else R.string.toast_import_failed), Toast.LENGTH_SHORT).show()
-    }
     val active = data.activeWeapon
 
     Column(
@@ -118,32 +85,6 @@ fun ProfilesScreen(
             TextButton(onClick = { onEditAmmo(newLoadFor(active)) }) {
                 Icon(Icons.Filled.Add, null)
                 Text(stringResource(R.string.action_add_load))
-            }
-        }
-
-        Section(stringResource(R.string.section_sync)) {
-            when (sync) {
-                SyncState.Unavailable -> Unit
-                SyncState.SignedOut -> {
-                    Text(stringResource(R.string.sync_sign_in_hint), style = MaterialTheme.typography.bodySmall)
-                    Button(onClick = {
-                        scope.launch {
-                            onSignIn(context)?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
-                        }
-                    }) { Text(stringResource(R.string.action_sign_in_google)) }
-                }
-                is SyncState.SignedIn -> {
-                    Text(stringResource(R.string.sync_signed_in_as, sync.email ?: stringResource(R.string.sync_signed_in)), style = MaterialTheme.typography.bodyMedium)
-                    sync.error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
-                    TextButton(onClick = onSignOut) { Text(stringResource(R.string.action_sign_out)) }
-                }
-            }
-            Text(stringResource(R.string.sync_file_hint), style = MaterialTheme.typography.bodySmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { exportLauncher.launch("ballistics-${LocalDate.now()}.json") }) { Text(stringResource(R.string.action_export)) }
-                OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) }) {
-                    Text(stringResource(R.string.action_import))
-                }
             }
         }
     }

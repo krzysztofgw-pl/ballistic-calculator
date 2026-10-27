@@ -57,6 +57,7 @@ import kotlinx.coroutines.withContext
 import pl.ballistics.app.CalcResult
 import pl.ballistics.app.Lead
 import pl.ballistics.app.TargetAnalysis
+import pl.ballistics.app.TargetInputs
 import pl.ballistics.app.lead
 import pl.ballistics.app.data.AngularUnit
 import pl.ballistics.app.data.Conditions
@@ -67,6 +68,7 @@ import pl.ballistics.app.reticle.Reticle
 import pl.ballistics.app.reticle.Reticles
 import pl.ballistics.app.reticle.Weight
 import pl.ballistics.core.TrajectoryPoint
+import pl.ballistics.core.Units
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.pow
@@ -118,19 +120,30 @@ fun TargetScreen(
     val targetSpeed = conditions.targetSpeedMps.toNumber()?.takeIf { it > 0 }
     val targetDirection = conditions.targetDirectionDeg.toNumber() ?: 90.0
 
-    // The distance is solved on its own first; the wind sweep for the charts follows once it settles.
-    val solved by produceState<Solved?>(null, result, distance, targetSpeed, targetDirection) {
+    val inputs = TargetInputs(
+        windMinMps = conditions.windMinMps.toNumber()?.takeIf { it >= 0 },
+        windMaxMps = conditions.windMaxMps.toNumber()?.takeIf { it >= 0 },
+        widthM = (conditions.targetWidthCm.toNumber()?.takeIf { it > 0 } ?: 50.0) / 100,
+        heightM = (conditions.targetHeightCm.toNumber()?.takeIf { it > 0 } ?: 50.0) / 100,
+        velocitySdMps = result.ammo.velocitySd.toNumber()?.takeIf { it >= 0 } ?: TargetInputs.DEFAULT_VELOCITY_SD,
+        windSdMps = conditions.windUncertaintyMps.toNumber()?.takeIf { it >= 0 } ?: 1.0,
+        rangeSdM = conditions.rangeUncertaintyM.toNumber()?.takeIf { it >= 0 } ?: 5.0,
+        groupRad = (weapon.groupMoa.toNumber()?.takeIf { it > 0 } ?: TargetInputs.DEFAULT_GROUP_MOA) * Units.MOA,
+    )
+    // The distance is solved on its own first; the sweeps for the charts and tools follow once it settles,
+    // and until then the previous ones for the same distance stay on screen.
+    val solved by produceState<Solved?>(null, result, distance, targetSpeed, targetDirection, inputs) {
         val (point, lead) = withContext(Dispatchers.Default) {
             runCatching {
                 val p = result.setup.pointAt(distance, solution.zeroElevationRad)
                 p to targetSpeed?.let { result.setup.lead(distance, solution.zeroElevationRad, it, targetDirection) }
             }.getOrDefault(null to null)
         }
-        value = Solved(distance, point, lead, null)
+        value = Solved(distance, point, lead, value?.takeIf { it.distance == distance }?.analysis)
         if (point != null) {
             delay(300)
             value = Solved(distance, point, lead, withContext(Dispatchers.Default) {
-                runCatching { TargetAnalysis.of(result.setup, solution.zeroElevationRad, distance) }.getOrNull()
+                runCatching { TargetAnalysis.of(result.setup, solution.zeroElevationRad, distance, inputs) }.getOrNull()
             })
         }
     }
@@ -182,6 +195,14 @@ fun TargetScreen(
             }
             NumberField(stringResource(R.string.label_target_direction), conditions.targetDirectionDeg, "°", m) { v ->
                 update { it.copy(targetDirectionDeg = v) }
+            }
+        }
+        FieldRow { m ->
+            NumberField(stringResource(R.string.label_target_width), conditions.targetWidthCm, "cm", m) { v ->
+                update { it.copy(targetWidthCm = v) }
+            }
+            NumberField(stringResource(R.string.label_target_height), conditions.targetHeightCm, "cm", m) { v ->
+                update { it.copy(targetHeightCm = v) }
             }
         }
 
@@ -293,7 +314,10 @@ fun TargetScreen(
         }
         if (sfp) Text(stringResource(R.string.sfp_note, calMag.magFmt()), style = MaterialTheme.typography.bodySmall)
 
-        analysis?.let { a -> TargetCharts(result, a, distance) }
+        TargetTools(result, conditions, update, analysis, inputs, reticle.unit) { setDistance(it) }
+        if (analysis != null) {
+            Collapsible(stringResource(R.string.section_charts)) { TargetCharts(result, analysis, distance) }
+        }
     }
 }
 

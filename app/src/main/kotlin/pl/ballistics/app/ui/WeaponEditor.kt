@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import pl.ballistics.app.R
+import pl.ballistics.app.TargetInputs
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
@@ -62,6 +63,10 @@ fun WeaponEditor(
                 NumberField(stringResource(R.string.label_twist), w.twistIn, "in", m, optional = true) { w = w.copy(twistIn = it) }
             }
             SwitchRow(stringResource(R.string.label_right_twist), w.rightHandTwist) { w = w.copy(rightHandTwist = it) }
+            NumberField(
+                stringResource(R.string.label_group), w.groupMoa, "MOA", optional = true,
+                placeholder = TargetInputs.DEFAULT_GROUP_MOA.toString(),
+            ) { w = w.copy(groupMoa = it) }
         }
 
         Section(stringResource(R.string.section_scope_mount)) {

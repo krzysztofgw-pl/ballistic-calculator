@@ -2,20 +2,30 @@ package pl.ballistics.app.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,20 +43,23 @@ import pl.ballistics.app.R
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.WeaponProfile
 
-private data class Tab(@StringRes val title: Int, val icon: ImageVector)
+private data class MainTab(@StringRes val title: Int, val icon: ImageVector)
 
 private val tabs = listOf(
-    Tab(R.string.tab_profiles, Icons.Filled.Person),
-    Tab(R.string.tab_conditions, Icons.Filled.Place),
-    Tab(R.string.tab_table, Icons.AutoMirrored.Filled.List),
-    Tab(R.string.tab_target, Icons.Filled.Search),
+    MainTab(R.string.tab_profiles, Icons.Filled.Person),
+    MainTab(R.string.tab_conditions, Icons.Filled.Place),
+    MainTab(R.string.tab_table, Icons.AutoMirrored.Filled.List),
+    MainTab(R.string.tab_target, Icons.Filled.Search),
 )
 
 /** What is open on top of the tabs. */
 private sealed interface Editor {
     data class Weapon(val profile: WeaponProfile) : Editor
     data class Ammo(val profile: AmmoProfile) : Editor
+    data object Settings : Editor
 }
+
+private const val TARGET_TAB = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,20 +95,82 @@ fun App(vm: MainViewModel = viewModel()) {
             )
             return
         }
+        Editor.Settings -> {
+            BackHandler { editor = null }
+            SettingsScreen(
+                ui = data.ui,
+                onUi = vm::updateUi,
+                sync = sync,
+                onSignIn = vm::signIn,
+                onSignOut = vm::signOut,
+                onExport = vm::exportData,
+                onImport = vm::importData,
+                onClose = { editor = null },
+            )
+            return
+        }
         null -> Unit
     }
 
+    val view = LocalView.current
+    DisposableEffect(data.ui.keepScreenOn) {
+        view.keepScreenOn = data.ui.keepScreenOn
+        onDispose { view.keepScreenOn = false }
+    }
+    val targetTabs: @Composable () -> Unit = {
+        TargetTabs(
+            targets = data.targets,
+            activeId = data.activeTargetId,
+            onSelect = vm::selectTarget,
+            onAdd = vm::addTarget,
+            onRename = vm::renameTarget,
+            onDelete = vm::deleteTarget,
+        )
+    }
+
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(tabs[tab].title)) }) },
+        topBar = {
+            Column {
+                TopAppBar(
+                    title = { Text(stringResource(tabs[tab].title)) },
+                    actions = {
+                        IconButton(onClick = { editor = Editor.Settings }) {
+                            Icon(Icons.Filled.Settings, stringResource(R.string.title_settings))
+                        }
+                    },
+                )
+                if (data.ui.tabsAtTop) {
+                    TabRow(selectedTabIndex = tab) {
+                        tabs.forEachIndexed { index, t ->
+                            Tab(
+                                selected = tab == index,
+                                onClick = { tab = index },
+                                text = { Text(stringResource(t.title)) },
+                                icon = { Icon(t.icon, contentDescription = null) },
+                            )
+                        }
+                    }
+                }
+                if (tab == TARGET_TAB && data.ui.subTabsAtTop) targetTabs()
+            }
+        },
         bottomBar = {
-            NavigationBar {
-                tabs.forEachIndexed { index, t ->
-                    NavigationBarItem(
-                        selected = tab == index,
-                        onClick = { tab = index },
-                        icon = { Icon(t.icon, contentDescription = null) },
-                        label = { Text(stringResource(t.title)) },
-                    )
+            Column {
+                // Sub-tabs sit right above the main tabs, within reach of the thumb.
+                if (tab == TARGET_TAB && !data.ui.subTabsAtTop) targetTabs()
+                if (!data.ui.tabsAtTop) {
+                    NavigationBar {
+                        tabs.forEachIndexed { index, t ->
+                            NavigationBarItem(
+                                selected = tab == index,
+                                onClick = { tab = index },
+                                icon = { Icon(t.icon, contentDescription = null) },
+                                label = { Text(stringResource(t.title)) },
+                            )
+                        }
+                    }
+                } else {
+                    Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
                 }
             }
         },
@@ -106,11 +182,6 @@ fun App(vm: MainViewModel = viewModel()) {
                 onSelectWeapon = vm::selectWeapon,
                 onEditWeapon = { editor = Editor.Weapon(it) },
                 onEditAmmo = { editor = Editor.Ammo(it) },
-                onExport = vm::exportData,
-                onImport = vm::importData,
-                sync = sync,
-                onSignIn = vm::signIn,
-                onSignOut = vm::signOut,
                 modifier = modifier,
             )
             1 -> ConditionsScreen(data.conditions, vm::updateConditions, modifier)

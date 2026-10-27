@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import pl.ballistics.app.R
+import pl.ballistics.app.TargetInputs
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.BulletLibrary
@@ -129,6 +130,10 @@ fun AmmoEditor(
                 ) { a = a.copy(powderSensitivity = it) }
                 NumberField(stringResource(R.string.label_at_temperature), a.powderReferenceTemp, "°C", m) { a = a.copy(powderReferenceTemp = it) }
             }
+            NumberField(
+                stringResource(R.string.label_velocity_sd), a.velocitySd, "m/s", optional = true,
+                placeholder = TargetInputs.DEFAULT_VELOCITY_SD.toString(),
+            ) { a = a.copy(velocitySd = it) }
         }
 
         Section(stringResource(R.string.section_notes)) {
