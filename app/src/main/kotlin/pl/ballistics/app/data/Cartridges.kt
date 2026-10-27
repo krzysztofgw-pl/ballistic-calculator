@@ -58,10 +58,29 @@ object Cartridges {
     fun bulletDiameterIn(text: String): Double? =
         find(text)?.bulletDiameterIn ?: text.trim().takeIf { it.startsWith(".") }?.toNumber()?.takeIf { it in 0.17..0.6 }
 
-    /** ".264 (6.5 mm)": a bore group for bullets without a cartridge name. */
+    /** ".224″": bullet diameter as calibers are written. Not the cartridge name: a .223 Rem takes .224″ bullets. */
+    fun inches(diameterIn: Double): String = String.format(Locale.US, "%.3f", diameterIn).removePrefix("0") + "″"
+
+    /** Cartridges that take bullets of this diameter. */
+    fun forDiameter(diameterIn: Double): List<Cartridge> = all.filter { sameDiameter(it.bulletDiameterIn, diameterIn) }
+
+    /**
+     * ".224″ (5.56 mm) bullets · .223 Rem, .22-250 Rem, .22 Creedmoor": a group of bullets by diameter,
+     * naming the cartridges that use them so ".224" is not mistaken for a cartridge.
+     */
     fun boreLabel(diameterIn: Double): String {
+        val names = forDiameter(diameterIn).map { it.name }
+        val cartridges = when {
+            names.isEmpty() -> ""
+            names.size <= 3 -> " · " + names.joinToString(", ")
+            else -> " · " + names.take(3).joinToString(", ") + "…"
+        }
+        return "${inches(diameterIn)} (${metric(diameterIn)}) bullets$cartridges"
+    }
+
+    private fun metric(diameterIn: Double): String {
         val inch = String.format(Locale.US, "%.3f", diameterIn).removePrefix("0")
-        val metric = when (inch) {
+        return when (inch) {
             ".224" -> "5.56 mm"
             ".243" -> "6 mm"
             ".264" -> "6.5 mm"
@@ -72,10 +91,9 @@ object Cartridges {
             ".338" -> "8.6 mm"
             else -> String.format(Locale.US, "%.2f mm", diameterIn * 25.4)
         }
-        return "$inch ($metric)"
     }
 
-    fun sameDiameter(a: Double, b: Double) = abs(a - b) < 0.0015
+    fun sameDiameter(a: Double, b: Double) = abs(a - b) < 0.0008
 }
 
 private const val MM_PER_IN = 25.4

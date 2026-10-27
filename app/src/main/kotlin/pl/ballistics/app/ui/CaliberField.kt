@@ -32,7 +32,7 @@ fun CaliberField(label: String, value: String, diameterIn: Double?, emptyHint: S
         ?: Cartridges.all
     val hint = when {
         value.isBlank() -> emptyHint
-        known != null -> stringResource(R.string.caliber_known, known.name, Cartridges.boreLabel(known.bulletDiameterIn))
+        known != null -> stringResource(R.string.caliber_known, known.name, Cartridges.inches(known.bulletDiameterIn))
         else -> stringResource(R.string.caliber_unknown)
     }
     Box {
@@ -52,7 +52,7 @@ fun CaliberField(label: String, value: String, diameterIn: Double?, emptyHint: S
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             options.forEach { c ->
                 DropdownMenuItem(
-                    text = { Text("${c.name}  ·  ${Cartridges.boreLabel(c.bulletDiameterIn)}") },
+                    text = { Text(stringResource(R.string.cartridge_option, c.name, Cartridges.inches(c.bulletDiameterIn))) },
                     onClick = { onChange(c.name); open = false },
                 )
             }

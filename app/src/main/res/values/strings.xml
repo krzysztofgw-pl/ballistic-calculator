@@ -97,7 +97,10 @@
     <string name="hint_data_source">Factory load: a complete cartridge you buy, so the bullet, BCs, cartridge and the box velocity with its test barrel are filled in. Bullet: only the projectile, for handloads; enter your own velocity. Either way, correct the velocity with your chronograph.</string>
     <string name="label_cartridge">Cartridge</string>
     <string name="cartridge_any">Empty: any cartridge with this bullet diameter</string>
-    <string name="caliber_known">%1$s · %2$s bullets</string>
+    <string name="caliber_known">%1$s takes %2$s bullets</string>
+    <string name="cartridge_option">%1$s  ·  %2$s bullet</string>
+    <string name="hint_bullet_diameters">Bullets are listed by diameter, which differs from the cartridge name: a .223 Rem takes .224″ bullets, 6mm Creedmoor and .243 Win take .243″, 6.5 Creedmoor .264″, .308 Win .308″. Pick your cartridge in the filter and it is filled into the load.</string>
+    <string name="bullet_filter_option">%1$s (%2$s bullets)</string>
     <string name="caliber_unknown">Not a known cartridge: loads are matched by bullet diameter when the caliber is a number like .308</string>
     <string name="caliber_rifle_empty">Pick from the list to see only the loads that fit</string>
     <string name="caliber_unknown_group">Unknown caliber</string>
