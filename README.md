@@ -25,6 +25,15 @@ Aplikacja w Kotlinie i Jetpack Compose, solver jako osobny moduł w czystym Kotl
 - **Znos żyroskopowy (spin drift)** i **skok aerodynamiczny** od wiatru bocznego wg Litza.
 - **Strzał pod kątem i przechył broni**, **czułość prochu na temperaturę**, osobne warunki przystrzelania.
 
+## Aplikacja
+
+- **Profile broni**: karabin, luneta (jednostki i wartość kliku), wysokość montażu, zero i przypisana amunicja.
+  Pomocnik wysokości montażu liczy ją z pomiaru suwmiarką albo szacuje z obiektywu, pierścieni i szyny.
+- **Profile amunicji**: z biblioteki danych katalogowych (pociski Hornady, Sierra, Berger i amunicja fabryczna)
+  albo własne, w tym krzywa Cd(Mach).
+- **Synchronizacja**: eksport/import wszystkich profili do pliku JSON (np. na Dysk Google) oraz automatyczna
+  kopia zapasowa Androida na koncie Google.
+
 ## Weryfikacja
 
 `ReferenceTrajectoryTest` porównuje wyniki z niezależną implementacją

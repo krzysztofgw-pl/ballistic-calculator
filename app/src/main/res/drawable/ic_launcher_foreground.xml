@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reticle with a trajectory arc landing on a holdover mark. Content stays inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Ring -->
+    <path
+        android:pathData="M54,27a27,27 0 1,1 0,54a27,27 0 1,1 0,-54"
+        android:strokeColor="#FFEDE8DA"
+        android:strokeWidth="2.6"
+        android:fillColor="#00000000" />
+    <!-- Heavy posts -->
+    <path
+        android:pathData="M27,54H36M72,54H81M54,27V36M54,72V81"
+        android:strokeColor="#FFEDE8DA"
+        android:strokeWidth="4"
+        android:fillColor="#00000000" />
+    <!-- Fine crosshair -->
+    <path
+        android:pathData="M36,54H50M58,54H72M54,36V50M54,58V72"
+        android:strokeColor="#FFEDE8DA"
+        android:strokeWidth="1.4"
+        android:fillColor="#00000000" />
+    <!-- Holdover hashes -->
+    <path
+        android:pathData="M51,61H57M51,66H57M52,71H56M47,54V57M61,54V57M42,54V56M66,54V56"
+        android:strokeColor="#FFEDE8DA"
+        android:strokeWidth="1.2"
+        android:fillColor="#00000000" />
+    <!-- Trajectory -->
+    <path
+        android:pathData="M30,47Q47,44 54,66"
+        android:strokeColor="#FFFF7043"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Impact -->
+    <path
+        android:pathData="M54,66m-3.6,0a3.6,3.6 0 1,0 7.2,0a3.6,3.6 0 1,0 -7.2,0"
+        android:fillColor="#FFFF3D00" />
+</vector>

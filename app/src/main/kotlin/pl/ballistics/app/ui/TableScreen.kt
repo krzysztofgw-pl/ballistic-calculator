@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.CalcResult
-import pl.ballistics.app.toNumber
 import pl.ballistics.core.TrajectoryPoint
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -50,11 +49,12 @@ fun TableScreen(result: CalcResult?, modifier: Modifier = Modifier) {
 @Composable
 private fun Table(result: CalcResult.Ok, modifier: Modifier) {
     val s = result.solution
-    val unit = result.inputs.angularUnit
-    val click = result.inputs.clickValue.toNumber()?.takeIf { it > 0 }
+    val unit = result.angularUnit
+    val click = result.clickValue
 
     Column(modifier.fillMaxSize()) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text("${result.weapon.name} · ${result.ammo.name}", style = MaterialTheme.typography.titleSmall)
             val summary = buildList {
                 add("V0 ${s.muzzleVelocityMps.roundToInt()} m/s")
                 add("wys. gęstościowa ${s.densityAltitudeM.roundToInt()} m")
@@ -66,7 +66,7 @@ private fun Table(result: CalcResult.Ok, modifier: Modifier) {
                 else if (it < 1.4) Warning("Stabilność marginalna (Sg < 1,4).")
             }
             Text(
-                "Poprawki w ${unit.label}: ↑ w górę, P/L w prawo/lewo. Klik = ${result.inputs.clickValue} ${unit.label}.",
+                "Poprawki w ${unit.label}: ↑ w górę, P/L w prawo/lewo. Klik = ${result.weapon.clickValue} ${unit.label}.",
                 style = MaterialTheme.typography.bodySmall,
             )
         }

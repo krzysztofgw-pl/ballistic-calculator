@@ -1,5 +1,10 @@
 package pl.ballistics.app
 
+import pl.ballistics.app.data.AmmoProfile
+import pl.ballistics.app.data.AngularUnit
+import pl.ballistics.app.data.Conditions
+import pl.ballistics.app.data.DragType
+import pl.ballistics.app.data.WeaponProfile
 import pl.ballistics.core.Ammunition
 import pl.ballistics.core.Atmosphere
 import pl.ballistics.core.BallisticCoefficient
@@ -16,7 +21,15 @@ import pl.ballistics.core.Units
 import pl.ballistics.core.Wind
 
 sealed interface CalcResult {
-    data class Ok(val solution: Solution, val inputs: Inputs) : CalcResult
+    data class Ok(
+        val solution: Solution,
+        val weapon: WeaponProfile,
+        val ammo: AmmoProfile,
+    ) : CalcResult {
+        val angularUnit: AngularUnit get() = weapon.angularUnit
+        val clickValue: Double? get() = weapon.clickValue.toNumber()?.takeIf { it > 0 }
+    }
+
     data class Error(val message: String) : CalcResult
 }
 
@@ -27,8 +40,10 @@ fun String.toNumber(): Double? = trim().replace(',', '.').toDoubleOrNull()
 
 object Calculator {
 
-    fun calculate(inputs: Inputs): CalcResult = try {
-        CalcResult.Ok(solve(inputs), inputs)
+    fun calculate(weapon: WeaponProfile?, ammo: AmmoProfile?, conditions: Conditions): CalcResult = try {
+        if (weapon == null) throw InputError("Dodaj profil broni w zakładce Profile.")
+        if (ammo == null) throw InputError("Wybierz amunicję dla: ${weapon.name}.")
+        CalcResult.Ok(solve(weapon, ammo, conditions), weapon, ammo)
     } catch (e: InputError) {
         CalcResult.Error(e.message ?: "Błąd danych")
     } catch (e: IllegalArgumentException) {
@@ -41,63 +56,63 @@ object Calculator {
         return v
     }
 
-    private fun solve(i: Inputs): Solution {
-        val massKg = num(i.massGr, "masa pocisku", true) * Units.GRAIN
-        val diameterM = num(i.diameterMm, "średnica", true) / 1000
-        val lengthM = i.lengthMm.toNumber()?.takeIf { it > 0 }?.div(1000)
+    private fun solve(w: WeaponProfile, a: AmmoProfile, c: Conditions): Solution {
+        val massKg = num(a.massGr, "masa pocisku", true) * Units.GRAIN
+        val diameterM = num(a.diameterMm, "średnica", true) / 1000
+        val lengthM = a.lengthMm.toNumber()?.takeIf { it > 0 }?.div(1000)
 
-        val drag: DragModel = when (i.dragType) {
-            DragType.CUSTOM -> parseCurve(i.customCurve, massKg, diameterM)
-            else -> BallisticCoefficient(DragFunction.valueOf(i.dragType.name), num(i.bc, "BC", true))
+        val drag: DragModel = when (a.dragType) {
+            DragType.CUSTOM -> parseCurve(a.customCurve, massKg, diameterM)
+            else -> BallisticCoefficient(DragFunction.valueOf(a.dragType.name), num(a.bc, "BC", true))
         }
         val ammo = Ammunition(
             projectile = Projectile(drag, massKg, diameterM, lengthM),
-            muzzleVelocityMps = num(i.muzzleVelocity, "prędkość początkowa", true),
-            powderSensitivityMpsPerC = num(i.powderSensitivity, "czułość prochu"),
-            powderReferenceTempC = num(i.powderReferenceTemp, "temperatura odniesienia prochu"),
+            muzzleVelocityMps = num(a.muzzleVelocity, "prędkość początkowa", true),
+            powderSensitivityMpsPerC = num(a.powderSensitivity, "czułość prochu"),
+            powderReferenceTempC = num(a.powderReferenceTemp, "temperatura odniesienia prochu"),
         )
         val rifle = Rifle(
-            sightHeightM = num(i.sightHeightCm, "wysokość celownika") / 100,
-            zeroRangeM = num(i.zeroRangeM, "odległość przystrzelania", true),
-            twistM = i.twistIn.toNumber()?.takeIf { it > 0 }?.times(Units.INCH),
-            rightHandTwist = i.rightHandTwist,
+            sightHeightM = num(w.sightHeightCm, "wysokość celownika") / 100,
+            zeroRangeM = num(w.zeroRangeM, "odległość przystrzelania", true),
+            twistM = w.twistIn.toNumber()?.takeIf { it > 0 }?.times(Units.INCH),
+            rightHandTwist = w.rightHandTwist,
         )
 
-        val altitude = num(i.altitudeM, "wysokość n.p.m.")
-        val temperature = num(i.temperatureC, "temperatura")
-        val pressurePa = num(i.pressureHpa, "ciśnienie", true) * Units.HPA
-        val humidity = (num(i.humidityPct, "wilgotność") / 100).coerceIn(0.0, 1.0)
-        val atmosphere = if (i.pressureIsQnh) {
+        val altitude = num(c.altitudeM, "wysokość n.p.m.")
+        val temperature = num(c.temperatureC, "temperatura")
+        val pressurePa = num(c.pressureHpa, "ciśnienie", true) * Units.HPA
+        val humidity = (num(c.humidityPct, "wilgotność") / 100).coerceIn(0.0, 1.0)
+        val atmosphere = if (c.pressureIsQnh) {
             Atmosphere.fromSeaLevelPressure(pressurePa, altitude, temperature, humidity)
         } else {
             Atmosphere(altitude, pressurePa, temperature, humidity)
         }
         val zeroAtmosphere = Atmosphere(
-            stationPressurePa = num(i.zeroPressureHpa, "ciśnienie przy przystrzelaniu", true) * Units.HPA,
-            temperatureC = num(i.zeroTemperatureC, "temperatura przy przystrzelaniu"),
+            stationPressurePa = num(w.zeroPressureHpa, "ciśnienie przy przystrzelaniu", true) * Units.HPA,
+            temperatureC = num(w.zeroTemperatureC, "temperatura przy przystrzelaniu"),
         )
 
-        val windSpeed = num(i.windSpeed, "prędkość wiatru")
-        val winds = if (windSpeed != 0.0) listOf(Wind.fromClock(windSpeed, num(i.windClock, "kierunek wiatru"))) else emptyList()
+        val windSpeed = num(c.windSpeed, "prędkość wiatru")
+        val winds = if (windSpeed != 0.0) listOf(Wind.fromClock(windSpeed, num(c.windClock, "kierunek wiatru"))) else emptyList()
 
         val conditions = ShotConditions(
             atmosphere = atmosphere,
             winds = winds,
-            lookAngleRad = num(i.lookAngleDeg, "kąt strzału") * Units.DEG,
-            cantRad = num(i.cantDeg, "przechył") * Units.DEG,
-            latitudeRad = if (i.coriolis) num(i.latitudeDeg, "szerokość geograficzna") * Units.DEG else null,
-            azimuthRad = if (i.coriolis) num(i.azimuthDeg, "azymut") * Units.DEG else 0.0,
+            lookAngleRad = num(c.lookAngleDeg, "kąt strzału") * Units.DEG,
+            cantRad = num(c.cantDeg, "przechył") * Units.DEG,
+            latitudeRad = if (c.coriolis) num(c.latitudeDeg, "szerokość geograficzna") * Units.DEG else null,
+            azimuthRad = if (c.coriolis) num(c.azimuthDeg, "azymut") * Units.DEG else 0.0,
         )
-        val maxRange = num(i.maxRangeM, "zasięg tabeli", true)
-        val step = num(i.stepM, "krok tabeli", true)
+        val maxRange = num(c.maxRangeM, "zasięg tabeli", true)
+        val step = num(c.stepM, "krok tabeli", true)
         if (maxRange / step > 1000) throw InputError("Za mały krok tabeli")
 
         val options = SolverOptions(
             maxRangeM = maxRange,
             stepM = step,
-            spinDrift = i.spinDrift,
-            aerodynamicJump = i.aerodynamicJump,
-            coriolis = i.coriolis,
+            spinDrift = c.spinDrift,
+            aerodynamicJump = c.aerodynamicJump,
+            coriolis = c.coriolis,
         )
         return Solver(options).solve(rifle, ammo, conditions, zeroAtmosphere)
     }
