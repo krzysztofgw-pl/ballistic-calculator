@@ -29,6 +29,7 @@ import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.BulletLibrary
 import pl.ballistics.app.data.DragType
 import pl.ballistics.app.data.withBullet
+import pl.ballistics.app.data.withDragType
 import pl.ballistics.app.data.withFactoryLoad
 
 private enum class Picker { BULLET, FACTORY }
