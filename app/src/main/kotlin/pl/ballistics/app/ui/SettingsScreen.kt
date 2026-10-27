@@ -106,7 +106,7 @@ fun SettingsScreen(
             }
 
             Section(stringResource(R.string.section_measurements)) {
-                SwitchRow(stringResource(R.string.label_pressure_is_qnh), pressureIsQnh, onPressureIsQnh)
+                SwitchRow(stringResource(R.string.label_station_pressure), !pressureIsQnh) { onPressureIsQnh(!it) }
                 SwitchRow(stringResource(R.string.label_location_latitude), ui.locationSetsLatitude) { v ->
                     onUi { it.copy(locationSetsLatitude = v) }
                 }

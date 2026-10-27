@@ -142,7 +142,7 @@
     <string name="label_humidity">Humidity</string>
     <string name="label_pressure_qnh">Pressure (QNH)</string>
     <string name="label_pressure_station">Station pressure</string>
-    <string name="label_pressure_is_qnh">Pressure is QNH (sea-level corrected, as in forecasts); off: station pressure</string>
+    <string name="label_station_pressure">Station pressure (off: QNH)</string>
     <string name="label_altitude">Altitude</string>
     <string name="unit_m_asl">m ASL</string>
     <string name="label_wind_speed">Speed</string>
