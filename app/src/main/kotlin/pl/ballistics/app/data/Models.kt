@@ -43,6 +43,7 @@ data class WeaponProfile(
     val focalPlane: FocalPlane = FocalPlane.FFP,
     /** SFP only: magnification at which the reticle subtensions are true. */
     val calibratedMagnification: String = "10",
+    val minMagnification: String = "1",
     val maxMagnification: String = "25",
 
     val zeroRangeM: String = "100",

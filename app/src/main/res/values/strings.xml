@@ -61,6 +61,7 @@
     <string name="label_reticle">Reticle</string>
     <string name="label_focal_plane">Focal plane</string>
     <string name="label_calibrated_mag">Reticle true at</string>
+    <string name="label_min_mag">Min magnification</string>
     <string name="label_max_mag">Max magnification</string>
     <string name="label_sight_height">Scope axis above bore axis</string>
     <string name="label_load">Load</string>
@@ -181,7 +182,12 @@
     <string name="label_reticle_units">Reticle units</string>
     <string name="reticle_own">%1$s (scope)</string>
     <string name="reticle_preview_note">Previewing another reticle. %1$s has: %2$s.</string>
-    <string name="sfp_note">Second focal plane: subtensions are true at %1$s×. Magnification: %2$d×</string>
+    <string name="sfp_note">Second focal plane: subtensions are true at %1$s×, holds change with magnification.</string>
+    <string name="ffp_note">First focal plane: holds are the same at every magnification; zooming only changes the view.</string>
+    <string name="magnification_value">Magnification %1$s×</string>
+    <string name="action_unlock_magnification">Beyond scope range</string>
+    <string name="magnification_outside_range">Outside the scope\'s %1$s–%2$s× range</string>
+    <string name="hint_pinch_zoom">Pinch the reticle to zoom.</string>
     <string name="hold_on_reticle">Hold %2$s %5$s %1$s, %4$s %5$s %3$s</string>
     <string name="or_dial">Or dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
     <string name="hold_outside_reticle">Hold point is outside the reticle: dial the turrets.</string>
