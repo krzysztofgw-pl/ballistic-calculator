@@ -71,7 +71,12 @@ fun WeaponEditor(
             }
             NumberField(stringResource(R.string.label_click_value), w.clickValue, w.angularUnit.label) { w = w.copy(clickValue = it) }
             ReticleChoice(stringResource(R.string.label_reticle), Reticles.byId(w.reticleId), w.angularUnit, { stringResource(it.family) }) {
-                w = w.copy(reticleId = it.id)
+                w = w.copy(
+                    reticleId = it.id,
+                    focalPlane = it.focalPlane ?: w.focalPlane,
+                    calibratedMagnification = it.calibratedMagnification?.let { m -> if (m % 1.0 == 0.0) m.toInt().toString() else m.toString() }
+                        ?: w.calibratedMagnification,
+                )
             }
             Choice(stringResource(R.string.label_focal_plane), w.focalPlane, FocalPlane.entries, { stringResource(it.label) }) { w = w.copy(focalPlane = it) }
             FieldRow { m ->
