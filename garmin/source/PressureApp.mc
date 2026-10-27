@@ -5,14 +5,18 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Sensor;
 import Toybox.SensorHistory;
+import Toybox.System;
+import Toybox.Timer;
 import Toybox.WatchUi;
 
 // Sends the watch's station pressure (the barometer's own reading, not reduced to sea level)
 // to the Ballistics phone app. The phone opens this app and asks; the app answers each request
-// and also sends once on start and whenever START is pressed.
+// and also sends once on start and whenever START is pressed. It runs only while open and closes
+// itself a few seconds after a reading reaches the phone, so it costs no battery in the background.
 class PressureApp extends Application.AppBase {
     var pressurePa as Float or Null = null;
     var status as Symbol = :none;
+    var closeTimer as Timer.Timer = new Timer.Timer();
 
     function initialize() {
         AppBase.initialize();
@@ -25,6 +29,7 @@ class PressureApp extends Application.AppBase {
     }
 
     function onStop(state as Dictionary or Null) as Void {
+        closeTimer.stop();
         Sensor.enableSensorEvents(null);
     }
 
@@ -68,6 +73,7 @@ class PressureApp extends Application.AppBase {
         if (pa == null) {
             status = :none;
         } else {
+            closeTimer.stop();
             status = :sending;
             Communications.transmit({ "pa" => pa }, null, new SendListener(self));
         }
@@ -76,7 +82,14 @@ class PressureApp extends Application.AppBase {
 
     function onSent(ok as Boolean) as Void {
         status = ok ? :sent : :failed;
+        if (ok) {
+            closeTimer.start(method(:close), 5000, false);
+        }
         WatchUi.requestUpdate();
+    }
+
+    function close() as Void {
+        System.exit();
     }
 }
 
