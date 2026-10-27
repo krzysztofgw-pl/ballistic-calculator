@@ -1,5 +1,6 @@
 package pl.ballistics.app.ui
 
+import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,13 +24,16 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AppData
+import pl.ballistics.app.data.SyncState
 import pl.ballistics.app.data.WeaponProfile
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @Composable
@@ -39,9 +44,13 @@ fun ProfilesScreen(
     onEditAmmo: (AmmoProfile) -> Unit,
     onExport: () -> String,
     onImport: (String) -> Boolean,
+    sync: SyncState,
+    onSignIn: suspend (Context) -> String?,
+    onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         val ok = runCatching {
@@ -97,8 +106,27 @@ fun ProfilesScreen(
         }
 
         Section("Synchronizacja") {
+            when (sync) {
+                SyncState.Unavailable -> Unit
+                SyncState.SignedOut -> {
+                    Text(
+                        "Zaloguj się kontem Google, a profile będą same synchronizować się między Twoimi telefonami.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Button(onClick = {
+                        scope.launch {
+                            onSignIn(context)?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+                        }
+                    }) { Text("Zaloguj przez Google") }
+                }
+                is SyncState.SignedIn -> {
+                    Text("Chmura: ${sync.email ?: "zalogowano"}", style = MaterialTheme.typography.bodyMedium)
+                    sync.error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+                    TextButton(onClick = onSignOut) { Text("Wyloguj") }
+                }
+            }
             Text(
-                "Zapisz profile do pliku (np. na Dysku Google) i wczytaj je na innym telefonie. " +
+                "Możesz też zapisać profile do pliku (np. na Dysku Google) i wczytać je na innym telefonie. " +
                     "Android dodatkowo sam robi kopię zapasową na Twoim koncie Google.",
                 style = MaterialTheme.typography.bodySmall,
             )

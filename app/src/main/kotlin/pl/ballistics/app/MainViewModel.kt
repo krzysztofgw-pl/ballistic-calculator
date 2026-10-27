@@ -13,6 +13,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AppData
+import pl.ballistics.app.data.CloudSync
+import pl.ballistics.app.data.SyncState
 import pl.ballistics.app.data.Conditions
 import pl.ballistics.app.data.Repository
 import pl.ballistics.app.data.WeaponProfile
@@ -27,15 +29,45 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val result: StateFlow<CalcResult?> = _result.asStateFlow()
 
     private var job: Job? = null
+    private var pushJob: Job? = null
+
+    private val cloud = CloudSync(application, ::onRemoteData).also { c ->
+        c.pendingFirstPush = { c.push(_data.value) }
+    }
+    val syncState: StateFlow<SyncState> = cloud.state
 
     init {
         recalculate(debounce = false)
     }
 
     private fun update(transform: (AppData) -> AppData) {
-        _data.value = transform(_data.value)
+        _data.value = transform(_data.value).copy(modifiedAt = System.currentTimeMillis())
         repository.save(_data.value)
         recalculate(debounce = true)
+        pushJob?.cancel()
+        pushJob = viewModelScope.launch {
+            delay(1500)
+            cloud.push(_data.value)
+        }
+    }
+
+    /** A newer copy arrived from another device; an older one means ours should go up. */
+    private fun onRemoteData(remote: AppData) {
+        val local = _data.value
+        when {
+            remote.modifiedAt > local.modifiedAt -> {
+                _data.value = remote
+                repository.save(remote)
+                recalculate(debounce = false)
+            }
+            remote.modifiedAt < local.modifiedAt -> cloud.push(local)
+        }
+    }
+
+    suspend fun signIn(activity: android.content.Context): String? = cloud.signIn(activity)
+
+    fun signOut() {
+        viewModelScope.launch { cloud.signOut() }
     }
 
     fun updateConditions(transform: (Conditions) -> Conditions) = update { it.copy(conditions = transform(it.conditions)) }

@@ -49,6 +49,7 @@ private sealed interface Editor {
 fun App(vm: MainViewModel = viewModel()) {
     val data by vm.data.collectAsStateWithLifecycle()
     val result by vm.result.collectAsStateWithLifecycle()
+    val sync by vm.syncState.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(2) }
     var editor by remember { mutableStateOf<Editor?>(null) }
 
@@ -103,6 +104,9 @@ fun App(vm: MainViewModel = viewModel()) {
                 onEditAmmo = { editor = Editor.Ammo(it) },
                 onExport = vm::exportData,
                 onImport = vm::importData,
+                sync = sync,
+                onSignIn = vm::signIn,
+                onSignOut = vm::signOut,
                 modifier = modifier,
             )
             1 -> ConditionsScreen(data.conditions, vm::updateConditions, modifier)

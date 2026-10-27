@@ -96,6 +96,8 @@ data class AppData(
     val ammo: List<AmmoProfile> = emptyList(),
     val activeWeaponId: String? = null,
     val conditions: Conditions = Conditions(),
+    /** Wall-clock time of the last local edit; the newer copy wins when syncing. */
+    val modifiedAt: Long = 0,
 ) {
     val activeWeapon: WeaponProfile? get() = weapons.find { it.id == activeWeaponId } ?: weapons.firstOrNull()
 
