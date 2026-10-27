@@ -43,6 +43,7 @@ object Reticles {
             duplex, inUnit(duplex, "duplex-mrad", R.string.reticle_duplex_mrad, AngularUnit.MRAD),
             dls1(), dls3(),
             dls2, inUnit(dls2, "dls-2-moa", R.string.reticle_dls_2_moa, AngularUnit.MOA),
+            dlr3(),
         )
     }
 
@@ -194,6 +195,45 @@ object Reticles {
         add(Mark.Line(-34.0, 0.0, -40.0, 0.0, Weight.HEAVY))
         add(Mark.Line(0.0, -34.0, 0.0, -40.0, Weight.HEAVY))
         add(Mark.Line(0.0, 17.0, 0.0, 40.0, Weight.HEAVY))
+    })
+
+    /**
+     * Delta Optical Stryker HD 3.5-21x44 DLR-3: MRAD, second focal plane,
+     * calibrated at 21x. Drawn from Delta's published diagram: a broken centre,
+     * 0.2 MRAD ticks out to 1, then 0.5 MRAD ticks, numbered at 5 and 10, a
+     * T-bar at 3 MRAD up and heavy side posts from 5.5 MRAD.
+     */
+    private fun dlr3() = Reticle("dlr-3", R.string.reticle_dlr_3, AngularUnit.MRAD, 10.5, buildList<Mark> {
+        // Broken centre: two short dashes on each arm around a fine dot.
+        for ((from, to) in listOf(0.08 to 0.18, 0.26 to 0.34)) {
+            add(Mark.Line(from, 0.0, to, 0.0)); add(Mark.Line(-from, 0.0, -to, 0.0))
+            add(Mark.Line(0.0, from, 0.0, to)); add(Mark.Line(0.0, -from, 0.0, -to))
+        }
+        add(Mark.Dot(0.0, 0.0, 0.02))
+        add(Mark.Line(0.42, 0.0, 5.5, 0.0)); add(Mark.Line(-0.42, 0.0, -5.5, 0.0))
+        add(Mark.Line(0.0, 0.42, 0.0, 3.0)); add(Mark.Line(0.0, -0.42, 0.0, -10.5))
+        add(Mark.Line(5.5, 0.0, 10.5, 0.0, Weight.HEAVY)); add(Mark.Line(-5.5, 0.0, -10.5, 0.0, Weight.HEAVY))
+
+        fun len(v: Double) = when {
+            abs(v - v.roundToInt()) < 1e-6 -> 0.16
+            else -> 0.08
+        }
+        val stops = listOf(0.6, 0.8) + generateSequence(1.0) { it + 0.5 }.takeWhile { it <= 10.0 + 1e-9 }
+        for (v in stops) {
+            val l = len(v)
+            if (v <= 5.0 + 1e-9) {
+                val h = if (abs(v - 5.0) < 1e-6) 0.35 else l
+                add(Mark.Line(v, -h, v, h)); add(Mark.Line(-v, -h, -v, h))
+            }
+            if (v < 3.0 - 1e-9) add(Mark.Line(-l, v, l, v))
+            add(Mark.Line(-l, -v, l, -v))
+        }
+        add(Mark.Line(-0.3, 3.0, 0.3, 3.0))
+        add(Mark.Line(-0.3, -5.0, 0.3, -5.0))
+        add(Mark.Label(5.0, 0.8, "5")); add(Mark.Label(-5.0, 0.8, "5"))
+        add(Mark.Label(0.6, 3.0, "3"))
+        add(Mark.Label(0.6, -5.0, "5"))
+        add(Mark.Label(0.7, -10.0, "10"))
     })
 
     /** Classic hunting duplex: fine centre, heavy outer posts. */
