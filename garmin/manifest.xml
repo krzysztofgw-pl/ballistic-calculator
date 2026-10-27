@@ -2,7 +2,7 @@
 <iq:manifest version="3" xmlns:iq="http://www.garmin.com/xml/connectiq">
     <!-- The id is shared with the phone app (GarminPressure.kt); keep both in step. -->
     <iq:application id="d8c4bc4d63d94a6cb0071345dc138c56" type="watch-app" name="@Strings.AppName"
-        entry="PressureApp" launcherIcon="@Drawables.LauncherIcon" minApiVersion="3.2.0">
+        entry="PressureApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="3.2.0">
         <iq:products>
             <iq:product id="fenix7x"/>
             <iq:product id="fenix7xpro"/>

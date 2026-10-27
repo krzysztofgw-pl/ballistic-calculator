@@ -125,7 +125,7 @@ class PressureView extends WatchUi.View {
 
         var pa = app.pressurePa;
         if (pa == null) {
-            dc.drawText(w / 2, h / 2, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.NoReading),
+            dc.drawText(w / 2, h / 2, Graphics.FONT_MEDIUM, (WatchUi.loadResource(Rez.Strings.NoReading) as String),
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
             return;
         }
@@ -133,7 +133,7 @@ class PressureView extends WatchUi.View {
             Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.drawText(w / 2, h * 0.56, Graphics.FONT_SMALL, "hPa", Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 0.66, Graphics.FONT_XTINY, WatchUi.loadResource(Rez.Strings.Station),
+        dc.drawText(w / 2, h * 0.66, Graphics.FONT_XTINY, (WatchUi.loadResource(Rez.Strings.Station) as String),
             Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
         var line = null;
@@ -146,11 +146,11 @@ class PressureView extends WatchUi.View {
         }
         if (line != null) {
             dc.setColor(app.status == :failed ? Graphics.COLOR_ORANGE : Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, h * 0.76, Graphics.FONT_XTINY, WatchUi.loadResource(line),
+            dc.drawText(w / 2, h * 0.76, Graphics.FONT_XTINY, (WatchUi.loadResource(line) as String),
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         }
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 0.86, Graphics.FONT_XTINY, WatchUi.loadResource(Rez.Strings.Hint),
+        dc.drawText(w / 2, h * 0.86, Graphics.FONT_XTINY, (WatchUi.loadResource(Rez.Strings.Hint) as String),
             Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }
