@@ -136,6 +136,7 @@ data class Conditions(
     /** The distance picked on the target screen; blank picks the middle of the table. */
     val targetRangeM: String = "",
     /** Moving target: its speed and the direction it moves, degrees from the line of fire (90 = to the right). */
+    val targetMoving: Boolean = false,
     val targetSpeedMps: String = "0",
     val targetDirectionDeg: String = "90",
     val targetWidthCm: String = "50",
@@ -151,7 +152,7 @@ data class Conditions(
     fun withoutTarget(): Conditions {
         val d = Conditions()
         return copy(
-            targetRangeM = d.targetRangeM, targetSpeedMps = d.targetSpeedMps, targetDirectionDeg = d.targetDirectionDeg,
+            targetRangeM = d.targetRangeM, targetMoving = d.targetMoving, targetSpeedMps = d.targetSpeedMps, targetDirectionDeg = d.targetDirectionDeg,
             targetWidthCm = d.targetWidthCm, targetHeightCm = d.targetHeightCm, windMinMps = d.windMinMps,
             windMaxMps = d.windMaxMps, windUncertaintyMps = d.windUncertaintyMps, rangeUncertaintyM = d.rangeUncertaintyM,
         )
@@ -160,7 +161,7 @@ data class Conditions(
     /** The conditions with [t]'s distance, angles, motion and size. */
     fun withTarget(t: SavedTarget) = copy(
         targetRangeM = t.rangeM, lookAngleDeg = t.lookAngleDeg, azimuthDeg = t.azimuthDeg,
-        targetSpeedMps = t.speedMps, targetDirectionDeg = t.directionDeg, targetWidthCm = t.widthCm, targetHeightCm = t.heightCm,
+        targetMoving = t.moving, targetSpeedMps = t.speedMps, targetDirectionDeg = t.directionDeg, targetWidthCm = t.widthCm, targetHeightCm = t.heightCm,
     )
 
     /** Wind direction in degrees from the line of fire, converted from the clock for older data. */
@@ -176,6 +177,7 @@ data class SavedTarget(
     val rangeM: String = "",
     val lookAngleDeg: String = "0",
     val azimuthDeg: String = "0",
+    val moving: Boolean = false,
     val speedMps: String = "0",
     val directionDeg: String = "90",
     val widthCm: String = "50",
@@ -184,7 +186,7 @@ data class SavedTarget(
     /** This target with the values currently set in [c]. */
     fun from(c: Conditions) = copy(
         rangeM = c.targetRangeM, lookAngleDeg = c.lookAngleDeg, azimuthDeg = c.azimuthDeg,
-        speedMps = c.targetSpeedMps, directionDeg = c.targetDirectionDeg, widthCm = c.targetWidthCm, heightCm = c.targetHeightCm,
+        moving = c.targetMoving, speedMps = c.targetSpeedMps, directionDeg = c.targetDirectionDeg, widthCm = c.targetWidthCm, heightCm = c.targetHeightCm,
     )
 }
 

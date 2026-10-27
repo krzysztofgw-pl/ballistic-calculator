@@ -52,9 +52,9 @@ For each range: drop, elevation and clicks, wind drift and windage correction, v
 flight and Mach. The range column stays in place while the other columns scroll sideways.
 
 ### Target
-Pick a distance to the metre with the slider, the arrows or by typing it, and get the hold and the dial
-correction for it.
-- Moving target: its speed and the direction it moves (90° = to the right). The lead uses the time of
+Pick a distance to the metre with the slider, the arrows or by typing it (all in one row), and get the
+hold and the dial correction for it.
+- Moving target, switched on with a checkbox: its speed and the direction it moves (90° = to the right). The lead uses the time of
   flight to where the target will be, and its hold point is drawn on the reticle in blue.
 - Impact points drawn on the scope's reticle, with a magnification slider; the same holds can be
   previewed on any other reticle.
@@ -68,7 +68,7 @@ correction for it.
 - Range error: vertical miss when the distance is off by up to ±50 m, and the error that still hits a
   target of the given height.
 - Temperature: muzzle velocity and elevation 10 °C colder and warmer.
-- Hit probability: chance of a first-round hit on the target from the velocity SD (load), the 5-shot
+- Hit probability: chance of a first-round hit on the target (its width and height are set here) from the velocity SD (load), the 5-shot
   group (rifle) and how well the wind and the distance are known. Each source's spread comes from the
   full solution; a 5-shot group is taken as three standard deviations.
 - Ranging with the reticle: distance from the target size and its reading in the reticle.

@@ -1,6 +1,7 @@
 package pl.ballistics.app.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -117,7 +120,7 @@ fun TargetScreen(
         ?: conditions.targetRangeM.toNumber()?.takeIf { it > 0 }
         ?: points.getOrNull(points.size / 2)?.rangeM ?: 0.0
     fun setDistance(m: Double) = update { it.copy(targetRangeM = m.coerceIn(1.0, maxDistance).roundToInt().toString()) }
-    val targetSpeed = conditions.targetSpeedMps.toNumber()?.takeIf { it > 0 }
+    val targetSpeed = conditions.targetSpeedMps.toNumber()?.takeIf { it > 0 && conditions.targetMoving }
     val targetDirection = conditions.targetDirectionDeg.toNumber() ?: 90.0
 
     val inputs = TargetInputs(
@@ -169,40 +172,43 @@ fun TargetScreen(
         modifier.verticalScroll(rememberScrollState()).padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        // The typed distance and the slider share one row; the arrows step a metre either way.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { setDistance(distance - 1) }) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, stringResource(R.string.action_closer))
-            }
             NumberField(
                 stringResource(R.string.label_target_distance),
                 dragged?.roundToInt()?.toString() ?: conditions.targetRangeM.ifBlank { distance.roundToInt().toString() },
                 "m",
-                Modifier.weight(1f),
+                Modifier.width(116.dp),
             ) { v -> update { it.copy(targetRangeM = v) } }
+            IconButton(onClick = { setDistance(distance - 1) }) {
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, stringResource(R.string.action_closer))
+            }
+            Slider(
+                value = distance.toFloat().coerceIn(1f, maxDistance.toFloat()),
+                onValueChange = { dragged = it },
+                onValueChangeFinished = { dragged?.let { setDistance(it.toDouble()) }; dragged = null },
+                valueRange = 1f..maxDistance.toFloat(),
+                modifier = Modifier.weight(1f),
+            )
             IconButton(onClick = { setDistance(distance + 1) }) {
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, stringResource(R.string.action_farther))
             }
         }
-        Slider(
-            value = distance.toFloat().coerceIn(1f, maxDistance.toFloat()),
-            onValueChange = { dragged = it },
-            onValueChangeFinished = { dragged?.let { setDistance(it.toDouble()) }; dragged = null },
-            valueRange = 1f..maxDistance.toFloat(),
-        )
-        FieldRow { m ->
-            NumberField(stringResource(R.string.label_target_speed), conditions.targetSpeedMps, "m/s", m) { v ->
-                update { it.copy(targetSpeedMps = v) }
-            }
-            NumberField(stringResource(R.string.label_target_direction), conditions.targetDirectionDeg, "°", m) { v ->
-                update { it.copy(targetDirectionDeg = v) }
-            }
+        Row(
+            Modifier.fillMaxWidth().clickable { update { it.copy(targetMoving = !it.targetMoving) } },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(conditions.targetMoving, onCheckedChange = { v -> update { it.copy(targetMoving = v) } })
+            Text(stringResource(R.string.label_moving_target))
         }
-        FieldRow { m ->
-            NumberField(stringResource(R.string.label_target_width), conditions.targetWidthCm, "cm", m) { v ->
-                update { it.copy(targetWidthCm = v) }
-            }
-            NumberField(stringResource(R.string.label_target_height), conditions.targetHeightCm, "cm", m) { v ->
-                update { it.copy(targetHeightCm = v) }
+        if (conditions.targetMoving) {
+            FieldRow { m ->
+                NumberField(stringResource(R.string.label_target_speed), conditions.targetSpeedMps, "m/s", m) { v ->
+                    update { it.copy(targetSpeedMps = v) }
+                }
+                NumberField(stringResource(R.string.label_target_direction), conditions.targetDirectionDeg, "°", m) { v ->
+                    update { it.copy(targetDirectionDeg = v) }
+                }
             }
         }
 

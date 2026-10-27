@@ -275,6 +275,7 @@
     <string name="label_target_distance">Distance</string>
     <string name="action_closer">1 m closer</string>
     <string name="action_farther">1 m farther</string>
+    <string name="label_moving_target">Moving target</string>
     <string name="label_target_speed">Target speed</string>
     <string name="label_target_direction">Moving to (90° = right)</string>
     <string name="moving_hold">Moving: hold %2$s %5$s %1$s, %4$s %5$s %3$s (lead %6$s %7$s m)</string>
@@ -320,7 +321,7 @@
     <string name="label_wind_uncertainty">Wind known to ±</string>
     <string name="label_range_uncertainty">Distance known to ±</string>
     <string name="assumed">(assumed)</string>
-    <string name="hit_inputs">Velocity SD %1$s m/s, group %2$s MOA, target %3$s × %4$s cm</string>
+    <string name="hit_inputs">Velocity SD %1$s m/s, group %2$s MOA</string>
     <string name="hit_result">First-round hit: %1$d%%</string>
     <string name="hit_breakdown">Vertical spread %1$s cm (velocity %2$s, distance %3$s, rifle %4$s). Horizontal %5$s cm (wind %6$s, rifle %7$s).</string>
     <string name="section_ranging">Ranging with the reticle</string>

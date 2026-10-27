@@ -142,6 +142,14 @@ fun TargetTools(
 
     Collapsible(stringResource(R.string.section_hit_probability)) {
         FieldRow { m ->
+            NumberField(stringResource(R.string.label_target_width), conditions.targetWidthCm, "cm", m) { v ->
+                update { it.copy(targetWidthCm = v) }
+            }
+            NumberField(stringResource(R.string.label_target_height), conditions.targetHeightCm, "cm", m) { v ->
+                update { it.copy(targetHeightCm = v) }
+            }
+        }
+        FieldRow { m ->
             NumberField(stringResource(R.string.label_wind_uncertainty), conditions.windUncertaintyMps, "m/s", m) { v ->
                 update { it.copy(windUncertaintyMps = v) }
             }
@@ -155,7 +163,6 @@ fun TargetTools(
                 R.string.hit_inputs,
                 inputs.velocitySdMps.f(1) + if (result.ammo.velocitySd.toNumber() == null) " $assumed" else "",
                 (inputs.groupRad / AngularUnit.MOA.radians).f(2) + if (result.weapon.groupMoa.toNumber() == null) " $assumed" else "",
-                cm(inputs.widthM), cm(inputs.heightM),
             ),
             style = MaterialTheme.typography.bodySmall,
         )
