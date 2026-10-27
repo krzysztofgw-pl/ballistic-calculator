@@ -22,6 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import pl.ballistics.app.R
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.BulletLibrary
@@ -43,31 +45,31 @@ fun AmmoEditor(
     var picker by remember { mutableStateOf<Picker?>(null) }
 
     EditorScaffold(
-        title = if (isNew) "Nowa amunicja" else a.name,
+        title = if (isNew) stringResource(R.string.title_new_load) else a.name,
         canDelete = !isNew,
         onSave = { onSave(a) },
         onDelete = onDelete,
         onClose = onClose,
     ) {
-        Section("Źródło danych") {
+        Section(stringResource(R.string.section_data_source)) {
             Text(
-                "Wybierz amunicję fabryczną albo sam pocisk (do elaboracji) z danych producentów, potem popraw prędkość wg chronografu.",
+                stringResource(R.string.hint_data_source),
                 style = MaterialTheme.typography.bodySmall,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { picker = Picker.FACTORY }) { Text("Fabryczna") }
-                OutlinedButton(onClick = { picker = Picker.BULLET }) { Text("Pocisk") }
+                OutlinedButton(onClick = { picker = Picker.FACTORY }) { Text(stringResource(R.string.action_factory_load)) }
+                OutlinedButton(onClick = { picker = Picker.BULLET }) { Text(stringResource(R.string.action_bullet)) }
             }
         }
 
-        Section("Pocisk") {
-            TextInput("Nazwa", a.name) { a = a.copy(name = it) }
-            Choice("Model oporu", a.dragType, DragType.entries, { if (it == DragType.CUSTOM) "Własna Cd(M)" else it.name }) {
+        Section(stringResource(R.string.section_bullet)) {
+            TextInput(stringResource(R.string.label_name), a.name) { a = a.copy(name = it) }
+            Choice(stringResource(R.string.label_drag_model), a.dragType, DragType.entries, { if (it == DragType.CUSTOM) stringResource(R.string.drag_custom) else it.name }) {
                 a = a.copy(dragType = it)
             }
             if (a.dragType == DragType.CUSTOM) {
                 Text(
-                    "Wklej krzywą oporu z pomiarów Dopplera: w każdym wierszu liczba Macha i Cd, np. \"0.80 0.157\".",
+                    stringResource(R.string.hint_custom_curve),
                     style = MaterialTheme.typography.bodySmall,
                 )
                 OutlinedTextField(
@@ -77,28 +79,28 @@ fun AmmoEditor(
                     modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
                 )
             } else {
-                NumberField("Współczynnik balistyczny ${a.dragType.name}", a.bc, "lb/in²") { a = a.copy(bc = it) }
+                NumberField(stringResource(R.string.label_bc, a.dragType.name), a.bc, "lb/in²") { a = a.copy(bc = it) }
             }
             FieldRow { m ->
-                NumberField("Masa", a.massGr, "gr", m) { a = a.copy(massGr = it) }
-                NumberField("Średnica", a.diameterMm, "mm", m) { a = a.copy(diameterMm = it) }
+                NumberField(stringResource(R.string.label_mass), a.massGr, "gr", m) { a = a.copy(massGr = it) }
+                NumberField(stringResource(R.string.label_diameter), a.diameterMm, "mm", m) { a = a.copy(diameterMm = it) }
             }
-            NumberField("Długość pocisku (stabilność, znos)", a.lengthMm, "mm", optional = true) { a = a.copy(lengthMm = it) }
+            NumberField(stringResource(R.string.label_bullet_length), a.lengthMm, "mm", optional = true) { a = a.copy(lengthMm = it) }
         }
 
-        Section("Prędkość") {
-            NumberField("Prędkość początkowa", a.muzzleVelocity, "m/s") { a = a.copy(muzzleVelocity = it) }
+        Section(stringResource(R.string.section_velocity)) {
+            NumberField(stringResource(R.string.label_muzzle_velocity), a.muzzleVelocity, "m/s") { a = a.copy(muzzleVelocity = it) }
             FieldRow { m ->
-                NumberField("Czułość prochu", a.powderSensitivity, "m/s/°C", m) { a = a.copy(powderSensitivity = it) }
-                NumberField("przy temp.", a.powderReferenceTemp, "°C", m) { a = a.copy(powderReferenceTemp = it) }
+                NumberField(stringResource(R.string.label_powder_sensitivity), a.powderSensitivity, "m/s/°C", m) { a = a.copy(powderSensitivity = it) }
+                NumberField(stringResource(R.string.label_at_temperature), a.powderReferenceTemp, "°C", m) { a = a.copy(powderReferenceTemp = it) }
             }
         }
 
-        Section("Notatki") {
+        Section(stringResource(R.string.section_notes)) {
             OutlinedTextField(
                 value = a.notes,
                 onValueChange = { a = a.copy(notes = it) },
-                placeholder = { Text("np. elaboracja, partia, długość lufy") },
+                placeholder = { Text(stringResource(R.string.hint_notes)) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -106,18 +108,18 @@ fun AmmoEditor(
 
     when (picker) {
         Picker.BULLET -> LibraryDialog(
-            title = "Pociski",
+            title = stringResource(R.string.title_bullets),
             options = BulletLibrary.bullets,
             label = { it.label },
-            detail = { b -> listOfNotNull(b.g1?.let { "G1 $it" }, b.g7?.let { "G7 $it" }, "kal. ${b.diameterIn}\"").joinToString(" · ") },
+            detail = { b -> listOfNotNull(b.g1?.let { "G1 $it" }, b.g7?.let { "G7 $it" }, "${b.diameterIn}\" cal").joinToString(" · ") },
             onPick = { a = a.withBullet(it); picker = null },
             onDismiss = { picker = null },
         )
         Picker.FACTORY -> LibraryDialog(
-            title = "Amunicja fabryczna",
+            title = stringResource(R.string.title_factory_loads),
             options = BulletLibrary.factoryLoads,
             label = { it.label },
-            detail = { "${it.muzzleVelocityFps.toInt()} fps (lufa testowa producenta)" },
+            detail = { stringResource(R.string.factory_load_velocity, it.muzzleVelocityFps.toInt()) },
             onPick = { a = a.withFactoryLoad(it); picker = null },
             onDismiss = { picker = null },
         )
@@ -130,7 +132,7 @@ private fun <T> LibraryDialog(
     title: String,
     options: List<T>,
     label: (T) -> String,
-    detail: (T) -> String,
+    detail: @Composable (T) -> String,
     onPick: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -141,7 +143,7 @@ private fun <T> LibraryDialog(
         title = { Text(title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(query, { query = it }, label = { Text("Szukaj") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(query, { query = it }, label = { Text(stringResource(R.string.action_search)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 LazyColumn(Modifier.heightIn(max = 400.dp)) {
                     items(filtered) { item ->
                         Column(Modifier.fillMaxWidth().clickable { onPick(item) }.padding(vertical = 8.dp)) {
@@ -152,11 +154,11 @@ private fun <T> LibraryDialog(
                     }
                 }
                 Text(
-                    "Dane katalogowe producentów; sprawdź BC i prędkość z aktualnym katalogiem i chronografem.",
+                    stringResource(R.string.hint_library_disclaimer),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Zamknij") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } },
     )
 }

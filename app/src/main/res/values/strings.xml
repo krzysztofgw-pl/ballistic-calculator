@@ -1,4 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Balistyka</string>
+    <string name="app_name">Ballistics</string>
+
+    <!-- Navigation -->
+    <string name="tab_profiles">Profiles</string>
+    <string name="tab_conditions">Conditions</string>
+    <string name="tab_table">Table</string>
+    <string name="tab_reticle">Reticle</string>
+
+    <!-- Actions -->
+    <string name="action_back">Back</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_use">Use</string>
+    <string name="action_search">Search</string>
+    <string name="action_add_rifle">Add rifle</string>
+    <string name="action_add_load">Add load</string>
+    <string name="action_export">Export</string>
+    <string name="action_import">Import</string>
+    <string name="action_sign_in_google">Sign in with Google</string>
+    <string name="action_sign_out">Sign out</string>
+    <string name="action_factory_load">Factory load</string>
+    <string name="action_bullet">Bullet</string>
+    <string name="action_sight_height_helper">Help me find the sight height</string>
+    <string name="delete_profile_title">Delete this profile?</string>
+    <string name="choose">choose</string>
+
+    <!-- Profiles -->
+    <string name="section_rifles">Rifles</string>
+    <string name="section_loads">Loads</string>
+    <string name="section_sync">Sync</string>
+    <string name="no_ammo">no load selected</string>
+    <string name="sync_sign_in_hint">Sign in with Google and your profiles will sync between your phones automatically.</string>
+    <string name="sync_signed_in">signed in</string>
+    <string name="sync_signed_in_as">Cloud: %1$s</string>
+    <string name="sync_file_hint">You can also save your profiles to a file (e.g. on Google Drive) and load them on another phone. Android also backs them up to your Google account.</string>
+    <string name="sync_not_configured">Cloud sync is not configured in this build</string>
+    <string name="sync_missing_client_id">The Firebase configuration has no Google client ID</string>
+    <string name="sync_sign_in_failed">Sign-in failed</string>
+    <string name="toast_exported">Profiles saved</string>
+    <string name="toast_export_failed">Could not save the file</string>
+    <string name="toast_imported">Profiles loaded</string>
+    <string name="toast_import_failed">This is not a profiles file</string>
+
+    <!-- Rifle editor -->
+    <string name="title_new_rifle">New rifle</string>
+    <string name="section_rifle">Rifle</string>
+    <string name="section_scope_mount">Scope and mount</string>
+    <string name="section_zero">Zero</string>
+    <string name="label_name">Name</string>
+    <string name="label_caliber">Caliber</string>
+    <string name="label_twist">Twist rate (1 turn in)</string>
+    <string name="label_right_twist">Right-hand twist</string>
+    <string name="label_scope">Scope</string>
+    <string name="label_turret_units">Turret units</string>
+    <string name="label_click_value">Click value</string>
+    <string name="label_reticle">Reticle</string>
+    <string name="label_focal_plane">Focal plane</string>
+    <string name="label_calibrated_mag">Reticle true at</string>
+    <string name="label_max_mag">Max magnification</string>
+    <string name="label_sight_height">Scope axis above bore axis</string>
+    <string name="label_load">Load</string>
+    <string name="label_zero_range">Zero range</string>
+    <string name="focal_plane_ffp">First (FFP)</string>
+    <string name="focal_plane_sfp">Second (SFP)</string>
+
+    <!-- Sight height helper -->
+    <string name="title_sight_height">Sight height</string>
+    <string name="label_method">Method</string>
+    <string name="method_measure">Measure</string>
+    <string name="method_estimate">Estimate</string>
+    <string name="hint_caliper">Open the bolt and measure with a caliper the gap from the top of the bolt body to the bottom of the scope tube.</string>
+    <string name="label_bolt_tube_gap">Bolt to tube gap</string>
+    <string name="label_bolt_diameter">Bolt body diameter</string>
+    <string name="label_tube_diameter">Scope tube diameter</string>
+    <string name="label_platform">Platform</string>
+    <string name="label_rail_above_bore">Rail above bore axis</string>
+    <string name="label_objective">Objective diameter</string>
+    <string name="hint_min_ring_axis">Lowest rings that clear the objective: axis about %1$.0f mm above the rail.</string>
+    <string name="label_ring_axis">Ring axis height above rail</string>
+    <string name="hint_ring_axis">Mount makers usually list the axis height in mm. Leave empty to use the lowest rings that fit. Rail heights are approximate; measuring is more accurate.</string>
+    <string name="sight_height_result">Sight height: %1$s cm</string>
+    <string name="fill_in_fields">Fill in the fields</string>
+    <string name="rail_bolt_picatinny">Bolt action, Picatinny rail</string>
+    <string name="rail_bolt_weaver">Bolt action, Weaver bases</string>
+    <string name="rail_ar15">AR-15 / AR-10 flat top</string>
+    <string name="rail_custom">Custom value</string>
+
+    <!-- Load editor -->
+    <string name="title_new_load">New load</string>
+    <string name="section_data_source">Data source</string>
+    <string name="hint_data_source">Pick a factory load or just a bullet (for handloads) from manufacturer data, then correct the velocity with your chronograph.</string>
+    <string name="section_bullet">Bullet</string>
+    <string name="label_drag_model">Drag model</string>
+    <string name="drag_custom">Custom Cd(M)</string>
+    <string name="hint_custom_curve">Paste a drag curve from Doppler data: one Mach number and Cd per line, e.g. \"0.80 0.157\".</string>
+    <string name="label_bc">%1$s ballistic coefficient</string>
+    <string name="label_mass">Weight</string>
+    <string name="label_diameter">Diameter</string>
+    <string name="label_bullet_length">Bullet length (stability, spin drift)</string>
+    <string name="section_velocity">Velocity</string>
+    <string name="label_muzzle_velocity">Muzzle velocity</string>
+    <string name="label_powder_sensitivity">Powder temp sensitivity</string>
+    <string name="label_at_temperature">at temperature</string>
+    <string name="section_notes">Notes</string>
+    <string name="hint_notes">e.g. load data, lot, barrel length</string>
+    <string name="title_bullets">Bullets</string>
+    <string name="title_factory_loads">Factory loads</string>
+    <string name="factory_load_velocity">%1$d fps (manufacturer test barrel)</string>
+    <string name="hint_library_disclaimer">Manufacturer catalogue data; check BC and velocity against the current catalogue and your chronograph.</string>
+
+    <!-- Conditions -->
+    <string name="section_atmosphere">Atmosphere</string>
+    <string name="section_wind">Wind</string>
+    <string name="section_shot">Shot</string>
+    <string name="section_advanced">Advanced effects</string>
+    <string name="label_temperature">Temperature</string>
+    <string name="label_humidity">Humidity</string>
+    <string name="label_pressure_qnh">Pressure (QNH)</string>
+    <string name="label_pressure_station">Station pressure</string>
+    <string name="label_pressure_is_qnh">Pressure is sea-level corrected (from a forecast)</string>
+    <string name="label_altitude">Altitude</string>
+    <string name="unit_m_asl">m ASL</string>
+    <string name="label_wind_speed">Speed</string>
+    <string name="label_wind_from">Direction (from)</string>
+    <string name="unit_oclock">o\'clock</string>
+    <string name="hint_wind_clock">Clock direction: 12 = from the target, 3 = from the right, 9 = from the left.</string>
+    <string name="label_look_angle">Shot angle</string>
+    <string name="label_cant">Cant</string>
+    <string name="label_table_range">Table range</string>
+    <string name="label_table_step">Step</string>
+    <string name="label_spin_drift">Spin drift</string>
+    <string name="label_aero_jump">Aerodynamic jump from crosswind</string>
+    <string name="label_coriolis">Coriolis and Eötvös effects</string>
+    <string name="label_latitude">Latitude</string>
+    <string name="label_azimuth">Shot azimuth</string>
+
+    <!-- Table -->
+    <string name="col_range">m</string>
+    <string name="col_drop">Drop cm</string>
+    <string name="col_elevation">Elev.</string>
+    <string name="col_clicks">Clicks</string>
+    <string name="col_windage">Wind cm</string>
+    <string name="col_wind_correction">Wind.</string>
+    <string name="col_velocity">m/s</string>
+    <string name="col_energy">J</string>
+    <string name="col_time">s</string>
+    <string name="col_mach">Mach</string>
+    <string name="summary_muzzle_velocity">MV %1$d m/s</string>
+    <string name="summary_density_altitude">density altitude %1$d m</string>
+    <string name="summary_stability">Sg %1$.2f</string>
+    <string name="warning_unstable">Bullet is unstable (Sg &lt; 1). Results are unreliable.</string>
+    <string name="warning_marginal">Marginal stability (Sg &lt; 1.4).</string>
+    <string name="table_legend">Corrections in %1$s: ↑ up, R/L right/left. One click = %2$s %1$s.</string>
+
+    <!-- Reticle -->
+    <string name="reticle_mrad_hash">MRAD, 0.2 hash</string>
+    <string name="reticle_mrad_tree">MRAD tree</string>
+    <string name="reticle_mil_dot">Mil-Dot</string>
+    <string name="reticle_moa_hash">MOA, 2 MOA hash</string>
+    <string name="reticle_moa_tree">MOA tree</string>
+    <string name="reticle_duplex">Duplex</string>
+    <string name="reticle_own">%1$s (scope)</string>
+    <string name="reticle_preview_note">Previewing another reticle. %1$s has: %2$s.</string>
+    <string name="sfp_note">Second focal plane: subtensions are true at %1$s×. Magnification: %2$d×</string>
+    <string name="hold_on_reticle">Hold %2$s %5$s %1$s, %4$s %5$s %3$s</string>
+    <string name="or_dial">Or dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
+    <string name="hold_outside_reticle">Hold point is outside the reticle: dial the turrets.</string>
+    <string name="above_center">above center</string>
+    <string name="below_center">below center</string>
+    <string name="up">up</string>
+    <string name="down">down</string>
+    <string name="right">right</string>
+    <string name="left">left</string>
+
+    <!-- Validation -->
+    <string name="error_no_weapon">Add a rifle profile on the Profiles tab.</string>
+    <string name="error_no_ammo">Choose a load for %1$s.</string>
+    <string name="error_cannot_solve">Cannot compute the trajectory</string>
+    <string name="error_invalid_value">Invalid value: %1$s</string>
+    <string name="error_must_be_positive">%1$s must be greater than zero</string>
+    <string name="error_step_too_small">Table step is too small</string>
+    <string name="error_bad_curve_row">Invalid drag curve row: %1$s</string>
+    <string name="error_curve_too_short">The Cd curve needs at least two points (Mach Cd)</string>
+    <string name="field_bullet_mass">bullet weight</string>
+    <string name="field_diameter">diameter</string>
+    <string name="field_bc">BC</string>
+    <string name="field_muzzle_velocity">muzzle velocity</string>
+    <string name="field_powder_sensitivity">powder temperature sensitivity</string>
+    <string name="field_powder_reference_temp">powder reference temperature</string>
+    <string name="field_sight_height">sight height</string>
+    <string name="field_zero_range">zero range</string>
+    <string name="field_altitude">altitude</string>
+    <string name="field_temperature">temperature</string>
+    <string name="field_pressure">pressure</string>
+    <string name="field_humidity">humidity</string>
+    <string name="field_zero_pressure">pressure at zeroing</string>
+    <string name="field_zero_temperature">temperature at zeroing</string>
+    <string name="field_wind_speed">wind speed</string>
+    <string name="field_wind_direction">wind direction</string>
+    <string name="field_look_angle">shot angle</string>
+    <string name="field_cant">cant</string>
+    <string name="field_latitude">latitude</string>
+    <string name="field_azimuth">azimuth</string>
+    <string name="field_table_range">table range</string>
+    <string name="field_table_step">table step</string>
 </resources>

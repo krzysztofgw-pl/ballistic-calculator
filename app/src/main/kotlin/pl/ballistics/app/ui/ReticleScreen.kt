@@ -21,6 +21,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import pl.ballistics.app.R
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -78,18 +80,20 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
         modifier.verticalScroll(rememberScrollState()).padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Choice("Siatka", reticle, Reticles.all, { if (it.id == own.id) "${it.name} (luneta)" else it.name }) {
+        Choice(stringResource(R.string.label_reticle), reticle, Reticles.all, {
+            if (it.id == own.id) stringResource(R.string.reticle_own, stringResource(it.name)) else stringResource(it.name)
+        }) {
             previewId = it.id
         }
         if (previewId != own.id) {
             Text(
-                "Podgląd na innej siatce. Luneta ${weapon.scopeName.ifBlank { weapon.name }} ma: ${own.name}.",
+                stringResource(R.string.reticle_preview_note, weapon.scopeName.ifBlank { weapon.name }, stringResource(own.name)),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
         if (sfp) {
             Text(
-                "Druga płaszczyzna: podziałka prawdziwa przy ${calMag.fmt(0)}×. Powiększenie: ${magnification.roundToInt()}×",
+                stringResource(R.string.sfp_note, calMag.fmt(0), magnification.roundToInt()),
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
@@ -118,23 +122,30 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
             val rightDial = -p.windageRad / unit.radians
             Text("${p.rangeM.roundToInt()} m", style = MaterialTheme.typography.titleMedium)
             Text(
-                "Trzymaj: ${vertical(h.y)} ${h.y.absFmt()}, ${horizontal(h.x)} ${h.x.absFmt()} ${reticle.unit.label} na siatce",
+                stringResource(
+                    R.string.hold_on_reticle,
+                    stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center), h.y.absFmt(),
+                    stringResource(if (h.x >= 0) R.string.right else R.string.left), h.x.absFmt(),
+                    reticle.unit.label,
+                ),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Text(
-                "Albo kręć: ${if (upDial >= 0) "w górę" else "w dół"} ${upDial.absFmt()} ${unit.label}, " +
-                    "${if (rightDial >= 0) "w prawo" else "w lewo"} ${rightDial.absFmt()} ${unit.label}",
+                stringResource(
+                    R.string.or_dial,
+                    stringResource(if (upDial >= 0) R.string.up else R.string.down), upDial.absFmt(),
+                    stringResource(if (rightDial >= 0) R.string.right else R.string.left), rightDial.absFmt(),
+                    unit.label,
+                ),
                 style = MaterialTheme.typography.bodyMedium,
             )
             if (abs(h.x) > reticle.extent || abs(h.y) > reticle.extent) {
-                Text("Punkt poza siatką: użyj bębna.", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.hold_outside_reticle), color = MaterialTheme.colorScheme.error)
             }
         }
     }
 }
 
-private fun vertical(y: Double) = if (y <= 0) "pod środkiem" else "nad środkiem"
-private fun horizontal(x: Double) = if (x >= 0) "w prawo" else "w lewo"
 private fun Double.fmt(decimals: Int) = "%.${decimals}f".format(this)
 private fun Double.absFmt() = abs(this).fmt(1)
 

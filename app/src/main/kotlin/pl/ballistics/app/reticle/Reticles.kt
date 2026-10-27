@@ -1,5 +1,7 @@
 package pl.ballistics.app.reticle
 
+import androidx.annotation.StringRes
+import pl.ballistics.app.R
 import pl.ballistics.app.data.AngularUnit
 import kotlin.math.abs
 import kotlin.math.floor
@@ -22,7 +24,7 @@ sealed interface Mark {
  */
 data class Reticle(
     val id: String,
-    val name: String,
+    @StringRes val name: Int,
     val unit: AngularUnit,
     val extent: Double,
     val marks: List<Mark>,
@@ -73,7 +75,7 @@ object Reticles {
         add(Mark.Line(0.0, -from, 0.0, -to, Weight.HEAVY))
     }
 
-    private fun mradHash() = Reticle("mrad-hash", "MRAD, podziałka 0,2", AngularUnit.MRAD, 12.0, buildList<Mark> {
+    private fun mradHash() = Reticle("mrad-hash", R.string.reticle_mrad_hash, AngularUnit.MRAD, 12.0, buildList<Mark> {
         tickedCross(10.0, 10.0, 10.0, 6.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 2.0, tick = 0.3)
         add(Mark.Line(10.0, 0.0, 12.0, 0.0, Weight.HEAVY))
         add(Mark.Line(-10.0, 0.0, -12.0, 0.0, Weight.HEAVY))
@@ -82,7 +84,7 @@ object Reticles {
     })
 
     /** Holdover grid: a dot every 1 mil, rows widening with drop, like modern "tree" reticles. */
-    private fun mradTree() = Reticle("mrad-tree", "MRAD, drzewko", AngularUnit.MRAD, 12.0, buildList<Mark> {
+    private fun mradTree() = Reticle("mrad-tree", R.string.reticle_mrad_tree, AngularUnit.MRAD, 12.0, buildList<Mark> {
         tickedCross(10.0, 10.0, 12.0, 6.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 2.0, tick = 0.25)
         for (row in 1..11) {
             val y = -row.toDouble()
@@ -99,7 +101,7 @@ object Reticles {
         add(Mark.Line(0.0, 6.0, 0.0, 12.0, Weight.HEAVY))
     })
 
-    private fun milDot() = Reticle("mil-dot", "Mil-Dot", AngularUnit.MRAD, 8.0, buildList<Mark> {
+    private fun milDot() = Reticle("mil-dot", R.string.reticle_mil_dot, AngularUnit.MRAD, 8.0, buildList<Mark> {
         add(Mark.Line(-5.0, 0.0, 5.0, 0.0))
         add(Mark.Line(0.0, -5.0, 0.0, 5.0))
         for (k in 1..4) {
@@ -110,12 +112,12 @@ object Reticles {
         posts(5.0, 8.0)
     })
 
-    private fun moaHash() = Reticle("moa-hash", "MOA, podziałka 2", AngularUnit.MOA, 40.0, buildList<Mark> {
+    private fun moaHash() = Reticle("moa-hash", R.string.reticle_moa_hash, AngularUnit.MOA, 40.0, buildList<Mark> {
         tickedCross(30.0, 30.0, 34.0, 20.0, minor = 2.0, half = 10.0, major = 10.0, labelEvery = 10.0, tick = 1.0)
         posts(34.0, 40.0)
     })
 
-    private fun moaTree() = Reticle("moa-tree", "MOA, drzewko", AngularUnit.MOA, 40.0, buildList<Mark> {
+    private fun moaTree() = Reticle("moa-tree", R.string.reticle_moa_tree, AngularUnit.MOA, 40.0, buildList<Mark> {
         tickedCross(30.0, 30.0, 38.0, 20.0, minor = 2.0, half = 10.0, major = 10.0, labelEvery = 10.0, tick = 0.9)
         for (row in 1..9) {
             val y = -4.0 * row
@@ -131,7 +133,7 @@ object Reticles {
     })
 
     /** Classic hunting duplex: fine centre, heavy outer posts. */
-    private fun duplex() = Reticle("duplex", "Duplex", AngularUnit.MOA, 40.0, buildList<Mark> {
+    private fun duplex() = Reticle("duplex", R.string.reticle_duplex, AngularUnit.MOA, 40.0, buildList<Mark> {
         add(Mark.Line(-12.0, 0.0, 12.0, 0.0))
         add(Mark.Line(0.0, -12.0, 0.0, 12.0))
         posts(12.0, 40.0)

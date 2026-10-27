@@ -7,6 +7,7 @@ import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.FirebaseApp
+import pl.ballistics.app.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
@@ -84,9 +85,9 @@ class CloudSync(private val context: Context, private val onRemote: (AppData) ->
 
     /** Google sign-in through Credential Manager; [activityContext] must be an Activity. */
     suspend fun signIn(activityContext: Context): String? {
-        if (!available) return "Synchronizacja nie jest skonfigurowana w tej wersji"
+        if (!available) return context.getString(R.string.sync_not_configured)
         val clientIdRes = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
-        if (clientIdRes == 0) return "Brak identyfikatora klienta Google w konfiguracji Firebase"
+        if (clientIdRes == 0) return context.getString(R.string.sync_missing_client_id)
         return try {
             val option = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
@@ -98,7 +99,7 @@ class CloudSync(private val context: Context, private val onRemote: (AppData) ->
             auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null)).await()
             null
         } catch (e: Exception) {
-            e.localizedMessage ?: "Logowanie nie powiodło się"
+            e.localizedMessage ?: context.getString(R.string.sync_sign_in_failed)
         }
     }
 

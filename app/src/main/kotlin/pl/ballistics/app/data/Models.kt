@@ -1,12 +1,14 @@
 package pl.ballistics.app.data
 
+import androidx.annotation.StringRes
 import kotlinx.serialization.Serializable
+import pl.ballistics.app.R
 import pl.ballistics.core.Units
 import java.util.UUID
 
-enum class FocalPlane(val label: String) {
-    FFP("Pierwsza (FFP)"),
-    SFP("Druga (SFP)"),
+enum class FocalPlane(@StringRes val label: Int) {
+    FFP(R.string.focal_plane_ffp),
+    SFP(R.string.focal_plane_sfp),
 }
 
 enum class AngularUnit(val label: String, val radians: Double) {
@@ -28,7 +30,7 @@ fun newId(): String = UUID.randomUUID().toString()
 @Serializable
 data class WeaponProfile(
     val id: String = newId(),
-    val name: String = "Nowa broń",
+    val name: String = "New rifle",
     val caliber: String = "",
     val twistIn: String = "10",
     val rightHandTwist: Boolean = true,
@@ -54,7 +56,7 @@ data class WeaponProfile(
 @Serializable
 data class AmmoProfile(
     val id: String = newId(),
-    val name: String = "Nowa amunicja",
+    val name: String = "New load",
     val dragType: DragType = DragType.G7,
     val bc: String = "0.25",
     val customCurve: String = "",
@@ -114,7 +116,7 @@ data class AppData(
                 lengthMm = "31.5",
                 muzzleVelocity = "790",
             )
-            val weapon = WeaponProfile(name = "Karabin .308", caliber = ".308 Win", ammoId = ammo.id)
+            val weapon = WeaponProfile(name = ".308 rifle", caliber = ".308 Win", ammoId = ammo.id)
             return AppData(weapons = listOf(weapon), ammo = listOf(ammo), activeWeaponId = weapon.id)
         }
     }
