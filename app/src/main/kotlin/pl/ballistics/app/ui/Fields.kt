@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.toNumber
 
@@ -78,9 +79,10 @@ fun SwitchRow(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
 fun <T> Choice(label: String, selected: T, options: List<T>, name: @Composable (T) -> String, onSelect: (T) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, Modifier.weight(1f))
-        Box {
-            OutlinedButton(onClick = { open = true }) { Text(name(selected)) }
+        // The label keeps its width; a long choice wraps inside its button instead of squeezing the label.
+        Text(label, Modifier.padding(end = 12.dp))
+        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+            OutlinedButton(onClick = { open = true }) { Text(name(selected), textAlign = TextAlign.Center) }
             DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
                 options.forEach {
                     DropdownMenuItem(text = { Text(name(it)) }, onClick = { onSelect(it); open = false })

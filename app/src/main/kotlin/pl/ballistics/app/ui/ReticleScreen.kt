@@ -53,6 +53,7 @@ import pl.ballistics.app.reticle.Reticles
 import pl.ballistics.app.reticle.Weight
 import pl.ballistics.core.TrajectoryPoint
 import kotlin.math.abs
+import kotlin.math.sign
 import kotlin.math.roundToInt
 
 /** Where the bullet lands, in reticle units: hold this point on the target. */
@@ -72,7 +73,9 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
     val maxMag = weapon.maxMagnification.toNumber()?.takeIf { it > 1 } ?: 25.0
     val minMag = weapon.minMagnification.toNumber()?.takeIf { it > 0 && it < maxMag } ?: 1.0
     val calMag = weapon.calibratedMagnification.toNumber()?.takeIf { it > 0 } ?: maxMag
-    var magnification by remember(weapon.id) { mutableFloatStateOf(calMag.coerceIn(minMag, maxMag).toFloat()) }
+    // Start where the reticle reads true and looks as designed: SFP at its calibrated power, FFP at full power.
+    val startMag = if (sfp) calMag.coerceIn(minMag, maxMag) else maxMag
+    var magnification by remember(weapon.id, sfp, startMag, minMag) { mutableFloatStateOf(startMag.toFloat()) }
     var unlocked by remember(weapon.id) { mutableStateOf(false) }
     // Unlocked, the zoom goes past the scope's range: down to 1× and up to twice its top power.
     val range = if (unlocked) minOf(1.0, minMag).toFloat()..(maxMag * 2).toFloat() else minMag.toFloat()..maxMag.toFloat()
@@ -237,21 +240,29 @@ private fun ReticleView(reticle: Reticle, holds: List<Hold>, selected: Trajector
         val c = Offset(size.width / 2, size.height / 2)
         val px = radius / field
         fun at(x: Double, y: Double) = Offset(c.x + (x * px).toFloat(), c.y - (y * px).toFloat())
+        // Crosshair arms drawn to the reticle's outer part run on to the edge of the field of view, as in the scope.
+        val edge = maxOf(field, reticle.extent) * 1.5
+        fun reach(v: Double) = if (abs(v) >= reticle.extent * 0.8) sign(v) * maxOf(abs(v), edge) else v
+        fun arm(m: Mark.Line): Mark.Line = when {
+            m.x1 == 0.0 && m.x2 == 0.0 -> m.copy(y1 = reach(m.y1), y2 = reach(m.y2))
+            m.y1 == 0.0 && m.y2 == 0.0 -> m.copy(x1 = reach(m.x1), x2 = reach(m.x2))
+            else -> m
+        }
 
         val lens = Path().apply { addOval(androidx.compose.ui.geometry.Rect(c, radius)) }
         clipPath(lens) {
             drawRect(Brush.radialGradient(listOf(Color(0xFFF4F6F2), Color(0xFFC9D2C9)), center = c, radius = radius))
             reticle.marks.forEach { m ->
                 when (m) {
-                    is Mark.Line -> drawLine(
-                        ink, at(m.x1, m.y1), at(m.x2, m.y2),
+                    is Mark.Line -> arm(m).let { l -> drawLine(
+                        ink, at(l.x1, l.y1), at(l.x2, l.y2),
                         strokeWidth = when (m.weight) {
                             Weight.FINE -> 1.2.dp.toPx()
                             Weight.MEDIUM -> 2.dp.toPx()
                             Weight.HEAVY -> 5.dp.toPx()
                         },
                         cap = StrokeCap.Butt,
-                    )
+                    ) }
                     is Mark.Dot -> drawCircle(ink, maxOf((m.r * px).toFloat(), 1.5.dp.toPx()), at(m.x, m.y))
                     is Mark.Label -> label(text, m.text, at(m.x, m.y), ink)
                 }
