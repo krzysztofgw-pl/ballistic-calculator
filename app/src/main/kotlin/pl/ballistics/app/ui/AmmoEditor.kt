@@ -29,6 +29,7 @@ import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.BulletLibrary
 import pl.ballistics.app.data.DragType
 import pl.ballistics.app.data.withBullet
+import pl.ballistics.app.data.withDragType
 import pl.ballistics.app.data.withFactoryLoad
 
 private enum class Picker { BULLET, FACTORY }
@@ -65,7 +66,7 @@ fun AmmoEditor(
         Section(stringResource(R.string.section_bullet)) {
             TextInput(stringResource(R.string.label_name), a.name) { a = a.copy(name = it) }
             Choice(stringResource(R.string.label_drag_model), a.dragType, DragType.entries, { if (it == DragType.CUSTOM) stringResource(R.string.drag_custom) else it.name }) {
-                a = a.copy(dragType = it)
+                a = a.withDragType(it)
             }
             if (a.dragType == DragType.CUSTOM) {
                 Text(
@@ -80,6 +81,10 @@ fun AmmoEditor(
                 )
             } else {
                 NumberField(stringResource(R.string.label_bc, a.dragType.name), a.bc, "lb/in²") { a = a.copy(bc = it) }
+                Text(
+                    stringResource(R.string.hint_bc_model, a.dragType.name),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
             FieldRow { m ->
                 NumberField(stringResource(R.string.label_mass), a.massGr, "gr", m) { a = a.copy(massGr = it) }
@@ -111,7 +116,14 @@ fun AmmoEditor(
             title = stringResource(R.string.title_bullets),
             options = BulletLibrary.bullets,
             label = { it.label },
-            detail = { b -> listOfNotNull(b.g1?.let { "G1 $it" }, b.g7?.let { "G7 $it" }, "${b.diameterIn}\" cal").joinToString(" · ") },
+            detail = { b ->
+                listOfNotNull(
+                    b.g1?.let { "G1 $it" },
+                    b.g7?.let { "G7 $it" },
+                    b.lengthIn?.let { stringResource(R.string.bullet_length, it) },
+                    b.twistIn?.let { stringResource(R.string.bullet_twist, if (it % 1.0 == 0.0) it.toInt() else it) },
+                ).joinToString(" · ")
+            },
             onPick = { a = a.withBullet(it); picker = null },
             onDismiss = { picker = null },
         )
@@ -137,7 +149,8 @@ private fun <T> LibraryDialog(
     onDismiss: () -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
-    val filtered = options.filter { label(it).contains(query.trim(), ignoreCase = true) }
+    val words = query.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+    val filtered = options.filter { o -> label(o).let { l -> words.all { l.contains(it, ignoreCase = true) } } }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },

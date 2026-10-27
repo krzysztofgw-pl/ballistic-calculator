@@ -58,7 +58,10 @@ data class AmmoProfile(
     val id: String = newId(),
     val name: String = "New load",
     val dragType: DragType = DragType.G7,
+    /** BC for [dragType]; a number for one drag model is meaningless for another. */
     val bc: String = "0.25",
+    /** BCs entered or loaded for the other drag models, restored when the model is switched back. */
+    val bcByModel: Map<DragType, String> = emptyMap(),
     val customCurve: String = "",
     val massGr: String = "175",
     val diameterMm: String = "7.82",
@@ -68,6 +71,17 @@ data class AmmoProfile(
     val powderReferenceTemp: String = "15",
     val notes: String = "",
 )
+
+/**
+ * Switches the drag model without carrying the BC across: a G7 BC read as G1
+ * (or the other way round) would be off by a factor of about two. The BC known
+ * for the new model is restored, otherwise the field is left empty to be filled in.
+ */
+fun AmmoProfile.withDragType(type: DragType): AmmoProfile {
+    if (type == dragType) return this
+    val known = if (dragType == DragType.CUSTOM || bc.isBlank()) bcByModel else bcByModel + (dragType to bc)
+    return copy(dragType = type, bcByModel = known, bc = known[type].orEmpty())
+}
 
 /** Conditions at the firing point and table settings, shared by all profiles. */
 @Serializable

@@ -99,6 +99,7 @@
     <string name="drag_custom">Custom Cd(M)</string>
     <string name="hint_custom_curve">Paste a drag curve from Doppler data: one Mach number and Cd per line, e.g. \"0.80 0.157\".</string>
     <string name="label_bc">%1$s ballistic coefficient</string>
+    <string name="hint_bc_model">Enter the BC published for the %1$s model. BCs of different models are not interchangeable: switching the model restores that model\'s BC or leaves the field empty.</string>
     <string name="label_mass">Weight</string>
     <string name="label_diameter">Diameter</string>
     <string name="label_bullet_length">Bullet length (stability, spin drift)</string>
@@ -111,7 +112,9 @@
     <string name="title_bullets">Bullets</string>
     <string name="title_factory_loads">Factory loads</string>
     <string name="factory_load_velocity">%1$d fps (manufacturer test barrel)</string>
-    <string name="hint_library_disclaimer">Manufacturer catalogue data; check BC and velocity against the current catalogue and your chronograph.</string>
+    <string name="hint_library_disclaimer">Manufacturer catalogue data; check BC and velocity against the current catalogue and your chronograph. Search by maker, name or caliber, e.g. \"308 hybrid\".</string>
+    <string name="bullet_length">%1$.3f″</string>
+    <string name="bullet_twist">1:%1$s″ twist</string>
 
     <!-- Conditions -->
     <string name="section_atmosphere">Atmosphere</string>
