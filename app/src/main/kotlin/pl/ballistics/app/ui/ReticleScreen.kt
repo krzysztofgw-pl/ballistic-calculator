@@ -1,6 +1,9 @@
 package pl.ballistics.app.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,12 +22,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import pl.ballistics.app.R
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -64,16 +69,23 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
     var previewId by remember(weapon.id) { mutableStateOf(own.id) }
     val reticle = Reticles.byId(previewId)
     val sfp = weapon.focalPlane == FocalPlane.SFP
-    val calMag = weapon.calibratedMagnification.toNumber()?.takeIf { it > 0 } ?: 10.0
     val maxMag = weapon.maxMagnification.toNumber()?.takeIf { it > 1 } ?: 25.0
-    var magnification by remember(weapon.id) { mutableFloatStateOf(calMag.toFloat()) }
+    val minMag = weapon.minMagnification.toNumber()?.takeIf { it > 0 && it < maxMag } ?: 1.0
+    val calMag = weapon.calibratedMagnification.toNumber()?.takeIf { it > 0 } ?: maxMag
+    var magnification by remember(weapon.id) { mutableFloatStateOf(calMag.coerceIn(minMag, maxMag).toFloat()) }
+    var unlocked by remember(weapon.id) { mutableStateOf(false) }
+    // Unlocked, the zoom goes past the scope's range: down to 1× and up to twice its top power.
+    val range = if (unlocked) minOf(1.0, minMag).toFloat()..(maxMag * 2).toFloat() else minMag.toFloat()..maxMag.toFloat()
+    val currentRange by rememberUpdatedState(range)
 
     val points = result.solution.points.filter { it.rangeM > 0 }
     var selectedRange by remember(weapon.id) { mutableStateOf<Double?>(null) }
     val selected = points.find { it.rangeM == selectedRange } ?: points.getOrNull(points.size / 2)
 
     // In an SFP scope the reticle's angular size scales with calibrated / current magnification.
+    // In an FFP scope reticle and target scale together, so only the field of view changes.
     val scale = if (sfp) magnification / calMag else 1.0
+    val field = if (sfp) reticle.extent else reticle.extent * maxMag / magnification
     val holds = points.map { p ->
         Hold(p, p.windageRad / reticle.unit.radians * scale, p.dropRad / reticle.unit.radians * scale)
     }
@@ -93,19 +105,58 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
             )
         }
-        if (sfp) {
+        Text(
+            if (sfp) stringResource(R.string.sfp_note, calMag.magFmt()) else stringResource(R.string.ffp_note),
+            style = MaterialTheme.typography.bodySmall,
+        )
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                stringResource(R.string.sfp_note, calMag.fmt(0), magnification.roundToInt()),
-                style = MaterialTheme.typography.bodySmall,
+                stringResource(R.string.magnification_value, magnification.toDouble().magFmt()),
+                Modifier.weight(1f),
+                style = MaterialTheme.typography.titleSmall,
             )
-            Slider(
-                value = magnification,
-                onValueChange = { magnification = it },
-                valueRange = 1f..maxMag.toFloat(),
+            FilterChip(
+                selected = unlocked,
+                onClick = {
+                    unlocked = !unlocked
+                    if (!unlocked) magnification = magnification.coerceIn(minMag.toFloat(), maxMag.toFloat())
+                },
+                label = { Text(stringResource(R.string.action_unlock_magnification)) },
+            )
+        }
+        Slider(
+            value = magnification.coerceIn(range),
+            onValueChange = { magnification = it },
+            valueRange = range,
+        )
+        if (magnification < minMag - 1e-3 || magnification > maxMag + 1e-3) {
+            Text(
+                stringResource(R.string.magnification_outside_range, minMag.magFmt(), maxMag.magFmt()),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
 
-        ReticleView(reticle, holds, selected, Modifier.fillMaxWidth().aspectRatio(1f))
+        ReticleView(
+            reticle, holds, selected, field,
+            Modifier.fillMaxWidth().aspectRatio(1f).pointerInput(weapon.id) {
+                // Two-finger pinch only, so a one-finger drag still scrolls the screen.
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false)
+                    do {
+                        val event = awaitPointerEvent()
+                        if (event.changes.count { it.pressed } >= 2) {
+                            val zoom = event.calculateZoom()
+                            if (zoom != 1f) {
+                                magnification = (magnification * zoom).coerceIn(currentRange)
+                                event.changes.forEach { it.consume() }
+                            }
+                        }
+                    } while (event.changes.any { it.pressed })
+                }
+            },
+        )
+        Text(stringResource(R.string.hint_pinch_zoom), style = MaterialTheme.typography.bodySmall)
 
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             points.forEach { p ->
@@ -173,17 +224,18 @@ internal fun ReticleChoice(
 }
 
 private fun Double.fmt(decimals: Int) = "%.${decimals}f".format(this)
+private fun Double.magFmt() = if (abs(this - roundToInt()) < 0.05) roundToInt().toString() else fmt(1)
 private fun Double.absFmt() = abs(this).fmt(1)
 
 @Composable
-private fun ReticleView(reticle: Reticle, holds: List<Hold>, selected: TrajectoryPoint?, modifier: Modifier) {
+private fun ReticleView(reticle: Reticle, holds: List<Hold>, selected: TrajectoryPoint?, field: Double, modifier: Modifier) {
     val text = rememberTextMeasurer()
     val ink = Color(0xFF111111)
     val hold = Color(0xFFE53935)
     Canvas(modifier) {
         val radius = size.minDimension / 2
         val c = Offset(size.width / 2, size.height / 2)
-        val px = radius / reticle.extent
+        val px = radius / field
         fun at(x: Double, y: Double) = Offset(c.x + (x * px).toFloat(), c.y - (y * px).toFloat())
 
         val lens = Path().apply { addOval(androidx.compose.ui.geometry.Rect(c, radius)) }

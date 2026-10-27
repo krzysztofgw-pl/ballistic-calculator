@@ -71,6 +71,9 @@ fun WeaponEditor(
                         w = w.copy(calibratedMagnification = it)
                     }
                 }
+            }
+            FieldRow { m ->
+                NumberField(stringResource(R.string.label_min_mag), w.minMagnification, "×", m) { w = w.copy(minMagnification = it) }
                 NumberField(stringResource(R.string.label_max_mag), w.maxMagnification, "×", m) { w = w.copy(maxMagnification = it) }
             }
             NumberField(stringResource(R.string.label_sight_height), w.sightHeightCm, "cm") { w = w.copy(sightHeightCm = it) }
