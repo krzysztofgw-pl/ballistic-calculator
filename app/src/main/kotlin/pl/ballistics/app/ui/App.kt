@@ -1,11 +1,13 @@
 package pl.ballistics.app.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -22,18 +24,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pl.ballistics.app.MainViewModel
+import pl.ballistics.app.R
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.WeaponProfile
 
-private data class Tab(val title: String, val icon: ImageVector)
+private data class Tab(@StringRes val title: Int, val icon: ImageVector)
 
 private val tabs = listOf(
-    Tab("Profile", Icons.Filled.Person),
-    Tab("Warunki", Icons.Filled.Place),
-    Tab("Tabela", Icons.AutoMirrored.Filled.List),
+    Tab(R.string.tab_profiles, Icons.Filled.Person),
+    Tab(R.string.tab_conditions, Icons.Filled.Place),
+    Tab(R.string.tab_table, Icons.AutoMirrored.Filled.List),
+    Tab(R.string.tab_reticle, Icons.Filled.Search),
 )
 
 /** What is open on top of the tabs. */
@@ -47,6 +52,7 @@ private sealed interface Editor {
 fun App(vm: MainViewModel = viewModel()) {
     val data by vm.data.collectAsStateWithLifecycle()
     val result by vm.result.collectAsStateWithLifecycle()
+    val sync by vm.syncState.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(2) }
     var editor by remember { mutableStateOf<Editor?>(null) }
 
@@ -78,7 +84,7 @@ fun App(vm: MainViewModel = viewModel()) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(tabs[tab].title) }) },
+        topBar = { TopAppBar(title = { Text(stringResource(tabs[tab].title)) }) },
         bottomBar = {
             NavigationBar {
                 tabs.forEachIndexed { index, t ->
@@ -86,7 +92,7 @@ fun App(vm: MainViewModel = viewModel()) {
                         selected = tab == index,
                         onClick = { tab = index },
                         icon = { Icon(t.icon, contentDescription = null) },
-                        label = { Text(t.title) },
+                        label = { Text(stringResource(t.title)) },
                     )
                 }
             }
@@ -101,10 +107,14 @@ fun App(vm: MainViewModel = viewModel()) {
                 onEditAmmo = { editor = Editor.Ammo(it) },
                 onExport = vm::exportData,
                 onImport = vm::importData,
+                sync = sync,
+                onSignIn = vm::signIn,
+                onSignOut = vm::signOut,
                 modifier = modifier,
             )
             1 -> ConditionsScreen(data.conditions, vm::updateConditions, modifier)
-            else -> TableScreen(result, modifier)
+            2 -> TableScreen(result, modifier)
+            else -> ReticleScreen(result, modifier)
         }
     }
 }

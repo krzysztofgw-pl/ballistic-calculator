@@ -5,23 +5,42 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+// Cloud sync is compiled in always but only configured when the Firebase
+// project file is present; without it the app works offline-only.
+if (file("google-services.json").exists()) apply(plugin = "com.google.gms.google-services")
+
+// CI passes the release key through secrets; local builds fall back to the debug key.
+val releaseKeystore = System.getenv("SIGNING_KEYSTORE_PATH")?.let { file(it) }?.takeIf { it.exists() }
+val releasePassword = System.getenv("SIGNING_PASSWORD")
+
 android {
     namespace = "pl.ballistics.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "pl.ballistics.app"
+        applicationId = "com.kgwlabs.ballistics"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
+    }
+
+    signingConfigs {
+        if (releaseKeystore != null && releasePassword != null) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = releasePassword
+                keyAlias = "kgwlabs-ballistics"
+                keyPassword = releasePassword
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Signed with the debug key so the APK from CI installs directly.
-            signingConfig = signingConfigs.getByName("debug")
+            // A stable key lets new APKs install over old ones and keeps Google sign-in working.
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
         }
     }
 
@@ -55,4 +74,12 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 }

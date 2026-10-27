@@ -43,7 +43,7 @@ class Repository(context: Context) {
             fun s(key: String, default: String) = o[key]?.jsonPrimitive?.contentOrNull ?: default
             fun b(key: String, default: Boolean) = o[key]?.jsonPrimitive?.booleanOrNull ?: default
             val ammo = AmmoProfile(
-                name = "Amunicja",
+                name = "My load",
                 dragType = runCatching { DragType.valueOf(s("dragType", "G7")) }.getOrDefault(DragType.G7),
                 bc = s("bc", "0.243"),
                 customCurve = s("customCurve", ""),
@@ -55,7 +55,7 @@ class Repository(context: Context) {
                 powderReferenceTemp = s("powderReferenceTemp", "15"),
             )
             val weapon = WeaponProfile(
-                name = "Moja broń",
+                name = "My rifle",
                 twistIn = s("twistIn", "10"),
                 rightHandTwist = b("rightHandTwist", true),
                 angularUnit = runCatching { AngularUnit.valueOf(s("angularUnit", "MRAD")) }.getOrDefault(AngularUnit.MRAD),

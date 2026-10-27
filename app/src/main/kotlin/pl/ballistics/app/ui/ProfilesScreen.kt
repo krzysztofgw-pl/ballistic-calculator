@@ -1,5 +1,6 @@
 package pl.ballistics.app.ui
 
+import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,13 +24,18 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import pl.ballistics.app.R
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AppData
+import pl.ballistics.app.data.SyncState
 import pl.ballistics.app.data.WeaponProfile
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @Composable
@@ -39,15 +46,19 @@ fun ProfilesScreen(
     onEditAmmo: (AmmoProfile) -> Unit,
     onExport: () -> String,
     onImport: (String) -> Boolean,
+    sync: SyncState,
+    onSignIn: suspend (Context) -> String?,
+    onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         val ok = runCatching {
             context.contentResolver.openOutputStream(uri)?.use { it.write(onExport().toByteArray()) } != null
         }.getOrDefault(false)
-        Toast.makeText(context, if (ok) "Zapisano profile" else "Nie udało się zapisać pliku", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(if (ok) R.string.toast_exported else R.string.toast_export_failed), Toast.LENGTH_SHORT).show()
     }
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -55,7 +66,7 @@ fun ProfilesScreen(
             context.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() }
         }.getOrNull()
         val ok = text != null && onImport(text)
-        Toast.makeText(context, if (ok) "Wczytano profile" else "To nie jest plik profili", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(if (ok) R.string.toast_imported else R.string.toast_import_failed), Toast.LENGTH_SHORT).show()
     }
     val active = data.activeWeapon
 
@@ -63,11 +74,11 @@ fun ProfilesScreen(
         modifier.verticalScroll(rememberScrollState()).padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Section("Broń") {
+        Section(stringResource(R.string.section_rifles)) {
             data.weapons.forEach { w ->
                 ProfileRow(
                     title = w.name,
-                    subtitle = listOf(w.caliber, w.scopeName, data.ammoFor(w)?.name ?: "brak amunicji")
+                    subtitle = listOf(w.caliber, w.scopeName, data.ammoFor(w)?.name ?: stringResource(R.string.no_ammo))
                         .filter { it.isNotBlank() }.joinToString(" · "),
                     selected = w.id == active?.id,
                     onSelect = { onSelectWeapon(w.id) },
@@ -76,11 +87,11 @@ fun ProfilesScreen(
             }
             TextButton(onClick = { onEditWeapon(WeaponProfile(ammoId = data.ammo.firstOrNull()?.id)) }) {
                 Icon(Icons.Filled.Add, null)
-                Text("Dodaj broń")
+                Text(stringResource(R.string.action_add_rifle))
             }
         }
 
-        Section("Amunicja") {
+        Section(stringResource(R.string.section_loads)) {
             data.ammo.forEach { a ->
                 ProfileRow(
                     title = a.name,
@@ -92,20 +103,32 @@ fun ProfilesScreen(
             }
             TextButton(onClick = { onEditAmmo(AmmoProfile()) }) {
                 Icon(Icons.Filled.Add, null)
-                Text("Dodaj amunicję")
+                Text(stringResource(R.string.action_add_load))
             }
         }
 
-        Section("Synchronizacja") {
-            Text(
-                "Zapisz profile do pliku (np. na Dysku Google) i wczytaj je na innym telefonie. " +
-                    "Android dodatkowo sam robi kopię zapasową na Twoim koncie Google.",
-                style = MaterialTheme.typography.bodySmall,
-            )
+        Section(stringResource(R.string.section_sync)) {
+            when (sync) {
+                SyncState.Unavailable -> Unit
+                SyncState.SignedOut -> {
+                    Text(stringResource(R.string.sync_sign_in_hint), style = MaterialTheme.typography.bodySmall)
+                    Button(onClick = {
+                        scope.launch {
+                            onSignIn(context)?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+                        }
+                    }) { Text(stringResource(R.string.action_sign_in_google)) }
+                }
+                is SyncState.SignedIn -> {
+                    Text(stringResource(R.string.sync_signed_in_as, sync.email ?: stringResource(R.string.sync_signed_in)), style = MaterialTheme.typography.bodyMedium)
+                    sync.error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+                    TextButton(onClick = onSignOut) { Text(stringResource(R.string.action_sign_out)) }
+                }
+            }
+            Text(stringResource(R.string.sync_file_hint), style = MaterialTheme.typography.bodySmall)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { exportLauncher.launch("balistyka-${LocalDate.now()}.json") }) { Text("Eksportuj") }
+                OutlinedButton(onClick = { exportLauncher.launch("ballistics-${LocalDate.now()}.json") }) { Text(stringResource(R.string.action_export)) }
                 OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) }) {
-                    Text("Importuj")
+                    Text(stringResource(R.string.action_import))
                 }
             }
         }
@@ -120,6 +143,6 @@ private fun ProfileRow(title: String, subtitle: String, selected: Boolean?, onSe
             Text(title, style = MaterialTheme.typography.bodyLarge)
             if (subtitle.isNotBlank()) Text(subtitle, style = MaterialTheme.typography.bodySmall)
         }
-        IconButton(onClick = onEdit) { Icon(Icons.Filled.Edit, contentDescription = "Edytuj") }
+        IconButton(onClick = onEdit) { Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.action_edit)) }
     }
 }

@@ -15,12 +15,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import pl.ballistics.app.R
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AngularUnit
+import pl.ballistics.app.data.FocalPlane
 import pl.ballistics.app.data.RailPlatform
 import pl.ballistics.app.data.WeaponProfile
+import pl.ballistics.app.reticle.Reticles
 import pl.ballistics.app.toNumber
 import pl.ballistics.core.ScopeMount
 import java.util.Locale
@@ -38,40 +42,50 @@ fun WeaponEditor(
     var mountHelper by remember { mutableStateOf(false) }
 
     EditorScaffold(
-        title = if (isNew) "Nowa broń" else w.name,
+        title = if (isNew) stringResource(R.string.title_new_rifle) else w.name,
         canDelete = !isNew,
         onSave = { onSave(w) },
         onDelete = onDelete,
         onClose = onClose,
     ) {
-        Section("Broń") {
-            TextInput("Nazwa", w.name) { w = w.copy(name = it) }
-            TextInput("Kaliber", w.caliber) { w = w.copy(caliber = it) }
-            NumberField("Skok gwintu (1 obrót na)", w.twistIn, "cal", optional = true) { w = w.copy(twistIn = it) }
-            SwitchRow("Gwint prawoskrętny", w.rightHandTwist) { w = w.copy(rightHandTwist = it) }
+        Section(stringResource(R.string.section_rifle)) {
+            TextInput(stringResource(R.string.label_name), w.name) { w = w.copy(name = it) }
+            TextInput(stringResource(R.string.label_caliber), w.caliber) { w = w.copy(caliber = it) }
+            NumberField(stringResource(R.string.label_twist), w.twistIn, "in", optional = true) { w = w.copy(twistIn = it) }
+            SwitchRow(stringResource(R.string.label_right_twist), w.rightHandTwist) { w = w.copy(rightHandTwist = it) }
         }
 
-        Section("Luneta i montaż") {
-            TextInput("Luneta", w.scopeName) { w = w.copy(scopeName = it) }
-            Choice("Jednostki poprawek", w.angularUnit, AngularUnit.entries, { it.label }) { v ->
+        Section(stringResource(R.string.section_scope_mount)) {
+            TextInput(stringResource(R.string.label_scope), w.scopeName) { w = w.copy(scopeName = it) }
+            Choice(stringResource(R.string.label_turret_units), w.angularUnit, AngularUnit.entries, { it.label }) { v ->
                 w = w.copy(angularUnit = v, clickValue = if (v == AngularUnit.MRAD) "0.1" else "0.25")
             }
-            NumberField("Wartość kliku", w.clickValue, w.angularUnit.label) { w = w.copy(clickValue = it) }
-            NumberField("Wysokość osi lunety nad osią lufy", w.sightHeightCm, "cm") { w = w.copy(sightHeightCm = it) }
-            TextButton(onClick = { mountHelper = true }) { Text("Pomóż wyznaczyć wysokość") }
+            NumberField(stringResource(R.string.label_click_value), w.clickValue, w.angularUnit.label) { w = w.copy(clickValue = it) }
+            Choice(stringResource(R.string.label_reticle), Reticles.byId(w.reticleId), Reticles.all, { stringResource(it.name) }) { w = w.copy(reticleId = it.id) }
+            Choice(stringResource(R.string.label_focal_plane), w.focalPlane, FocalPlane.entries, { stringResource(it.label) }) { w = w.copy(focalPlane = it) }
+            FieldRow { m ->
+                if (w.focalPlane == FocalPlane.SFP) {
+                    NumberField(stringResource(R.string.label_calibrated_mag), w.calibratedMagnification, "×", m) {
+                        w = w.copy(calibratedMagnification = it)
+                    }
+                }
+                NumberField(stringResource(R.string.label_max_mag), w.maxMagnification, "×", m) { w = w.copy(maxMagnification = it) }
+            }
+            NumberField(stringResource(R.string.label_sight_height), w.sightHeightCm, "cm") { w = w.copy(sightHeightCm = it) }
+            TextButton(onClick = { mountHelper = true }) { Text(stringResource(R.string.action_sight_height_helper)) }
         }
 
-        Section("Przystrzelanie") {
+        Section(stringResource(R.string.section_zero)) {
             Choice(
-                "Amunicja",
+                stringResource(R.string.label_load),
                 ammo.find { it.id == w.ammoId },
                 listOf<AmmoProfile?>(null) + ammo,
-                { it?.name ?: "wybierz" },
+                { it?.name ?: stringResource(R.string.choose) },
             ) { w = w.copy(ammoId = it?.id) }
-            NumberField("Odległość zera", w.zeroRangeM, "m") { w = w.copy(zeroRangeM = it) }
+            NumberField(stringResource(R.string.label_zero_range), w.zeroRangeM, "m") { w = w.copy(zeroRangeM = it) }
             FieldRow { m ->
-                NumberField("Temperatura", w.zeroTemperatureC, "°C", m) { w = w.copy(zeroTemperatureC = it) }
-                NumberField("Ciśnienie stacji", w.zeroPressureHpa, "hPa", m) { w = w.copy(zeroPressureHpa = it) }
+                NumberField(stringResource(R.string.label_temperature), w.zeroTemperatureC, "°C", m) { w = w.copy(zeroTemperatureC = it) }
+                NumberField(stringResource(R.string.label_pressure_station), w.zeroPressureHpa, "hPa", m) { w = w.copy(zeroPressureHpa = it) }
             }
         }
     }
@@ -122,48 +136,47 @@ private fun MountHelperDialog(onDismiss: () -> Unit, onUse: (String) -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Wysokość lunety") },
+        title = { Text(stringResource(R.string.title_sight_height)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Choice("Metoda", measure, listOf(true, false), { if (it) "Pomiar" else "Szacunek" }) { measure = it }
+                Choice(stringResource(R.string.label_method), measure, listOf(true, false), { stringResource(if (it) R.string.method_measure else R.string.method_estimate) }) { measure = it }
                 if (measure) {
                     Text(
-                        "Otwórz zamek i zmierz suwmiarką odstęp od wierzchu trzonu zamka do spodu tubusa lunety.",
+                        stringResource(R.string.hint_caliper),
                         style = MaterialTheme.typography.bodySmall,
                     )
-                    NumberField("Odstęp zamek–tubus", gap, "mm") { gap = it }
-                    NumberField("Średnica trzonu zamka", bolt, "mm") { bolt = it }
-                    NumberField("Średnica tubusa", tube, "mm") { tube = it }
+                    NumberField(stringResource(R.string.label_bolt_tube_gap), gap, "mm") { gap = it }
+                    NumberField(stringResource(R.string.label_bolt_diameter), bolt, "mm") { bolt = it }
+                    NumberField(stringResource(R.string.label_tube_diameter), tube, "mm") { tube = it }
                 } else {
-                    Choice("Platforma", platform, RailPlatform.entries, { it.label }) {
+                    Choice(stringResource(R.string.label_platform), platform, RailPlatform.entries, { stringResource(it.label) }) {
                         platform = it
                         it.railAboveBoreMm?.let { v -> railAboveBore = v.toString() }
                     }
-                    NumberField("Szyna nad osią lufy", railAboveBore, "mm") { railAboveBore = it }
-                    NumberField("Średnica obiektywu", objective, "mm") { objective = it }
+                    NumberField(stringResource(R.string.label_rail_above_bore), railAboveBore, "mm") { railAboveBore = it }
+                    NumberField(stringResource(R.string.label_objective), objective, "mm") { objective = it }
                     val minAxis = objective.toNumber()?.let { ScopeMount.minRingAxisHeightM(it) * 1000 }
                     if (minAxis != null) {
                         Text(
-                            "Najniższe pierścienie mieszczące obiektyw: oś ok. %.0f mm nad szyną.".format(minAxis),
+                            stringResource(R.string.hint_min_ring_axis, minAxis),
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
-                    NumberField("Wysokość osi pierścieni nad szyną", ringAxis, "mm", optional = true) { ringAxis = it }
+                    NumberField(stringResource(R.string.label_ring_axis), ringAxis, "mm", optional = true) { ringAxis = it }
                     Text(
-                        "Producent montażu zwykle podaje wysokość osi w mm. Puste pole = najniższe pasujące pierścienie. " +
-                            "Wysokości szyn są orientacyjne, pomiar jest dokładniejszy.",
+                        stringResource(R.string.hint_ring_axis),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
                 Text(
-                    resultM?.let { "Wysokość: ${cm(it)} cm" } ?: "Uzupełnij pola",
+                    resultM?.let { stringResource(R.string.sight_height_result, cm(it)) } ?: stringResource(R.string.fill_in_fields),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
         },
         confirmButton = {
-            TextButton(onClick = { resultM?.let { onUse(cm(it)) } }, enabled = resultM != null) { Text("Użyj") }
+            TextButton(onClick = { resultM?.let { onUse(cm(it)) } }, enabled = resultM != null) { Text(stringResource(R.string.action_use)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Anuluj") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )
 }

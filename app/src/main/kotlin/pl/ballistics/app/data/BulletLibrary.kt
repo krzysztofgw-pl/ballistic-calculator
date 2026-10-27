@@ -1,5 +1,7 @@
 package pl.ballistics.app.data
 
+import androidx.annotation.StringRes
+import pl.ballistics.app.R
 import pl.ballistics.core.Units
 import java.util.Locale
 
@@ -95,9 +97,9 @@ object BulletLibrary {
 }
 
 /** Typical rail-top height above the bore axis; a starting point, not a measurement. */
-enum class RailPlatform(val label: String, val railAboveBoreMm: Double?) {
-    BOLT_PICATINNY("Karabin powtarzalny, szyna Picatinny", 16.0),
-    BOLT_BASES("Karabin powtarzalny, podstawy Weaver", 13.0),
-    AR15("AR-15 / AR-10, płaski top", 28.0),
-    CUSTOM("Własna wartość", null),
+enum class RailPlatform(@StringRes val label: Int, val railAboveBoreMm: Double?) {
+    BOLT_PICATINNY(R.string.rail_bolt_picatinny, 16.0),
+    BOLT_BASES(R.string.rail_bolt_weaver, 13.0),
+    AR15(R.string.rail_ar15, 28.0),
+    CUSTOM(R.string.rail_custom, null),
 }

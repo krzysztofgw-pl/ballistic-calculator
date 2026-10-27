@@ -1,8 +1,15 @@
 package pl.ballistics.app.data
 
+import androidx.annotation.StringRes
 import kotlinx.serialization.Serializable
+import pl.ballistics.app.R
 import pl.ballistics.core.Units
 import java.util.UUID
+
+enum class FocalPlane(@StringRes val label: Int) {
+    FFP(R.string.focal_plane_ffp),
+    SFP(R.string.focal_plane_sfp),
+}
 
 enum class AngularUnit(val label: String, val radians: Double) {
     MRAD("MRAD", Units.MRAD),
@@ -23,7 +30,7 @@ fun newId(): String = UUID.randomUUID().toString()
 @Serializable
 data class WeaponProfile(
     val id: String = newId(),
-    val name: String = "Nowa broń",
+    val name: String = "New rifle",
     val caliber: String = "",
     val twistIn: String = "10",
     val rightHandTwist: Boolean = true,
@@ -32,6 +39,11 @@ data class WeaponProfile(
     val angularUnit: AngularUnit = AngularUnit.MRAD,
     val clickValue: String = "0.1",
     val sightHeightCm: String = "4.5",
+    val reticleId: String = "mrad-hash",
+    val focalPlane: FocalPlane = FocalPlane.FFP,
+    /** SFP only: magnification at which the reticle subtensions are true. */
+    val calibratedMagnification: String = "10",
+    val maxMagnification: String = "25",
 
     val zeroRangeM: String = "100",
     val zeroTemperatureC: String = "15",
@@ -44,7 +56,7 @@ data class WeaponProfile(
 @Serializable
 data class AmmoProfile(
     val id: String = newId(),
-    val name: String = "Nowa amunicja",
+    val name: String = "New load",
     val dragType: DragType = DragType.G7,
     val bc: String = "0.25",
     val customCurve: String = "",
@@ -86,6 +98,8 @@ data class AppData(
     val ammo: List<AmmoProfile> = emptyList(),
     val activeWeaponId: String? = null,
     val conditions: Conditions = Conditions(),
+    /** Wall-clock time of the last local edit; the newer copy wins when syncing. */
+    val modifiedAt: Long = 0,
 ) {
     val activeWeapon: WeaponProfile? get() = weapons.find { it.id == activeWeaponId } ?: weapons.firstOrNull()
 
@@ -102,7 +116,7 @@ data class AppData(
                 lengthMm = "31.5",
                 muzzleVelocity = "790",
             )
-            val weapon = WeaponProfile(name = "Karabin .308", caliber = ".308 Win", ammoId = ammo.id)
+            val weapon = WeaponProfile(name = ".308 rifle", caliber = ".308 Win", ammoId = ammo.id)
             return AppData(weapons = listOf(weapon), ammo = listOf(ammo), activeWeaponId = weapon.id)
         }
     }
