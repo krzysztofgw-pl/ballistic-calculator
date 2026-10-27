@@ -6,12 +6,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -24,8 +31,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import pl.ballistics.app.R
@@ -196,8 +205,12 @@ private fun WindAndAzimuthDial(i: Conditions, ui: UiSettings, update: ((Conditio
     }
 
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedButton(onClick = { withPermission { forecast = true } }) { Text(stringResource(R.string.action_forecast_wind)) }
-        OutlinedButton(onClick = {
+        OutlinedButton(onClick = { withPermission { forecast = true } }, modifier = Modifier.weight(1f)) {
+            Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
+            Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+            Text(stringResource(R.string.action_forecast_short), maxLines = 1)
+        }
+        OutlinedButton(modifier = Modifier.weight(1f), onClick = {
             withPermission {
                 scope.launch {
                     warning = null
@@ -235,7 +248,11 @@ private fun WindAndAzimuthDial(i: Conditions, ui: UiSettings, update: ((Conditio
                     }
                 }
             }
-        }) { Text(stringResource(R.string.action_phone_compass)) }
+        }) {
+            Icon(ImageVector.vectorResource(R.drawable.ic_compass), contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
+            Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+            Text(stringResource(R.string.action_compass_short), maxLines = 1)
+        }
     }
     status?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
     warning?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium) }

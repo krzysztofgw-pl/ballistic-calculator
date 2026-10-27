@@ -146,7 +146,6 @@
     <string name="label_altitude">Altitude</string>
     <string name="unit_m_asl">m ASL</string>
     <string name="label_wind_speed">Speed</string>
-    <string name="action_forecast_wind">Suggest from the weather forecast</string>
     <string name="title_forecast">Forecast wind</string>
     <string name="forecast_loading">Getting your location and the forecast…</string>
     <string name="forecast_failed">Could not get the forecast (%1$s). Check the internet connection.</string>
@@ -174,7 +173,6 @@
     <string name="label_aero_jump">Aerodynamic jump from crosswind</string>
     <string name="label_coriolis">Coriolis and Eötvös effects</string>
     <string name="label_latitude">Latitude</string>
-    <string name="action_phone_compass">Use phone compass</string>
     <string name="action_my_location">Use my location</string>
     <string name="compass_reading">Reading the compass: hold the phone along the line of fire, flat or upright with the camera to the target.</string>
     <string name="compass_true">Phone heading %1$s° (magnetic declination %2$s° applied).</string>
@@ -339,4 +337,6 @@
     <string name="section_measurements">Measurements and location</string>
     <string name="label_location_latitude">Location sets the latitude</string>
     <string name="label_location_altitude">Forecast sets the altitude (terrain height)</string>
+    <string name="action_forecast_short">Forecast</string>
+    <string name="action_compass_short">Compass</string>
 </resources>
