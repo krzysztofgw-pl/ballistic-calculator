@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Weather forecast for wind suggestions. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Optional: latitude for Coriolis and magnetic declination for the phone compass. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

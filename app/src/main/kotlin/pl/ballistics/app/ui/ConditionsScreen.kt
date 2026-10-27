@@ -126,6 +126,10 @@ private fun WindDial(i: Conditions, update: ((Conditions) -> Conditions) -> Unit
             style = MaterialTheme.typography.bodyMedium,
         )
     }
+    val withPermission = rememberWithLocationPermission()
+    var forecast by remember { mutableStateOf(false) }
+    OutlinedButton(onClick = { withPermission { forecast = true } }) { Text(stringResource(R.string.action_forecast_wind)) }
+    if (forecast) ForecastDialog(i, update) { forecast = false }
 }
 
 private fun cardinal(deg: Int): String? = when (deg) {

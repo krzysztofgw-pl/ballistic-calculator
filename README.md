@@ -32,6 +32,11 @@ Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table ran
 - **Azimuth dial**: a north-up 360° dial for the line of fire, which can be read from the phone's compass
   (corrected for magnetic declination when the location is known).
 - **Latitude** from the phone's location with one tap.
+- **Wind from the forecast**: the hourly forecast for the phone's location
+  ([Open-Meteo](https://open-meteo.com), free for non-commercial use) averaged over a chosen window: mean
+  speed, vector-mean direction, gusts and how steady the direction is. The 10 m forecast can be scaled to a
+  ~2 m line of fire, and the direction is converted to the line of fire with the shot azimuth. Temperature,
+  humidity and pressure can be filled in from the same forecast.
 
 ### Table
 For each range: drop, elevation and clicks, wind drift and windage correction, velocity, energy, time of
