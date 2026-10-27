@@ -132,7 +132,12 @@
     <string name="label_wind_speed">Speed</string>
     <string name="label_wind_from">Direction (from)</string>
     <string name="unit_oclock">o\'clock</string>
-    <string name="hint_wind_clock">Clock direction: 12 = from the target, 3 = from the right, 9 = from the left.</string>
+    <string name="hint_wind_dial">Top is the target. Tap or drag to where the wind blows from: 90° (3 o\'clock) is from the right, 270° (9 o\'clock) from the left.</string>
+    <string name="hint_wind_dial_north">North up, as in a forecast: tap or drag to where the wind blows from. The thin line is your shot azimuth.</string>
+    <string name="label_wind_north_up">North-up dial (forecast direction)</string>
+    <string name="wind_center_relative">%1$s°\n%2$s o\'clock</string>
+    <string name="wind_center_true">%1$s°\n%2$s</string>
+    <string name="wind_true_bearing">From the line of fire: %1$s° (%2$s o\'clock). True bearing: %3$s° %4$s, with the shot azimuth %5$s°.</string>
     <string name="label_look_angle">Shot angle</string>
     <string name="label_cant">Cant</string>
     <string name="label_table_range">Table range</string>
@@ -142,6 +147,20 @@
     <string name="label_coriolis">Coriolis and Eötvös effects</string>
     <string name="label_latitude">Latitude</string>
     <string name="label_azimuth">Shot azimuth</string>
+    <string name="hint_azimuth">True bearing of the line of fire, clockwise from north. Used for Coriolis and for the north-up wind dial.</string>
+    <string name="action_phone_compass">Use phone compass</string>
+    <string name="action_my_location">Use my location</string>
+    <string name="compass_reading">Reading the compass: hold the phone along the line of fire, flat or upright with the camera to the target.</string>
+    <string name="compass_true">Phone heading %1$s° (magnetic declination %2$s° applied).</string>
+    <string name="compass_magnetic">Phone heading %1$s° magnetic: no location, so declination is not applied.</string>
+    <string name="compass_unavailable">This phone has no compass sensor.</string>
+    <string name="hint_compass">Phone compasses are disturbed by steel and magnets, including the rifle and scope; check against a map when it matters.</string>
+    <string name="location_reading">Getting your location…</string>
+    <string name="location_result">%1$s, from your location (± %2$s m).</string>
+    <string name="location_unavailable">No location: allow location access and turn on location services, or type the latitude.</string>
+    <string name="latitude_north">%1$s° N</string>
+    <string name="latitude_south">%1$s° S</string>
+    <string name="hint_latitude">Positive north of the equator, negative south. A whole degree is enough for Coriolis.</string>
 
     <!-- Table -->
     <string name="col_range">m</string>
