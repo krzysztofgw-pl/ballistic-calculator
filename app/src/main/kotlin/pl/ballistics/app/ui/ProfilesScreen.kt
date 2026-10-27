@@ -33,12 +33,14 @@ import pl.ballistics.app.R
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.AppData
+import pl.ballistics.app.data.Cartridges
 import pl.ballistics.app.data.SyncState
 import pl.ballistics.app.data.WeaponProfile
 import pl.ballistics.app.data.caliberGroup
 import pl.ballistics.app.data.diameterInOrMax
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.Locale
 
 @Composable
 fun ProfilesScreen(
@@ -113,7 +115,7 @@ fun ProfilesScreen(
                         )
                     }
                 }
-            TextButton(onClick = { onEditAmmo(AmmoProfile()) }) {
+            TextButton(onClick = { onEditAmmo(newLoadFor(active)) }) {
                 Icon(Icons.Filled.Add, null)
                 Text(stringResource(R.string.action_add_load))
             }
@@ -145,6 +147,15 @@ fun ProfilesScreen(
             }
         }
     }
+}
+
+/** A new load starts with the cartridge and bullet diameter of the selected rifle, when it names a known cartridge. */
+private fun newLoadFor(rifle: WeaponProfile?): AmmoProfile {
+    val cartridge = rifle?.let { Cartridges.find(it.caliber) } ?: return AmmoProfile()
+    return AmmoProfile(
+        cartridge = cartridge.name,
+        diameterMm = String.format(Locale.US, "%.2f", cartridge.bulletDiameterIn * 25.4),
+    )
 }
 
 @Composable

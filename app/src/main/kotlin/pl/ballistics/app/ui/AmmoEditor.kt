@@ -38,6 +38,20 @@ import kotlin.math.roundToInt
 
 private enum class Picker { BULLET, FACTORY }
 
+/** Cartridges that have bullets in the library, smallest first. */
+private val bulletFilters: List<String> by lazy {
+    val diameters = BulletLibrary.bullets.map { it.diameterIn }.distinct()
+    Cartridges.all.filter { c -> diameters.any { Cartridges.sameDiameter(it, c.bulletDiameterIn) } }
+        .sortedBy { it.bulletDiameterIn }
+        .map { it.name }
+}
+
+/** Keeps the load's cartridge when it still fits a bullet of [diameterIn]; an unknown typed name is kept as is. */
+private fun AmmoProfile.cartridgeFor(diameterIn: Double): String {
+    val known = Cartridges.find(cartridge) ?: return cartridge
+    return if (Cartridges.sameDiameter(known.bulletDiameterIn, diameterIn)) cartridge else ""
+}
+
 @Composable
 fun AmmoEditor(
     initial: AmmoProfile,
@@ -141,7 +155,11 @@ fun AmmoEditor(
             options = BulletLibrary.bullets,
             label = { it.label },
             group = { Cartridges.boreLabel(it.diameterIn) },
-            initialGroup = Cartridges.find(a.cartridge)?.let { Cartridges.boreLabel(it.bulletDiameterIn) },
+            filters = bulletFilters,
+            filterLabel = { f -> Cartridges.find(f)?.let { stringResource(R.string.bullet_filter_option, it.name, Cartridges.inches(it.bulletDiameterIn)) } ?: f },
+            matches = { b, f -> Cartridges.find(f)?.let { Cartridges.sameDiameter(it.bulletDiameterIn, b.diameterIn) } ?: true },
+            initialFilter = Cartridges.find(a.cartridge)?.name,
+            hint = stringResource(R.string.hint_bullet_diameters),
             detail = { b ->
                 listOfNotNull(
                     b.g1?.let { "G1 $it" },
@@ -150,7 +168,7 @@ fun AmmoEditor(
                     b.twistIn?.let { stringResource(R.string.bullet_twist, if (it % 1.0 == 0.0) it.toInt() else it) },
                 ).joinToString(" · ")
             },
-            onPick = { a = a.withBullet(it); picker = null },
+            onPick = { b, filter -> a = a.withBullet(b).copy(cartridge = filter ?: a.cartridgeFor(b.diameterIn)); picker = null },
             onDismiss = { picker = null },
         )
         Picker.FACTORY -> LibraryDialog(
@@ -158,7 +176,11 @@ fun AmmoEditor(
             options = BulletLibrary.factoryLoads.sortedWith(compareBy({ it.bullet.diameterIn }, { it.cartridge })),
             label = { it.label },
             group = { it.cartridge },
-            initialGroup = Cartridges.find(a.cartridge)?.name,
+            filters = BulletLibrary.factoryLoads.sortedBy { it.bullet.diameterIn }.map { it.cartridge }.distinct(),
+            filterLabel = { it },
+            matches = { load, f -> load.cartridge == f },
+            initialFilter = Cartridges.find(a.cartridge)?.name,
+            hint = null,
             detail = {
                 stringResource(
                     R.string.factory_load_velocity,
@@ -168,7 +190,7 @@ fun AmmoEditor(
                     (it.testBarrelCm / 2.54).roundToInt(),
                 )
             },
-            onPick = { a = a.withFactoryLoad(it); picker = null },
+            onPick = { load, _ -> a = a.withFactoryLoad(load); picker = null },
             onDismiss = { picker = null },
         )
         null -> Unit
@@ -181,26 +203,30 @@ private fun <T> LibraryDialog(
     options: List<T>,
     label: (T) -> String,
     group: (T) -> String,
-    initialGroup: String?,
+    filters: List<String>,
+    filterLabel: @Composable (String) -> String,
+    matches: (T, String) -> Boolean,
+    initialFilter: String?,
+    hint: String?,
     detail: @Composable (T) -> String,
-    onPick: (T) -> Unit,
+    onPick: (T, String?) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
-    val groups = remember(options) { options.map(group).distinct() }
-    var selectedGroup by remember { mutableStateOf(initialGroup?.takeIf { it in groups }) }
+    var selectedFilter by remember { mutableStateOf(initialFilter?.takeIf { it in filters }) }
     val words = query.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
     val filtered = options.filter { o ->
-        (selectedGroup == null || group(o) == selectedGroup) && label(o).let { l -> words.all { l.contains(it, ignoreCase = true) } }
+        selectedFilter.let { f -> f == null || matches(o, f) } && label(o).let { l -> words.all { l.contains(it, ignoreCase = true) } }
     }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Choice(stringResource(R.string.label_library_caliber), selectedGroup, listOf<String?>(null) + groups, {
-                    it ?: stringResource(R.string.all_calibers)
-                }) { selectedGroup = it }
+                Choice(stringResource(R.string.label_library_caliber), selectedFilter, listOf<String?>(null) + filters, {
+                    it?.let { f -> filterLabel(f) } ?: stringResource(R.string.all_calibers)
+                }) { selectedFilter = it }
+                hint?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 OutlinedTextField(query, { query = it }, label = { Text(stringResource(R.string.action_search)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 LazyColumn(Modifier.heightIn(max = 400.dp)) {
                     filtered.groupBy(group).forEach { (name, rows) ->
@@ -213,7 +239,7 @@ private fun <T> LibraryDialog(
                             )
                         }
                         items(rows) { item ->
-                            Column(Modifier.fillMaxWidth().clickable { onPick(item) }.padding(vertical = 8.dp)) {
+                            Column(Modifier.fillMaxWidth().clickable { onPick(item, selectedFilter) }.padding(vertical = 8.dp)) {
                                 Text(label(item), style = MaterialTheme.typography.bodyMedium)
                                 Text(detail(item), style = MaterialTheme.typography.bodySmall)
                             }
