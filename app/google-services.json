@@ -12,7 +12,20 @@
           "package_name": "com.kgwlabs.ballistics"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "491153467072-r5qr3omb83d493l4emtbp055gdjnk8vt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kgwlabs.ballistics",
+            "certificate_hash": "7d0612d9aef1e731a1c8a5496d81b74dbb0aa78d"
+          }
+        },
+        {
+          "client_id": "491153467072-v49fj00rg8do4kbh3udbhqqmknueeso8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDXIpzTSUmH3Mk_Eb4EoFJpkLe02oXit2E"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "491153467072-v49fj00rg8do4kbh3udbhqqmknueeso8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
