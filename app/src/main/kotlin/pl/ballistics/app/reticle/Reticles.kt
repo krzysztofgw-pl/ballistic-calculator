@@ -21,6 +21,7 @@ sealed interface Mark {
  * magnification; in a first focal plane scope that is every magnification.
  *
  * @param extent half-width of the visible field, in [unit].
+ * @param family reticles that are the same design in MRAD and MOA share a family.
  */
 data class Reticle(
     val id: String,
@@ -28,14 +29,46 @@ data class Reticle(
     val unit: AngularUnit,
     val extent: Double,
     val marks: List<Mark>,
+    @StringRes val family: Int = name,
 )
 
 object Reticles {
     val all: List<Reticle> by lazy {
-        listOf(mradHash(), mradTree(), milDot(), moaHash(), moaTree(), duplex(), dls1(), dls2(), dls3())
+        val duplex = duplex()
+        val dls2 = dls2()
+        listOf(
+            mradHash(), moaHash(),
+            mradTree(), moaTree(),
+            milDot(),
+            duplex, inUnit(duplex, "duplex-mrad", R.string.reticle_duplex_mrad, AngularUnit.MRAD),
+            dls1(), dls3(),
+            dls2, inUnit(dls2, "dls-2-moa", R.string.reticle_dls_2_moa, AngularUnit.MOA),
+        )
     }
 
     fun byId(id: String): Reticle = all.find { it.id == id } ?: all.first()
+
+    /** One entry per design, in [unit] when the design comes in it. */
+    fun families(unit: AngularUnit): List<Reticle> =
+        all.groupBy { it.family }.values.map { v -> v.find { it.unit == unit } ?: v.first() }
+
+    /** The MRAD and MOA versions of [reticle]'s design. */
+    fun variants(reticle: Reticle): List<Reticle> = all.filter { it.family == reticle.family }
+
+    /** [reticle]'s design in [unit], or [reticle] itself when there is no such version. */
+    fun variant(reticle: Reticle, unit: AngularUnit): Reticle = variants(reticle).find { it.unit == unit } ?: reticle
+
+    /** The same plain design measured in another unit; only for reticles without a scale. */
+    private fun inUnit(r: Reticle, id: String, @StringRes name: Int, unit: AngularUnit): Reticle {
+        val k = r.unit.radians / unit.radians
+        return Reticle(id, name, unit, r.extent * k, r.marks.map { m ->
+            when (m) {
+                is Mark.Line -> m.copy(x1 = m.x1 * k, y1 = m.y1 * k, x2 = m.x2 * k, y2 = m.y2 * k)
+                is Mark.Dot -> m.copy(x = m.x * k, y = m.y * k, r = m.r * k)
+                is Mark.Label -> m.copy(x = m.x * k, y = m.y * k)
+            }
+        }, r.family)
+    }
 
     private fun label(v: Double) = abs(v).let { if (it % 1.0 == 0.0) it.roundToInt().toString() else it.toString() }
 
@@ -75,7 +108,7 @@ object Reticles {
         add(Mark.Line(0.0, -from, 0.0, -to, Weight.HEAVY))
     }
 
-    private fun mradHash() = Reticle("mrad-hash", R.string.reticle_mrad_hash, AngularUnit.MRAD, 12.0, buildList<Mark> {
+    private fun mradHash() = Reticle("mrad-hash", R.string.reticle_mrad_hash, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_hash, marks = buildList<Mark> {
         tickedCross(10.0, 10.0, 10.0, 6.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 2.0, tick = 0.3)
         add(Mark.Line(10.0, 0.0, 12.0, 0.0, Weight.HEAVY))
         add(Mark.Line(-10.0, 0.0, -12.0, 0.0, Weight.HEAVY))
@@ -84,7 +117,7 @@ object Reticles {
     })
 
     /** Holdover grid: a dot every 1 mil, rows widening with drop, like modern "tree" reticles. */
-    private fun mradTree() = Reticle("mrad-tree", R.string.reticle_mrad_tree, AngularUnit.MRAD, 12.0, buildList<Mark> {
+    private fun mradTree() = Reticle("mrad-tree", R.string.reticle_mrad_tree, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_tree, marks = buildList<Mark> {
         tickedCross(10.0, 10.0, 12.0, 6.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 2.0, tick = 0.25)
         for (row in 1..11) {
             val y = -row.toDouble()
@@ -112,12 +145,12 @@ object Reticles {
         posts(5.0, 8.0)
     })
 
-    private fun moaHash() = Reticle("moa-hash", R.string.reticle_moa_hash, AngularUnit.MOA, 40.0, buildList<Mark> {
+    private fun moaHash() = Reticle("moa-hash", R.string.reticle_moa_hash, AngularUnit.MOA, 40.0, family = R.string.reticle_family_hash, marks = buildList<Mark> {
         tickedCross(30.0, 30.0, 34.0, 20.0, minor = 2.0, half = 10.0, major = 10.0, labelEvery = 10.0, tick = 1.0)
         posts(34.0, 40.0)
     })
 
-    private fun moaTree() = Reticle("moa-tree", R.string.reticle_moa_tree, AngularUnit.MOA, 40.0, buildList<Mark> {
+    private fun moaTree() = Reticle("moa-tree", R.string.reticle_moa_tree, AngularUnit.MOA, 40.0, family = R.string.reticle_family_tree, marks = buildList<Mark> {
         tickedCross(30.0, 30.0, 38.0, 20.0, minor = 2.0, half = 10.0, major = 10.0, labelEvery = 10.0, tick = 0.9)
         for (row in 1..9) {
             val y = -4.0 * row
@@ -137,7 +170,7 @@ object Reticles {
      * Delta publishes 0.2 and 1 MRAD markings, 0.005 MRAD lines and a 0.03 MRAD
      * centre point; the extent of the scale is drawn to the published diagram.
      */
-    private fun dls1() = Reticle("dls-1", R.string.reticle_dls_1, AngularUnit.MRAD, 12.0, buildList<Mark> {
+    private fun dls1() = Reticle("dls-1", R.string.reticle_dls_1, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_dls_1_3, marks = buildList<Mark> {
         tickedCross(10.0, 10.0, 10.0, 5.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 5.0, tick = 0.25)
         add(Mark.Dot(0.0, 0.0, 0.015))
         add(Mark.Line(10.0, 0.0, 12.0, 0.0, Weight.HEAVY))
@@ -147,14 +180,14 @@ object Reticles {
     })
 
     /** DLS-2: the same scope with a plain fine cross and an illuminated centre point. */
-    private fun dls2() = Reticle("dls-2", R.string.reticle_dls_2, AngularUnit.MRAD, 12.0, buildList<Mark> {
+    private fun dls2() = Reticle("dls-2", R.string.reticle_dls_2, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_dls_2, marks = buildList<Mark> {
         add(Mark.Line(-10.0, 0.0, 10.0, 0.0))
         add(Mark.Line(0.0, -10.0, 0.0, 10.0))
         add(Mark.Dot(0.0, 0.0, 0.015))
     })
 
     /** DLS-3: the DLS-1 layout scaled in MOA, with 1 and 5 MOA markings. */
-    private fun dls3() = Reticle("dls-3", R.string.reticle_dls_3, AngularUnit.MOA, 40.0, buildList<Mark> {
+    private fun dls3() = Reticle("dls-3", R.string.reticle_dls_3, AngularUnit.MOA, 40.0, family = R.string.reticle_family_dls_1_3, marks = buildList<Mark> {
         tickedCross(34.0, 34.0, 34.0, 17.0, minor = 1.0, half = 5.0, major = 5.0, labelEvery = 10.0, tick = 0.9)
         add(Mark.Dot(0.0, 0.0, 0.05))
         add(Mark.Line(34.0, 0.0, 40.0, 0.0, Weight.HEAVY))
@@ -164,7 +197,7 @@ object Reticles {
     })
 
     /** Classic hunting duplex: fine centre, heavy outer posts. */
-    private fun duplex() = Reticle("duplex", R.string.reticle_duplex, AngularUnit.MOA, 40.0, buildList<Mark> {
+    private fun duplex() = Reticle("duplex", R.string.reticle_duplex, AngularUnit.MOA, 40.0, family = R.string.reticle_family_duplex, marks = buildList<Mark> {
         add(Mark.Line(-12.0, 0.0, 12.0, 0.0))
         add(Mark.Line(0.0, -12.0, 0.0, 12.0))
         posts(12.0, 40.0)

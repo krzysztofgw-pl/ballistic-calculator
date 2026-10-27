@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import pl.ballistics.app.R
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.ballistics.app.CalcResult
+import pl.ballistics.app.data.AngularUnit
 import pl.ballistics.app.data.FocalPlane
 import pl.ballistics.app.toNumber
 import pl.ballistics.app.reticle.Mark
@@ -80,8 +82,8 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
         modifier.verticalScroll(rememberScrollState()).padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Choice(stringResource(R.string.label_reticle), reticle, Reticles.all, {
-            if (it.id == own.id) stringResource(R.string.reticle_own, stringResource(it.name)) else stringResource(it.name)
+        ReticleChoice(stringResource(R.string.label_reticle), reticle, reticle.unit, {
+            if (it.family == own.family) stringResource(R.string.reticle_own, stringResource(it.family)) else stringResource(it.family)
         }) {
             previewId = it.id
         }
@@ -141,6 +143,30 @@ fun ReticleScreen(result: CalcResult?, modifier: Modifier = Modifier) {
             )
             if (abs(h.x) > reticle.extent || abs(h.y) > reticle.extent) {
                 Text(stringResource(R.string.hold_outside_reticle), color = MaterialTheme.colorScheme.error)
+            }
+        }
+    }
+}
+
+/**
+ * Picks a reticle design, then its MRAD or MOA version when it comes in both.
+ * A newly picked design starts in [preferredUnit] when it has that version.
+ */
+@Composable
+internal fun ReticleChoice(
+    label: String,
+    selected: Reticle,
+    preferredUnit: AngularUnit,
+    name: @Composable (Reticle) -> String,
+    onSelect: (Reticle) -> Unit,
+) {
+    Choice(label, selected, Reticles.families(preferredUnit), name) { onSelect(Reticles.variant(it, preferredUnit)) }
+    val variants = Reticles.variants(selected)
+    if (variants.size > 1) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.label_reticle_units), Modifier.weight(1f))
+            variants.forEach { v ->
+                FilterChip(selected = v.id == selected.id, onClick = { onSelect(v) }, label = { Text(v.unit.label) })
             }
         }
     }

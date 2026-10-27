@@ -158,15 +158,23 @@
     <string name="table_legend">Corrections in %1$s: ↑ up, R/L right/left. One click = %2$s %1$s.</string>
 
     <!-- Reticle -->
-    <string name="reticle_mrad_hash">MRAD, 0.2 hash</string>
-    <string name="reticle_mrad_tree">MRAD tree</string>
+    <string name="reticle_mrad_hash">Hash, 0.2 MRAD</string>
+    <string name="reticle_mrad_tree">Tree, MRAD</string>
     <string name="reticle_mil_dot">Mil-Dot</string>
-    <string name="reticle_moa_hash">MOA, 2 MOA hash</string>
-    <string name="reticle_moa_tree">MOA tree</string>
-    <string name="reticle_duplex">Duplex</string>
+    <string name="reticle_moa_hash">Hash, 2 MOA</string>
+    <string name="reticle_moa_tree">Tree, MOA</string>
+    <string name="reticle_duplex">Duplex, MOA</string>
+    <string name="reticle_duplex_mrad">Duplex, MRAD</string>
     <string name="reticle_dls_1">DLS-1 (Delta Stryker, MRAD)</string>
     <string name="reticle_dls_2">DLS-2 (Delta Stryker, fine cross)</string>
+    <string name="reticle_dls_2_moa">DLS-2 (Delta Stryker, fine cross, MOA)</string>
     <string name="reticle_dls_3">DLS-3 (Delta Stryker, MOA)</string>
+    <string name="reticle_family_hash">Hash</string>
+    <string name="reticle_family_tree">Tree</string>
+    <string name="reticle_family_duplex">Duplex</string>
+    <string name="reticle_family_dls_1_3">Delta DLS-1 / DLS-3</string>
+    <string name="reticle_family_dls_2">Delta DLS-2</string>
+    <string name="label_reticle_units">Reticle units</string>
     <string name="reticle_own">%1$s (scope)</string>
     <string name="reticle_preview_note">Previewing another reticle. %1$s has: %2$s.</string>
     <string name="sfp_note">Second focal plane: subtensions are true at %1$s×. Magnification: %2$d×</string>

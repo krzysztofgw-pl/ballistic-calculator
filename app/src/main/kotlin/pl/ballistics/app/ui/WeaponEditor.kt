@@ -61,7 +61,9 @@ fun WeaponEditor(
                 w = w.copy(angularUnit = v, clickValue = if (v == AngularUnit.MRAD) "0.1" else "0.25")
             }
             NumberField(stringResource(R.string.label_click_value), w.clickValue, w.angularUnit.label) { w = w.copy(clickValue = it) }
-            Choice(stringResource(R.string.label_reticle), Reticles.byId(w.reticleId), Reticles.all, { stringResource(it.name) }) { w = w.copy(reticleId = it.id) }
+            ReticleChoice(stringResource(R.string.label_reticle), Reticles.byId(w.reticleId), w.angularUnit, { stringResource(it.family) }) {
+                w = w.copy(reticleId = it.id)
+            }
             Choice(stringResource(R.string.label_focal_plane), w.focalPlane, FocalPlane.entries, { stringResource(it.label) }) { w = w.copy(focalPlane = it) }
             FieldRow { m ->
                 if (w.focalPlane == FocalPlane.SFP) {
