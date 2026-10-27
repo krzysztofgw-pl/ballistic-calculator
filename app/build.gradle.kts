@@ -18,7 +18,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "pl.ballistics.app"
+        applicationId = "pl.kgwlabs.balistyka"
         minSdk = 26
         targetSdk = 35
         versionCode = 2

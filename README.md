@@ -1,5 +1,7 @@
 # Balistyka: kalkulator balistyczny na Androida
 
+Aplikacja studia **KGW Labs** (pakiet `pl.kgwlabs.balistyka`).
+
 Kalkulator trajektorii pocisku oparty na ogólnodostępnych, uznanych modelach fizycznych.
 Aplikacja w Kotlinie i Jetpack Compose, solver jako osobny moduł w czystym Kotlinie.
 
