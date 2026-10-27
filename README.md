@@ -1,72 +1,113 @@
-# Ballistics: an Android ballistic calculator
+# Ballistics
 
-An app by **KGW Labs** (package `com.kgwlabs.ballistics`).
+An Android ballistic calculator by **KGW Labs** (`com.kgwlabs.ballistics`).
 
-A trajectory calculator built on established, publicly documented physical models.
-The app is written in Kotlin with Jetpack Compose; the solver is a separate pure-Kotlin module.
+Ballistics computes bullet trajectories with a 3DOF point-mass solver built on established, publicly documented
+models: standard drag functions, Doppler-derived drag curves, a humid-air atmosphere, Coriolis, spin drift and
+aerodynamic jump. It keeps rifle and load profiles, gives a dope table with turret clicks, draws the holds on
+your scope's reticle, and syncs everything to the cloud.
 
-## Modules
+> **Safety note.** A calculator only predicts. Always confirm the dope with live fire before relying on it,
+> and check library bullet data against the manufacturer's current figures.
 
-| Module | Contents |
-|---|---|
-| `core/` | Ballistic solver (pure JVM, no Android dependencies) and its tests |
-| `app/` | Android app: rifle and load profiles, conditions, dope table, reticle holds, sync |
+## Features
+
+### Profiles
+- **Rifles**: name, scope (turret unit MRAD or MOA, click value, reticle, first or second focal plane,
+  calibration and maximum magnification), sight height, zero range and the load it is zeroed with.
+- **Sight height helper**: compute it from a caliper measurement, or estimate it from the objective diameter,
+  ring height and rail.
+- **Loads**: muzzle velocity, powder temperature sensitivity, bullet weight, diameter, length and twist,
+  drag model and BC. Start from the built-in library (Hornady, Sierra and Berger bullets and factory loads)
+  or enter custom data, including a full Cd(Mach) curve.
+
+### Conditions
+Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction (clock), look angle,
+cant, Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table range and step.
+
+### Table
+For each range: drop, elevation and clicks, wind drift and windage correction, velocity, energy, time of
+flight and Mach.
+
+### Reticle
+Impact points for every range drawn on the scope's reticle: MRAD 0.2 hash, MRAD tree, Mil-Dot, MOA hash,
+MOA tree and Duplex. Second-focal-plane reticles get a magnification slider, and the same holds can be
+previewed on any other reticle.
+
+### Sync and backup
+- Google sign-in with live sync through Cloud Firestore (newer change wins).
+- JSON export and import of all profiles.
+- Android Auto Backup.
 
 ## Physics
 
-- **3DOF point-mass model** integrated with 4th-order Runge–Kutta (0.5 ms step) in an Earth-fixed frame.
-  This is the model behind JBM, Applied Ballistics and Hornady 3DOF.
-- **Drag functions G1, G2, G5, G6, G7, G8, GI, GS, RA4** (BRL data) with monotone (PCHIP) interpolation.
-- **Velocity-banded BCs** (Sierra style) and **custom Cd(Mach) curves** from Doppler radar
-  (Lapua, Hornady), the most accurate option available.
+- **3DOF point-mass model** integrated with 4th-order Runge–Kutta (0.5 ms step) in an Earth-fixed frame,
+  the model class used by JBM and most modern ballistic calculators.
+- **Drag functions** G1, G2, G5, G6, G7, G8, GI, GS and RA4 (BRL data) with monotone cubic (PCHIP)
+  interpolation.
+- **Velocity-banded BCs** (Sierra style) and **custom Cd(Mach) curves** from Doppler radar (Lapua, Hornady),
+  the most accurate option available.
 - **Atmosphere**: humid-air density (Buck vapour pressure), speed of sound from virtual temperature,
   ICAO lapse rate along the flight path, station pressure or QNH, density altitude.
-- **3D wind** (including vertical), by range zones.
-- **Coriolis and Eötvös**: the full −2Ω×v acceleration, WGS-84 normal gravity by latitude and height.
-- **Miller gyroscopic stability** corrected for velocity and air density.
+- **Wind**: the solver supports 3D wind (including vertical) by range zones; the app currently uses a single
+  horizontal wind.
+- **Coriolis and Eötvös**: the full −2Ω×v acceleration, with WGS-84 normal gravity by latitude and height.
+- **Gyroscopic stability**: Miller formula corrected for velocity and air density.
 - **Spin drift** and **aerodynamic jump** from crosswind (Litz).
 - **Inclined fire and cant**, **powder temperature sensitivity**, separate zeroing conditions.
 
-## App
-
-- **Rifle profiles**: rifle, scope (turret units and click value, reticle, focal plane), sight height,
-  zero and the load it is zeroed with. A helper computes the sight height from a caliper measurement or
-  estimates it from the objective, rings and rail.
-- **Load profiles**: from a library of catalogue data (Hornady, Sierra and Berger bullets and factory loads)
-  or custom, including a Cd(Mach) curve.
-- **Reticle holds**: impact points for every range drawn on the scope's reticle (MRAD 0.2 hash, MRAD tree,
-  Mil-Dot, MOA hash, MOA tree, Duplex), first and second focal plane (with a magnification slider for SFP),
-  and a preview of the same holds on any other reticle.
-- **Sync**: Google sign-in with live sync through Firestore, JSON export/import of all profiles, and Android
-  Auto Backup.
-
-All UI text lives in `app/src/main/res/values/strings.xml`, so translations are added as `values-xx` folders.
-
-## Verification
-
+### Verification
 `ReferenceTrajectoryTest` compares results with the independent
 [py-ballisticcalc](https://github.com/o-murphy/py_ballisticcalc) implementation for G1 and G7 with wind out to
 1000 m (0.1 MOA tolerance). `PhysicsTest` checks the ICAO atmosphere, the directions of Coriolis, Eötvös,
-spin drift and aerodynamic jump, and a hand-computed Sg.
+spin drift and aerodynamic jump, and a hand-computed stability factor. `ScopeMountTest` covers the
+sight height helper.
+
+## Installing
+
+1. Open the **Actions** tab, pick the latest successful run on `main` and download the `ballistics-apk` artifact.
+2. Unzip it and install the APK (allow installs from unknown sources when asked).
+
+Requires Android 8.0 (API 26) or newer. Builds signed with the release key update each other in place.
+Coming from a build signed with a different key or an older package name, export your profiles first,
+uninstall the old app, then import them.
+
+## Project layout
+
+| Path | Contents |
+|---|---|
+| `core/` | Ballistic solver, pure Kotlin/JVM with no Android dependencies, and its tests |
+| `app/` | Android app in Jetpack Compose (Material 3) |
+| `app/.../data/` | Profiles, bullet library, local storage, Firebase sync |
+| `app/.../reticle/` | Reticle definitions |
+| `app/.../ui/` | Screens: Profiles, Conditions, Table, Reticle, editors |
+| `.github/workflows/build.yml` | CI: solver tests and signed release APK |
+
+All UI text lives in `app/src/main/res/values/strings.xml`; translations are added as `values-xx` folders.
 
 ## Building
 
+Requires JDK 17.
+
 ```bash
-./gradlew :core:test           # solver, works without the Android SDK
+./gradlew :core:test           # solver tests, no Android SDK needed
 ./gradlew :app:assembleRelease # APK, needs the Android SDK
 ```
 
-Every push builds an APK in GitHub Actions: **Actions** tab → latest run → `ballistics-apk` artifact.
+The `app` module is included only when an Android SDK is configured (`local.properties` or `ANDROID_HOME`),
+so the solver can be built and tested anywhere.
 
 ### Release signing
 
 CI signs the APK with the key from the `SIGNING_KEYSTORE_BASE64` and `SIGNING_PASSWORD` repository secrets
-(alias `kgwlabs-ballistics`). Without them it falls back to the debug key, and such APKs cannot update an installed
-release build.
+(alias `kgwlabs-ballistics`). Without them it falls back to the debug key, and such APKs cannot update an
+installed release build. Keep the keystore safe: without it you cannot ship updates.
 
 ### Firebase
 
-Cloud sync is enabled when `app/google-services.json` is present. The Firestore rules expected by the app:
+Cloud sync is enabled when `app/google-services.json` is present; without it the app works offline only.
+The Firebase project needs Google sign-in enabled, the release SHA-1 and SHA-256 fingerprints registered for
+the Android app, and these Firestore rules, which let each user read and write only their own document:
 
 ```
 rules_version = '2';
