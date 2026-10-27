@@ -24,12 +24,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import pl.ballistics.app.R
+import pl.ballistics.app.TargetInputs
 import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.BulletLibrary
 import pl.ballistics.app.data.Cartridges
 import pl.ballistics.app.toNumber
 import pl.ballistics.app.data.DragType
+import pl.ballistics.app.data.STANDARD_POWDER_SENSITIVITY
+import pl.ballistics.app.data.withHandloadBullet
 import pl.ballistics.app.data.WeaponProfile
 import pl.ballistics.app.data.withBullet
 import pl.ballistics.app.data.withDragType
@@ -72,10 +75,6 @@ fun AmmoEditor(
         onClose = onClose,
     ) {
         Section(stringResource(R.string.section_data_source)) {
-            Text(
-                stringResource(R.string.hint_data_source),
-                style = MaterialTheme.typography.bodySmall,
-            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { picker = Picker.FACTORY }) { Text(stringResource(R.string.action_factory_load)) }
                 OutlinedButton(onClick = { picker = Picker.BULLET }) { Text(stringResource(R.string.action_bullet)) }
@@ -88,7 +87,6 @@ fun AmmoEditor(
                 stringResource(R.string.label_cartridge),
                 a.cartridge,
                 a.diameterMm.toNumber()?.div(25.4),
-                stringResource(R.string.cartridge_any),
             ) { a = a.copy(cartridge = it) }
             Choice(stringResource(R.string.label_drag_model), a.dragType, DragType.entries, { if (it == DragType.CUSTOM) stringResource(R.string.drag_custom) else it.name }) {
                 a = a.withDragType(it)
@@ -106,10 +104,6 @@ fun AmmoEditor(
                 )
             } else {
                 NumberField(stringResource(R.string.label_bc, a.dragType.name), a.bc, "lb/in²") { a = a.copy(bc = it) }
-                Text(
-                    stringResource(R.string.hint_bc_model, a.dragType.name),
-                    style = MaterialTheme.typography.bodySmall,
-                )
             }
             FieldRow { m ->
                 NumberField(stringResource(R.string.label_mass), a.massGr, "gr", m) { a = a.copy(massGr = it) }
@@ -123,10 +117,6 @@ fun AmmoEditor(
                 NumberField(stringResource(R.string.label_muzzle_velocity), a.muzzleVelocity, "m/s", m) { a = a.copy(muzzleVelocity = it) }
                 NumberField(stringResource(R.string.label_test_barrel), a.testBarrelCm, "cm", m, optional = true) { a = a.copy(testBarrelCm = it) }
             }
-            Text(
-                stringResource(R.string.hint_reference_velocity),
-                style = MaterialTheme.typography.bodySmall,
-            )
             weapons.mapNotNull { w -> w.measuredVelocity(a)?.let { w to it } }.forEach { (w, mv) ->
                 Text(
                     stringResource(R.string.measured_in_rifle, w.name, mv),
@@ -134,9 +124,16 @@ fun AmmoEditor(
                 )
             }
             FieldRow { m ->
-                NumberField(stringResource(R.string.label_powder_sensitivity), a.powderSensitivity, "m/s/°C", m) { a = a.copy(powderSensitivity = it) }
+                NumberField(
+                    stringResource(R.string.label_powder_sensitivity), a.powderSensitivity, "m/s/°C", m, optional = true,
+                    placeholder = STANDARD_POWDER_SENSITIVITY.toString(),
+                ) { a = a.copy(powderSensitivity = it) }
                 NumberField(stringResource(R.string.label_at_temperature), a.powderReferenceTemp, "°C", m) { a = a.copy(powderReferenceTemp = it) }
             }
+            NumberField(
+                stringResource(R.string.label_velocity_sd), a.velocitySd, "m/s", optional = true,
+                placeholder = TargetInputs.DEFAULT_VELOCITY_SD.toString(),
+            ) { a = a.copy(velocitySd = it) }
         }
 
         Section(stringResource(R.string.section_notes)) {
@@ -154,21 +151,21 @@ fun AmmoEditor(
             title = stringResource(R.string.title_bullets),
             options = BulletLibrary.bullets,
             label = { it.label },
-            group = { Cartridges.boreLabel(it.diameterIn) },
+            group = { Cartridges.caliberName(it.diameterIn) },
             filters = bulletFilters,
-            filterLabel = { f -> Cartridges.find(f)?.let { stringResource(R.string.bullet_filter_option, it.name, Cartridges.inches(it.bulletDiameterIn)) } ?: f },
+            filterLabel = { it },
             matches = { b, f -> Cartridges.find(f)?.let { Cartridges.sameDiameter(it.bulletDiameterIn, b.diameterIn) } ?: true },
             initialFilter = Cartridges.find(a.cartridge)?.name,
-            hint = stringResource(R.string.hint_bullet_diameters),
             detail = { b ->
                 listOfNotNull(
+                    stringResource(R.string.bullet_no_velocity),
                     b.g1?.let { "G1 $it" },
                     b.g7?.let { "G7 $it" },
                     b.lengthIn?.let { stringResource(R.string.bullet_length, it) },
                     b.twistIn?.let { stringResource(R.string.bullet_twist, if (it % 1.0 == 0.0) it.toInt() else it) },
                 ).joinToString(" · ")
             },
-            onPick = { b, filter -> a = a.withBullet(b).copy(cartridge = filter ?: a.cartridgeFor(b.diameterIn)); picker = null },
+            onPick = { b, filter -> a = a.withHandloadBullet(b).copy(cartridge = filter ?: a.cartridgeFor(b.diameterIn)); picker = null },
             onDismiss = { picker = null },
         )
         Picker.FACTORY -> LibraryDialog(
@@ -180,15 +177,15 @@ fun AmmoEditor(
             filterLabel = { it },
             matches = { load, f -> load.cartridge == f },
             initialFilter = Cartridges.find(a.cartridge)?.name,
-            hint = null,
             detail = {
-                stringResource(
-                    R.string.factory_load_velocity,
-                    it.muzzleVelocityMps.roundToInt(),
-                    it.muzzleVelocityFps.roundToInt(),
-                    it.testBarrelCm.roundToInt(),
-                    (it.testBarrelCm / 2.54).roundToInt(),
-                )
+                listOfNotNull(
+                    stringResource(
+                        R.string.factory_load_velocity,
+                        it.muzzleVelocityMps.roundToInt(),
+                        it.testBarrelCm.roundToInt(),
+                    ),
+                    it.bullet.g7?.let { g -> "G7 $g" } ?: it.bullet.g1?.let { g -> "G1 $g" },
+                ).joinToString(" · ")
             },
             onPick = { load, _ -> a = a.withFactoryLoad(load); picker = null },
             onDismiss = { picker = null },
@@ -207,7 +204,6 @@ private fun <T> LibraryDialog(
     filterLabel: @Composable (String) -> String,
     matches: (T, String) -> Boolean,
     initialFilter: String?,
-    hint: String?,
     detail: @Composable (T) -> String,
     onPick: (T, String?) -> Unit,
     onDismiss: () -> Unit,
@@ -226,8 +222,7 @@ private fun <T> LibraryDialog(
                 Choice(stringResource(R.string.label_library_caliber), selectedFilter, listOf<String?>(null) + filters, {
                     it?.let { f -> filterLabel(f) } ?: stringResource(R.string.all_calibers)
                 }) { selectedFilter = it }
-                hint?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
-                OutlinedTextField(query, { query = it }, label = { Text(stringResource(R.string.action_search)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(query, { query = it }, label = { Text(stringResource(R.string.action_search_library)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 LazyColumn(Modifier.heightIn(max = 400.dp)) {
                     filtered.groupBy(group).forEach { (name, rows) ->
                         item(key = "group:$name") {
@@ -247,10 +242,6 @@ private fun <T> LibraryDialog(
                         }
                     }
                 }
-                Text(
-                    stringResource(R.string.hint_library_disclaimer),
-                    style = MaterialTheme.typography.bodySmall,
-                )
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } },

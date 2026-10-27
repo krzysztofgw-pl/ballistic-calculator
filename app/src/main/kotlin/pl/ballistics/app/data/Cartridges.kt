@@ -58,38 +58,25 @@ object Cartridges {
     fun bulletDiameterIn(text: String): Double? =
         find(text)?.bulletDiameterIn ?: text.trim().takeIf { it.startsWith(".") }?.toNumber()?.takeIf { it in 0.17..0.6 }
 
-    /** ".224″": bullet diameter as calibers are written. Not the cartridge name: a .223 Rem takes .224″ bullets. */
-    fun inches(diameterIn: Double): String = String.format(Locale.US, "%.3f", diameterIn).removePrefix("0") + "″"
-
-    /** Cartridges that take bullets of this diameter. */
-    fun forDiameter(diameterIn: Double): List<Cartridge> = all.filter { sameDiameter(it.bulletDiameterIn, diameterIn) }
-
-    /**
-     * ".224″ (5.56 mm) bullets · .223 Rem, .22-250 Rem, .22 Creedmoor": a group of bullets by diameter,
-     * naming the cartridges that use them so ".224" is not mistaken for a cartridge.
-     */
-    fun boreLabel(diameterIn: Double): String {
-        val names = forDiameter(diameterIn).map { it.name }
-        val cartridges = when {
-            names.isEmpty() -> ""
-            names.size <= 3 -> " · " + names.joinToString(", ")
-            else -> " · " + names.take(3).joinToString(", ") + "…"
-        }
-        return "${inches(diameterIn)} (${metric(diameterIn)}) bullets$cartridges"
-    }
-
-    private fun metric(diameterIn: Double): String {
+    /** The caliber name bullets of this diameter go by: ".30 / 7.62 mm" for .308″, "6.5 mm" for .264″. */
+    fun caliberName(diameterIn: Double): String {
         val inch = String.format(Locale.US, "%.3f", diameterIn).removePrefix("0")
         return when (inch) {
-            ".224" -> "5.56 mm"
+            ".172" -> ".17"
+            ".204" -> ".20"
+            ".224" -> ".22 / 5.56 mm"
             ".243" -> "6 mm"
+            ".257" -> ".25"
             ".264" -> "6.5 mm"
+            ".277" -> ".270 / 6.8 mm"
             ".284" -> "7 mm"
-            ".308" -> "7.62 mm"
-            ".311" -> "7.62 mm"
+            ".308" -> ".30 / 7.62 mm"
+            ".310", ".311", ".312" -> ".303 / 7.62x39 / 7.62x54R"
             ".323" -> "8 mm"
-            ".338" -> "8.6 mm"
-            else -> String.format(Locale.US, "%.2f mm", diameterIn * 25.4)
+            ".338" -> ".338"
+            ".375" -> ".375"
+            ".510" -> ".50"
+            else -> inch
         }
     }
 
@@ -102,7 +89,7 @@ private const val MM_PER_IN = 25.4
 fun AmmoProfile.caliberGroup(): String =
     Cartridges.find(cartridge)?.name
         ?: cartridge.takeIf { it.isNotBlank() }
-        ?: diameterMm.toNumber()?.let { Cartridges.boreLabel(it / MM_PER_IN) }
+        ?: diameterMm.toNumber()?.let { Cartridges.caliberName(it / MM_PER_IN) }
         ?: ""
 
 /** Bullet diameter for sorting groups; unknown sorts last. */

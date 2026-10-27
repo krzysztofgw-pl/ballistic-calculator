@@ -82,8 +82,10 @@ class Solver(private val options: SolverOptions = SolverOptions()) {
         ammo: Ammunition,
         conditions: ShotConditions,
         zeroAtmosphere: Atmosphere = Atmosphere.icao(),
+        /** A bore elevation from an earlier solution with the same rifle and ammunition, to skip zeroing. */
+        zeroElevationRad: Double? = null,
     ): Solution {
-        val elevation = zero(rifle, ammo, zeroAtmosphere)
+        val elevation = zeroElevationRad ?: zero(rifle, ammo, zeroAtmosphere)
         val air = conditions.atmosphere.stateAt()
         val mv = ammo.muzzleVelocityAt(conditions.powderTempC ?: conditions.atmosphere.temperatureC)
         val p = ammo.projectile

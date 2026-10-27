@@ -6,7 +6,7 @@
     <string name="tab_profiles">Profiles</string>
     <string name="tab_conditions">Conditions</string>
     <string name="tab_table">Table</string>
-    <string name="tab_reticle">Reticle</string>
+    <string name="tab_target">Target</string>
 
     <!-- Actions -->
     <string name="action_back">Back</string>
@@ -16,15 +16,14 @@
     <string name="action_close">Close</string>
     <string name="action_edit">Edit</string>
     <string name="action_use">Use</string>
-    <string name="action_search">Search</string>
     <string name="action_add_rifle">Add rifle</string>
     <string name="action_add_load">Add load</string>
     <string name="action_export">Export</string>
     <string name="action_import">Import</string>
     <string name="action_sign_in_google">Sign in with Google</string>
     <string name="action_sign_out">Sign out</string>
-    <string name="action_factory_load">Factory load</string>
-    <string name="action_bullet">Bullet</string>
+    <string name="action_factory_load">Factory ammo</string>
+    <string name="action_bullet">Bullet for handload</string>
     <string name="action_sight_height_helper">Help me find the sight height</string>
     <string name="delete_profile_title">Delete this profile?</string>
     <string name="choose">choose</string>
@@ -34,10 +33,8 @@
     <string name="section_loads">Loads</string>
     <string name="section_sync">Sync</string>
     <string name="no_ammo">no load selected</string>
-    <string name="sync_sign_in_hint">Sign in with Google and your profiles will sync between your phones automatically.</string>
     <string name="sync_signed_in">signed in</string>
     <string name="sync_signed_in_as">Cloud: %1$s</string>
-    <string name="sync_file_hint">You can also save your profiles to a file (e.g. on Google Drive) and load them on another phone. Android also backs them up to your Google account.</string>
     <string name="sync_not_configured">Cloud sync is not configured in this build</string>
     <string name="sync_missing_client_id">The Firebase configuration has no Google client ID</string>
     <string name="sync_sign_in_failed">Sign-in failed</string>
@@ -94,15 +91,7 @@
     <!-- Load editor -->
     <string name="title_new_load">New load</string>
     <string name="section_data_source">Data source</string>
-    <string name="hint_data_source">Factory load: a complete cartridge you buy, so the bullet, BCs, cartridge and the box velocity with its test barrel are filled in. Bullet: only the projectile, for handloads; enter your own velocity. Either way, correct the velocity with your chronograph.</string>
     <string name="label_cartridge">Cartridge</string>
-    <string name="cartridge_any">Empty: any cartridge with this bullet diameter</string>
-    <string name="caliber_known">%1$s takes %2$s bullets</string>
-    <string name="cartridge_option">%1$s  ·  %2$s bullet</string>
-    <string name="hint_bullet_diameters">Bullets are listed by diameter, which differs from the cartridge name: a .223 Rem takes .224″ bullets, 6mm Creedmoor and .243 Win take .243″, 6.5 Creedmoor .264″, .308 Win .308″. Pick your cartridge in the filter and it is filled into the load.</string>
-    <string name="bullet_filter_option">%1$s (%2$s bullets)</string>
-    <string name="caliber_unknown">Not a known cartridge: loads are matched by bullet diameter when the caliber is a number like .308</string>
-    <string name="caliber_rifle_empty">Pick from the list to see only the loads that fit</string>
     <string name="caliber_unknown_group">Unknown caliber</string>
     <string name="action_choose_cartridge">Choose a cartridge</string>
     <string name="label_library_caliber">Caliber</string>
@@ -114,14 +103,12 @@
     <string name="drag_custom">Custom Cd(M)</string>
     <string name="hint_custom_curve">Paste a drag curve from Doppler data: one Mach number and Cd per line, e.g. \"0.80 0.157\".</string>
     <string name="label_bc">%1$s ballistic coefficient</string>
-    <string name="hint_bc_model">Enter the BC published for the %1$s model. BCs of different models are not interchangeable: switching the model restores that model\'s BC or leaves the field empty.</string>
     <string name="label_mass">Weight</string>
     <string name="label_diameter">Diameter</string>
     <string name="label_bullet_length">Bullet length (stability, spin drift)</string>
     <string name="section_velocity">Velocity</string>
     <string name="label_muzzle_velocity">Muzzle velocity</string>
     <string name="label_test_barrel">in a barrel of</string>
-    <string name="hint_reference_velocity">The velocity from the box or your chronograph and the barrel length it was measured in. Each rifle can store its own measured velocity for this load in the rifle editor.</string>
     <string name="measured_in_rifle">%1$s: %2$s m/s measured</string>
     <string name="label_barrel_length">Barrel length</string>
     <string name="label_rifle_velocity">Muzzle velocity in this rifle (chronograph)</string>
@@ -138,10 +125,11 @@
     <string name="label_at_temperature">at temperature</string>
     <string name="section_notes">Notes</string>
     <string name="hint_notes">e.g. load data, lot, barrel length</string>
-    <string name="title_bullets">Bullets</string>
-    <string name="title_factory_loads">Factory loads</string>
-    <string name="factory_load_velocity">%1$d m/s (%2$d fps) from a %3$d cm (%4$d″) test barrel</string>
-    <string name="hint_library_disclaimer">Manufacturer catalogue data; check BC and velocity against the current catalogue and your chronograph. Search by maker, name or caliber, e.g. \"308 hybrid\".</string>
+    <string name="title_bullets">Bullets for handloads</string>
+    <string name="bullet_no_velocity">no velocity</string>
+    <string name="action_search_library">Search maker or name</string>
+    <string name="title_factory_loads">Factory ammo</string>
+    <string name="factory_load_velocity">%1$d m/s, %2$d cm barrel</string>
     <string name="bullet_length">%1$.3f″</string>
     <string name="bullet_twist">1:%1$s″ twist</string>
 
@@ -159,9 +147,6 @@
     <string name="unit_m_asl">m ASL</string>
     <string name="label_wind_speed">Speed</string>
     <string name="label_wind_from">Direction (from)</string>
-    <string name="unit_oclock">o\'clock</string>
-    <string name="hint_wind_dial">Top is the target. Tap or drag to where the wind blows from: 90° (3 o\'clock) is from the right, 270° (9 o\'clock) from the left.</string>
-    <string name="hint_wind_dial_north">North up, as in a forecast: tap or drag to where the wind blows from. The thin line is your shot azimuth.</string>
     <string name="action_forecast_wind">Suggest from the weather forecast</string>
     <string name="title_forecast">Forecast wind</string>
     <string name="forecast_loading">Getting your location and the forecast…</string>
@@ -194,7 +179,6 @@
     <string name="label_coriolis">Coriolis and Eötvös effects</string>
     <string name="label_latitude">Latitude</string>
     <string name="label_azimuth">Shot azimuth</string>
-    <string name="hint_azimuth">True bearing of the line of fire, clockwise from north. Used for Coriolis and for the north-up wind dial.</string>
     <string name="action_phone_compass">Use phone compass</string>
     <string name="action_my_location">Use my location</string>
     <string name="compass_reading">Reading the compass: hold the phone along the line of fire, flat or upright with the camera to the target.</string>
@@ -207,7 +191,6 @@
     <string name="location_unavailable">No location: allow location access and turn on location services, or type the latitude.</string>
     <string name="latitude_north">%1$s° N</string>
     <string name="latitude_south">%1$s° S</string>
-    <string name="hint_latitude">Positive north of the equator, negative south. A whole degree is enough for Coriolis.</string>
 
     <!-- Table -->
     <string name="col_range">m</string>
@@ -243,14 +226,11 @@
     <string name="reticle_family_duplex">Duplex</string>
     <string name="reticle_family_dls_1_3">DLS-1 / DLS-3</string>
     <string name="label_reticle_units">Reticle units</string>
-    <string name="reticle_own">%1$s (scope)</string>
     <string name="reticle_preview_note">Previewing another reticle. %1$s has: %2$s.</string>
-    <string name="sfp_note">Second focal plane: subtensions are true at %1$s×, holds change with magnification.</string>
-    <string name="ffp_note">First focal plane: holds are the same at every magnification; zooming only changes the view.</string>
+    <string name="sfp_note">SFP: true at %1$s×</string>
     <string name="magnification_value">Magnification %1$s×</string>
     <string name="action_unlock_magnification">Beyond scope range</string>
     <string name="magnification_outside_range">Outside the scope\'s %1$s–%2$s× range</string>
-    <string name="hint_pinch_zoom">Pinch the reticle to zoom.</string>
     <string name="hold_on_reticle">Hold %2$s %5$s %1$s, %4$s %5$s %3$s</string>
     <string name="or_dial">Or dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
     <string name="hold_outside_reticle">Hold point is outside the reticle: dial the turrets.</string>
@@ -292,4 +272,64 @@
     <string name="field_azimuth">azimuth</string>
     <string name="field_table_range">table range</string>
     <string name="field_table_step">table step</string>
+    <string name="label_target_distance">Distance</string>
+    <string name="action_closer">1 m closer</string>
+    <string name="action_farther">1 m farther</string>
+    <string name="label_target_speed">Target speed</string>
+    <string name="label_target_direction">Moving to (90° = right)</string>
+    <string name="moving_hold">Moving: hold %2$s %5$s %1$s, %4$s %5$s %3$s (lead %6$s %7$s m)</string>
+    <string name="target_out_of_reach">The bullet does not reach %1$d m.</string>
+    <string name="chart_wind_speed">Wind correction (%1$s) by wind speed (m/s)</string>
+    <string name="chart_wind_direction">Wind correction (%1$s) by wind direction (o\'clock)</string>
+    <string name="chart_spin_drift">Spin drift correction (%1$s) by distance (m)</string>
+    <string name="wind_from_clock">%1$s o\'clock</string>
+    <string name="wind_speed_series">%1$d m/s</string>
+    <string name="spin_drift_at">Spin drift at %1$d m: %2$s cm, correct %3$s %4$s</string>
+    <string name="spin_drift_needs_data">Spin drift needs the bullet length and the barrel twist.</string>
+    <string name="spin_drift_off">Spin drift is off in Conditions.</string>
+    <string name="label_target_width">Target width</string>
+    <string name="label_target_height">Target height</string>
+    <string name="theme_system">Follow the system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="title_settings">Settings</string>
+    <string name="section_appearance">Appearance</string>
+    <string name="section_layout">Layout</string>
+    <string name="label_keep_screen_on">Keep the screen on</string>
+    <string name="label_tabs">Tabs</string>
+    <string name="label_sub_tabs">Sub-tabs</string>
+    <string name="placement_top">Top</string>
+    <string name="placement_bottom">Bottom</string>
+    <string name="target_free">Free</string>
+    <string name="target_default_name">Target %1$d</string>
+    <string name="action_add_target">Save as a new target</string>
+    <string name="title_target">Target</string>
+    <string name="section_charts">Charts</string>
+    <string name="section_wind_bracket">Wind bracket</string>
+    <string name="label_wind_min">Lightest wind</string>
+    <string name="label_wind_max">Strongest wind</string>
+    <string name="wind_bracket_result">%1$s–%2$s m/s: %3$s to %4$s %5$s, spread %6$s %5$s (%7$s cm)</string>
+    <string name="section_range_error">Range error</string>
+    <string name="range_error_row">%1$s m off: %2$s cm %3$s</string>
+    <string name="high">high</string>
+    <string name="low">low</string>
+    <string name="range_error_window">Hits a %3$s cm tall target from %1$s to %2$s m off</string>
+    <string name="section_temperature">Temperature</string>
+    <string name="temperature_row">%1$d °C: %2$d m/s, up %3$s %4$s</string>
+    <string name="section_hit_probability">Hit probability</string>
+    <string name="label_wind_uncertainty">Wind known to ±</string>
+    <string name="label_range_uncertainty">Distance known to ±</string>
+    <string name="assumed">(assumed)</string>
+    <string name="hit_inputs">Velocity SD %1$s m/s, group %2$s MOA, target %3$s × %4$s cm</string>
+    <string name="hit_result">First-round hit: %1$d%%</string>
+    <string name="hit_breakdown">Vertical spread %1$s cm (velocity %2$s, distance %3$s, rifle %4$s). Horizontal %5$s cm (wind %6$s, rifle %7$s).</string>
+    <string name="section_ranging">Ranging with the reticle</string>
+    <string name="label_ranging_size">Target size</string>
+    <string name="label_ranging_reading">Reads</string>
+    <string name="ranging_result">%1$d m</string>
+    <string name="action_use_distance">Use</string>
+    <string name="right_short">R</string>
+    <string name="left_short">L</string>
+    <string name="label_velocity_sd">Velocity SD</string>
+    <string name="label_group">5-shot group</string>
 </resources>

@@ -22,6 +22,9 @@ enum class DragType { G1, G7, G2, G5, G6, G8, GI, GS, RA4, CUSTOM }
 
 fun newId(): String = UUID.randomUUID().toString()
 
+/** Typical change of muzzle velocity with powder temperature, used when a load gives none. */
+const val STANDARD_POWDER_SENSITIVITY = 1.0
+
 /*
  * Numeric fields are kept as text so the editors can hold half-typed values
  * ("0," while typing "0,5"). They are parsed by Calculator.
@@ -54,6 +57,8 @@ data class WeaponProfile(
 
     /** Ammunition this rifle is zeroed with. */
     val ammoId: String? = null,
+    /** Extreme spread of a 5-shot group in MOA; used for the hit probability. */
+    val groupMoa: String = "",
     /** Muzzle velocity measured with this rifle, by ammo id; it overrides the load's reference velocity. */
     val muzzleVelocities: Map<String, String> = emptyMap(),
 ) {
@@ -84,8 +89,12 @@ data class AmmoProfile(
     /** Reference velocity: from the box, or a chronograph, in a barrel of [testBarrelCm]. */
     val muzzleVelocity: String = "800",
     val testBarrelCm: String = "",
-    val powderSensitivity: String = "0",
-    val powderReferenceTemp: String = "15",
+    /** m/s per °C; empty (or the old default 0) uses [STANDARD_POWDER_SENSITIVITY]. */
+    val powderSensitivity: String = "",
+    /** Temperature the reference velocity was measured at; factory data is for 21 °C (SAAMI, CIP). */
+    val powderReferenceTemp: String = "21",
+    /** Shot-to-shot standard deviation of the muzzle velocity; used for the hit probability. */
+    val velocitySd: String = "",
     val notes: String = "",
 )
 
@@ -124,11 +133,75 @@ data class Conditions(
     val aerodynamicJump: Boolean = true,
     val maxRangeM: String = "1000",
     val stepM: String = "50",
+    /** The distance picked on the target screen; blank picks the middle of the table. */
+    val targetRangeM: String = "",
+    /** Moving target: its speed and the direction it moves, degrees from the line of fire (90 = to the right). */
+    val targetSpeedMps: String = "0",
+    val targetDirectionDeg: String = "90",
+    val targetWidthCm: String = "50",
+    val targetHeightCm: String = "50",
+    /** Lightest and strongest wind expected; the forecast fills them in. Blank means not given. */
+    val windMinMps: String = "",
+    val windMaxMps: String = "",
+    /** How well the wind and the distance are known (1 σ), for the hit probability. */
+    val windUncertaintyMps: String = "1",
+    val rangeUncertaintyM: String = "5",
 ) {
+    /** Everything the table depends on; the target settings are solved on the target screen. */
+    fun withoutTarget(): Conditions {
+        val d = Conditions()
+        return copy(
+            targetRangeM = d.targetRangeM, targetSpeedMps = d.targetSpeedMps, targetDirectionDeg = d.targetDirectionDeg,
+            targetWidthCm = d.targetWidthCm, targetHeightCm = d.targetHeightCm, windMinMps = d.windMinMps,
+            windMaxMps = d.windMaxMps, windUncertaintyMps = d.windUncertaintyMps, rangeUncertaintyM = d.rangeUncertaintyM,
+        )
+    }
+
+    /** The conditions with [t]'s distance, angles, motion and size. */
+    fun withTarget(t: SavedTarget) = copy(
+        targetRangeM = t.rangeM, lookAngleDeg = t.lookAngleDeg, azimuthDeg = t.azimuthDeg,
+        targetSpeedMps = t.speedMps, targetDirectionDeg = t.directionDeg, targetWidthCm = t.widthCm, targetHeightCm = t.heightCm,
+    )
+
     /** Wind direction in degrees from the line of fire, converted from the clock for older data. */
     val windDirectionDeg: String
         get() = windFromDeg ?: windClock.toNumber()?.let { (it * 30).let { d -> if (d % 1.0 == 0.0) d.toInt().toString() else d.toString() } } ?: windClock
 }
+
+/** A target on the range card: where it is and how it moves, recalled from a sub-tab of the target screen. */
+@Serializable
+data class SavedTarget(
+    val id: String = newId(),
+    val name: String = "",
+    val rangeM: String = "",
+    val lookAngleDeg: String = "0",
+    val azimuthDeg: String = "0",
+    val speedMps: String = "0",
+    val directionDeg: String = "90",
+    val widthCm: String = "50",
+    val heightCm: String = "50",
+) {
+    /** This target with the values currently set in [c]. */
+    fun from(c: Conditions) = copy(
+        rangeM = c.targetRangeM, lookAngleDeg = c.lookAngleDeg, azimuthDeg = c.azimuthDeg,
+        speedMps = c.targetSpeedMps, directionDeg = c.targetDirectionDeg, widthCm = c.targetWidthCm, heightCm = c.targetHeightCm,
+    )
+}
+
+enum class ThemeMode(@StringRes val label: Int) {
+    SYSTEM(R.string.theme_system),
+    LIGHT(R.string.theme_light),
+    DARK(R.string.theme_dark),
+}
+
+/** How the app looks; synced with the profiles. */
+@Serializable
+data class UiSettings(
+    val theme: ThemeMode = ThemeMode.SYSTEM,
+    val tabsAtTop: Boolean = false,
+    val subTabsAtTop: Boolean = false,
+    val keepScreenOn: Boolean = false,
+)
 
 /** Everything the app stores; also the export/import file format. */
 @Serializable
@@ -138,6 +211,10 @@ data class AppData(
     val ammo: List<AmmoProfile> = emptyList(),
     val activeWeaponId: String? = null,
     val conditions: Conditions = Conditions(),
+    val targets: List<SavedTarget> = emptyList(),
+    /** The range-card target being edited; changes on the target screen are saved to it. */
+    val activeTargetId: String? = null,
+    val ui: UiSettings = UiSettings(),
     /** Wall-clock time of the last local edit; the newer copy wins when syncing. */
     val modifiedAt: Long = 0,
 ) {

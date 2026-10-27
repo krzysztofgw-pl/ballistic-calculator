@@ -22,12 +22,15 @@ your scope's reticle, and syncs everything to the cloud.
 - **Velocity per rifle**: each rifle stores the muzzle velocity measured with it for each load, which the
   solver uses instead of the load's reference velocity. The app shows the load's test barrel length and how
   it differs from your barrel; it does not guess a velocity for a different barrel.
-- **Calibers**: rifles and loads name their cartridge, picked from a list of common ones or typed. Loads are
-  grouped by caliber, and a rifle offers only the loads that fit it (same cartridge, or same bullet diameter
+- **Calibers**: rifles and loads name their cartridge, picked from a list of common ones or typed. Loads and
+  library bullets are grouped by caliber name (".30 / 7.62 mm", "6.5 mm"), and a rifle offers only the loads that fit it (same cartridge, or same bullet diameter
   when a load names none), with a switch to show the rest.
 - **Bullet library**: over 600 rifle bullets from Barnes, Berger, Hornady, Lapua, Sierra and Speer with
   published G1 and G7 BCs (Berger with length and twist), searchable by maker, name and caliber, plus common
   factory loads with their test barrel lengths. See [tools/bullet-library](tools/bullet-library/README.md) for sources and how to update it.
+
+Muzzle velocity follows the air temperature (taken as the powder temperature) with the load's sensitivity, or a
+standard 1.0 m/s per °C when none is entered; factory velocities are referenced to 21 °C (SAAMI, CIP).
 
 ### Conditions
 Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction, look angle, cant,
@@ -46,12 +49,33 @@ Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table ran
 
 ### Table
 For each range: drop, elevation and clicks, wind drift and windage correction, velocity, energy, time of
-flight and Mach.
+flight and Mach. The range column stays in place while the other columns scroll sideways.
 
-### Reticle
-Impact points for every range drawn on the scope's reticle: MRAD 0.2 hash, MRAD tree, Mil-Dot, MOA hash,
-MOA tree and Duplex. Second-focal-plane reticles get a magnification slider, and the same holds can be
-previewed on any other reticle.
+### Target
+Pick a distance to the metre with the slider, the arrows or by typing it, and get the hold and the dial
+correction for it.
+- Moving target: its speed and the direction it moves (90° = to the right). The lead uses the time of
+  flight to where the target will be, and its hold point is drawn on the reticle in blue.
+- Impact points drawn on the scope's reticle, with a magnification slider; the same holds can be
+  previewed on any other reticle.
+- Charts at that distance: windage correction by wind speed (one line per wind direction) and by wind
+  direction (one line per wind speed), each solved with the full model, so spin drift and aerodynamic
+  jump are included.
+- Spin drift correction by distance.
+- Range card: targets saved as sub-tabs (distance, look angle, azimuth, motion and size). Changes made
+  while a target is open are saved to it.
+- Wind bracket: corrections for the lightest and the strongest expected wind; the forecast fills both in.
+- Range error: vertical miss when the distance is off by up to ±50 m, and the error that still hits a
+  target of the given height.
+- Temperature: muzzle velocity and elevation 10 °C colder and warmer.
+- Hit probability: chance of a first-round hit on the target from the velocity SD (load), the 5-shot
+  group (rifle) and how well the wind and the distance are known. Each source's spread comes from the
+  full solution; a 5-shot group is taken as three standard deviations.
+- Ranging with the reticle: distance from the target size and its reading in the reticle.
+
+### Settings
+The gear in the top bar: light, dark or system theme; keep the screen on; tabs and sub-tabs at the top
+or the bottom; sync and backup.
 
 ### Sync and backup
 - Google sign-in with live sync through Cloud Firestore (newer change wins).
@@ -99,7 +123,7 @@ uninstall the old app, then import them.
 | `app/` | Android app in Jetpack Compose (Material 3) |
 | `app/.../data/` | Profiles, bullet library, local storage, Firebase sync |
 | `app/.../reticle/` | Reticle definitions |
-| `app/.../ui/` | Screens: Profiles, Conditions, Table, Reticle, editors |
+| `app/.../ui/` | Screens: Profiles, Conditions, Table, Target, editors |
 | `.github/workflows/build.yml` | CI: solver tests and signed release APK |
 
 All UI text lives in `app/src/main/res/values/strings.xml`; translations are added as `values-xx` folders.

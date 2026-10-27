@@ -7,10 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -74,14 +75,22 @@ private fun Table(result: CalcResult.Ok, modifier: Modifier) {
                 style = MaterialTheme.typography.bodySmall,
             )
         }
-        val scroll = rememberScrollState()
-        LazyColumn(Modifier.horizontalScroll(scroll)) {
-            item {
-                Row(Modifier.background(MaterialTheme.colorScheme.surfaceVariant).padding(vertical = 6.dp)) {
-                    columns.forEach { (title, w) -> Cell(stringResource(title), w, bold = true) }
-                }
+        // The range column stays put while the other columns scroll sideways under one shared scroll state.
+        val sideways = rememberScrollState()
+        val (rangeColumn, rest) = columns.first() to columns.drop(1)
+        Row(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
+            Cell(stringResource(rangeColumn.first), rangeColumn.second, bold = true)
+            Row(Modifier.horizontalScroll(sideways)) {
+                rest.forEach { (title, w) -> Cell(stringResource(title), w, bold = true) }
             }
-            items(s.points) { p -> PointRow(p, unit.radians, click) }
+        }
+        Row(Modifier.verticalScroll(rememberScrollState())) {
+            Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))) {
+                s.points.forEach { p -> Cell(p.rangeM.roundToInt().toString(), rangeColumn.second, bold = true) }
+            }
+            Column(Modifier.horizontalScroll(sideways)) {
+                s.points.forEach { p -> PointRow(p, unit.radians, click) }
+            }
         }
     }
 }
@@ -97,7 +106,6 @@ private fun PointRow(p: TrajectoryPoint, unitRad: Double, click: Double?) {
     val up = -p.dropRad / unitRad
     val right = -p.windageRad / unitRad
     val cells = listOf(
-        p.rangeM.roundToInt().toString(),
         "%.1f".format(p.dropM * 100),
         if (p.rangeM > 0) "↑%.2f".format(up) else "",
         if (p.rangeM > 0 && click != null) (up / click).roundToInt().toString() else "",
@@ -109,8 +117,8 @@ private fun PointRow(p: TrajectoryPoint, unitRad: Double, click: Double?) {
         "%.3f".format(p.timeS),
         "%.2f".format(p.mach),
     )
-    Row(Modifier.padding(vertical = 4.dp)) {
-        cells.forEachIndexed { index, text -> Cell(text, columns[index].second) }
+    Row {
+        cells.forEachIndexed { index, text -> Cell(text, columns[index + 1].second) }
     }
 }
 
@@ -120,11 +128,14 @@ private fun side(right: Double) = when {
     else -> ""
 }
 
+private val ROW_HEIGHT = 28.dp
+
 @Composable
 private fun Cell(text: String, width: Int, bold: Boolean = false) {
     Text(
         text,
-        modifier = Modifier.width(width.dp).padding(horizontal = 4.dp),
+        modifier = Modifier.width(width.dp).height(ROW_HEIGHT).padding(horizontal = 4.dp).wrapContentHeight(),
+        maxLines = 1,
         textAlign = TextAlign.End,
         fontWeight = if (bold) FontWeight.SemiBold else null,
         style = MaterialTheme.typography.bodySmall,

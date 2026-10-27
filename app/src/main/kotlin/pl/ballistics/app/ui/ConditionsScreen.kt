@@ -106,7 +106,6 @@ private fun WindDial(i: Conditions, update: ((Conditions) -> Conditions) -> Unit
             referenceDeg = azimuth,
             stepDeg = 5.0,
         )
-        Text(stringResource(R.string.hint_wind_dial_north), style = MaterialTheme.typography.bodySmall)
     } else {
         CompassDial(
             valueDeg = relative,
@@ -117,7 +116,6 @@ private fun WindDial(i: Conditions, update: ((Conditions) -> Conditions) -> Unit
             innerLabel = { if (it == 0) "12" else (it / 30).toString() },
             stepDeg = 5.0,
         )
-        Text(stringResource(R.string.hint_wind_dial), style = MaterialTheme.typography.bodySmall)
     }
     relative?.let {
         val bearing = (it + azimuth).mod(360.0)
@@ -176,7 +174,6 @@ private fun AzimuthDial(i: Conditions, update: ((Conditions) -> Conditions) -> U
         outerLabel = { "$it°" },
         innerLabel = { cardinal(it) },
     )
-    Text(stringResource(R.string.hint_azimuth), style = MaterialTheme.typography.bodySmall)
     OutlinedButton(onClick = {
         withPermission {
             scope.launch {
@@ -235,5 +232,4 @@ private fun LatitudeInput(i: Conditions, update: ((Conditions) -> Conditions) ->
         }
     }) { Text(stringResource(R.string.action_my_location)) }
     status?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-    Text(stringResource(R.string.hint_latitude), style = MaterialTheme.typography.bodySmall)
 }

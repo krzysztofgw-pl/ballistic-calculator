@@ -17,6 +17,8 @@ import pl.ballistics.app.data.CloudSync
 import pl.ballistics.app.data.SyncState
 import pl.ballistics.app.data.Conditions
 import pl.ballistics.app.data.Repository
+import pl.ballistics.app.data.SavedTarget
+import pl.ballistics.app.data.UiSettings
 import pl.ballistics.app.data.WeaponProfile
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -41,9 +43,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun update(transform: (AppData) -> AppData) {
-        _data.value = transform(_data.value).copy(modifiedAt = System.currentTimeMillis())
+        val before = _data.value
+        val after = transform(before).let { d ->
+            // The range-card target being edited follows what is set on the screens.
+            d.copy(targets = d.targets.map { if (it.id == d.activeTargetId) it.from(d.conditions) else it })
+        }
+        _data.value = after.copy(modifiedAt = System.currentTimeMillis())
         repository.save(_data.value)
-        recalculate(debounce = true)
+        if (tableInputs(before) != tableInputs(after)) recalculate(debounce = true)
         pushJob?.cancel()
         pushJob = viewModelScope.launch {
             delay(1500)
@@ -71,6 +78,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateConditions(transform: (Conditions) -> Conditions) = update { it.copy(conditions = transform(it.conditions)) }
+
+    /** What the table depends on; target settings and the look of the app are solved or applied elsewhere. */
+    private fun tableInputs(d: AppData) = listOf(d.weapons, d.ammo, d.activeWeaponId, d.conditions.withoutTarget())
+
+    fun updateUi(transform: (UiSettings) -> UiSettings) = update { it.copy(ui = transform(it.ui)) }
+
+    /** Recalls a range-card target; null leaves the card and keeps the current values. */
+    fun selectTarget(id: String?) = update { d ->
+        val t = d.targets.find { it.id == id }
+        if (t == null) d.copy(activeTargetId = null) else d.copy(activeTargetId = t.id, conditions = d.conditions.withTarget(t))
+    }
+
+    /** Saves the current target values as a new range-card target and selects it. */
+    fun addTarget(name: String) = update { d ->
+        val t = SavedTarget(name = name).from(d.conditions)
+        d.copy(targets = d.targets + t, activeTargetId = t.id)
+    }
+
+    fun renameTarget(id: String, name: String) = update { d ->
+        d.copy(targets = d.targets.map { if (it.id == id) it.copy(name = name) else it })
+    }
+
+    fun deleteTarget(id: String) = update { d ->
+        d.copy(targets = d.targets.filterNot { it.id == id }, activeTargetId = d.activeTargetId.takeIf { it != id })
+    }
 
     fun selectWeapon(id: String) = update { it.copy(activeWeaponId = id) }
 

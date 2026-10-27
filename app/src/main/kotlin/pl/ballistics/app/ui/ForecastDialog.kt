@@ -162,6 +162,8 @@ fun ForecastDialog(conditions: Conditions, onApply: ((Conditions) -> Conditions)
                         val az = c.azimuthDeg.toNumber() ?: 0.0
                         var next = c.copy(
                             windSpeed = one(s.speedMps * height.factor),
+                            windMinMps = one(s.minSpeedMps * height.factor),
+                            windMaxMps = one(s.maxSpeedMps * height.factor),
                             windFromDeg = (s.fromDeg - az).mod(360.0).roundToInt().mod(360).toString(),
                         )
                         if (fillAtmosphere) {
