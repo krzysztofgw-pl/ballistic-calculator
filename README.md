@@ -27,8 +27,19 @@ your scope's reticle, and syncs everything to the cloud.
   factory loads with their test barrel lengths. See [tools/bullet-library](tools/bullet-library/README.md) for sources and how to update it.
 
 ### Conditions
-Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction (clock), look angle,
-cant, Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table range and step.
+Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction, look angle, cant,
+Coriolis (latitude and shot azimuth), spin drift and aerodynamic jump, table range and step.
+
+- **Wind dial**: a 360° dial with labels every 30° (degrees and clock hours); tap or drag to where the wind
+  blows from. It can also be shown north-up, to enter a forecast direction, with the shot azimuth marked.
+- **Azimuth dial**: a north-up 360° dial for the line of fire, which can be read from the phone's compass
+  (corrected for magnetic declination when the location is known).
+- **Latitude** from the phone's location with one tap.
+- **Wind from the forecast**: the hourly forecast for the phone's location
+  ([Open-Meteo](https://open-meteo.com), free for non-commercial use) averaged over a chosen window: mean
+  speed, vector-mean direction, gusts and how steady the direction is. The 10 m forecast can be scaled to a
+  ~2 m line of fire, and the direction is converted to the line of fire with the shot azimuth. Temperature,
+  humidity and pressure can be filled in from the same forecast.
 
 ### Table
 For each range: drop, elevation and clicks, wind drift and windage correction, velocity, energy, time of

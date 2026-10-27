@@ -95,7 +95,7 @@ object Calculator {
         )
 
         val windSpeed = num(c.windSpeed, R.string.field_wind_speed)
-        val winds = if (windSpeed != 0.0) listOf(Wind.fromClock(windSpeed, num(c.windClock, R.string.field_wind_direction))) else emptyList()
+        val winds = if (windSpeed != 0.0) listOf(Wind.fromClock(windSpeed, num(c.windDirectionDeg, R.string.field_wind_direction) / 30)) else emptyList()
 
         val conditions = ShotConditions(
             atmosphere = atmosphere,
