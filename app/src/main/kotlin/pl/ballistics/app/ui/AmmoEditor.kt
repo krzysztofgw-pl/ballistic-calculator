@@ -28,15 +28,18 @@ import androidx.compose.ui.unit.dp
 import pl.ballistics.app.data.AmmoProfile
 import pl.ballistics.app.data.BulletLibrary
 import pl.ballistics.app.data.DragType
+import pl.ballistics.app.data.WeaponProfile
 import pl.ballistics.app.data.withBullet
 import pl.ballistics.app.data.withDragType
 import pl.ballistics.app.data.withFactoryLoad
+import kotlin.math.roundToInt
 
 private enum class Picker { BULLET, FACTORY }
 
 @Composable
 fun AmmoEditor(
     initial: AmmoProfile,
+    weapons: List<WeaponProfile>,
     isNew: Boolean,
     onSave: (AmmoProfile) -> Unit,
     onDelete: () -> Unit,
@@ -94,7 +97,20 @@ fun AmmoEditor(
         }
 
         Section(stringResource(R.string.section_velocity)) {
-            NumberField(stringResource(R.string.label_muzzle_velocity), a.muzzleVelocity, "m/s") { a = a.copy(muzzleVelocity = it) }
+            FieldRow { m ->
+                NumberField(stringResource(R.string.label_muzzle_velocity), a.muzzleVelocity, "m/s", m) { a = a.copy(muzzleVelocity = it) }
+                NumberField(stringResource(R.string.label_test_barrel), a.testBarrelCm, "cm", m, optional = true) { a = a.copy(testBarrelCm = it) }
+            }
+            Text(
+                stringResource(R.string.hint_reference_velocity),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            weapons.mapNotNull { w -> w.measuredVelocity(a)?.let { w to it } }.forEach { (w, mv) ->
+                Text(
+                    stringResource(R.string.measured_in_rifle, w.name, mv),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             FieldRow { m ->
                 NumberField(stringResource(R.string.label_powder_sensitivity), a.powderSensitivity, "m/s/°C", m) { a = a.copy(powderSensitivity = it) }
                 NumberField(stringResource(R.string.label_at_temperature), a.powderReferenceTemp, "°C", m) { a = a.copy(powderReferenceTemp = it) }
@@ -131,7 +147,15 @@ fun AmmoEditor(
             title = stringResource(R.string.title_factory_loads),
             options = BulletLibrary.factoryLoads,
             label = { it.label },
-            detail = { stringResource(R.string.factory_load_velocity, it.muzzleVelocityFps.toInt()) },
+            detail = {
+                stringResource(
+                    R.string.factory_load_velocity,
+                    it.muzzleVelocityMps.roundToInt(),
+                    it.muzzleVelocityFps.roundToInt(),
+                    it.testBarrelCm.roundToInt(),
+                    (it.testBarrelCm / 2.54).roundToInt(),
+                )
+            },
             onPick = { a = a.withFactoryLoad(it); picker = null },
             onDismiss = { picker = null },
         )

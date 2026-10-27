@@ -95,7 +95,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteAmmo(id: String) = update { d ->
         d.copy(
             ammo = d.ammo.filterNot { it.id == id },
-            weapons = d.weapons.map { if (it.ammoId == id) it.copy(ammoId = null) else it },
+            weapons = d.weapons.map {
+                it.copy(ammoId = it.ammoId.takeIf { a -> a != id }, muzzleVelocities = it.muzzleVelocities - id)
+            },
         )
     }
 

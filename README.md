@@ -13,15 +13,18 @@ your scope's reticle, and syncs everything to the cloud.
 ## Features
 
 ### Profiles
-- **Rifles**: name, scope (turret unit MRAD or MOA, click value, reticle, first or second focal plane,
+- **Rifles**: name, barrel length, scope (turret unit MRAD or MOA, click value, reticle, first or second focal plane,
   calibration and maximum magnification), sight height, zero range and the load it is zeroed with.
 - **Sight height helper**: compute it from a caliper measurement, or estimate it from the objective diameter,
   ring height and rail.
-- **Loads**: muzzle velocity, powder temperature sensitivity, bullet weight, diameter, length and twist,
+- **Loads**: reference muzzle velocity with the barrel length it was measured in, powder temperature sensitivity, bullet weight, diameter, length and twist,
   drag model and BC. Start from the built-in library or enter custom data, including a full Cd(Mach) curve.
+- **Velocity per rifle**: each rifle stores the muzzle velocity measured with it for each load, which the
+  solver uses instead of the load's reference velocity. The app shows the load's test barrel length and how
+  it differs from your barrel; it does not guess a velocity for a different barrel.
 - **Bullet library**: over 600 rifle bullets from Barnes, Berger, Hornady, Lapua, Sierra and Speer with
   published G1 and G7 BCs (Berger with length and twist), searchable by maker, name and caliber, plus common
-  factory loads. See [tools/bullet-library](tools/bullet-library/README.md) for sources and how to update it.
+  factory loads with their test barrel lengths. See [tools/bullet-library](tools/bullet-library/README.md) for sources and how to update it.
 
 ### Conditions
 Temperature, pressure (station or QNH), altitude, humidity, wind speed and direction (clock), look angle,

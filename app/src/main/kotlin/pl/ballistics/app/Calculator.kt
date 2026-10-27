@@ -69,7 +69,7 @@ object Calculator {
         }
         val ammo = Ammunition(
             projectile = Projectile(drag, massKg, diameterM, lengthM),
-            muzzleVelocityMps = num(a.muzzleVelocity, R.string.field_muzzle_velocity, true),
+            muzzleVelocityMps = num(w.muzzleVelocityFor(a), R.string.field_muzzle_velocity, true),
             powderSensitivityMpsPerC = num(a.powderSensitivity, R.string.field_powder_sensitivity),
             powderReferenceTempC = num(a.powderReferenceTemp, R.string.field_powder_reference_temp),
         )

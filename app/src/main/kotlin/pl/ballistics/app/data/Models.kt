@@ -34,6 +34,7 @@ data class WeaponProfile(
     val caliber: String = "",
     val twistIn: String = "10",
     val rightHandTwist: Boolean = true,
+    val barrelLengthCm: String = "",
 
     val scopeName: String = "",
     val angularUnit: AngularUnit = AngularUnit.MRAD,
@@ -52,7 +53,17 @@ data class WeaponProfile(
 
     /** Ammunition this rifle is zeroed with. */
     val ammoId: String? = null,
-)
+    /** Muzzle velocity measured with this rifle, by ammo id; it overrides the load's reference velocity. */
+    val muzzleVelocities: Map<String, String> = emptyMap(),
+) {
+    fun measuredVelocity(ammo: AmmoProfile): String? = muzzleVelocities[ammo.id]?.takeIf { it.isNotBlank() }
+
+    /** The velocity the solver uses: measured with this rifle if known, else the load's reference velocity. */
+    fun muzzleVelocityFor(ammo: AmmoProfile): String = measuredVelocity(ammo) ?: ammo.muzzleVelocity
+
+    fun withMeasuredVelocity(ammo: AmmoProfile, mps: String): WeaponProfile =
+        copy(muzzleVelocities = if (mps.isBlank()) muzzleVelocities - ammo.id else muzzleVelocities + (ammo.id to mps))
+}
 
 @Serializable
 data class AmmoProfile(
@@ -67,7 +78,9 @@ data class AmmoProfile(
     val massGr: String = "175",
     val diameterMm: String = "7.82",
     val lengthMm: String = "",
+    /** Reference velocity: from the box, or a chronograph, in a barrel of [testBarrelCm]. */
     val muzzleVelocity: String = "800",
+    val testBarrelCm: String = "",
     val powderSensitivity: String = "0",
     val powderReferenceTemp: String = "15",
     val notes: String = "",

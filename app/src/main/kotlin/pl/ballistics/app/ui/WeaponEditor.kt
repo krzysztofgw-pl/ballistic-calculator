@@ -51,7 +51,10 @@ fun WeaponEditor(
         Section(stringResource(R.string.section_rifle)) {
             TextInput(stringResource(R.string.label_name), w.name) { w = w.copy(name = it) }
             TextInput(stringResource(R.string.label_caliber), w.caliber) { w = w.copy(caliber = it) }
-            NumberField(stringResource(R.string.label_twist), w.twistIn, "in", optional = true) { w = w.copy(twistIn = it) }
+            FieldRow { m ->
+                NumberField(stringResource(R.string.label_barrel_length), w.barrelLengthCm, "cm", m, optional = true) { w = w.copy(barrelLengthCm = it) }
+                NumberField(stringResource(R.string.label_twist), w.twistIn, "in", m, optional = true) { w = w.copy(twistIn = it) }
+            }
             SwitchRow(stringResource(R.string.label_right_twist), w.rightHandTwist) { w = w.copy(rightHandTwist = it) }
         }
 
@@ -87,6 +90,15 @@ fun WeaponEditor(
                 listOf<AmmoProfile?>(null) + ammo,
                 { it?.name ?: stringResource(R.string.choose) },
             ) { w = w.copy(ammoId = it?.id) }
+            ammo.find { it.id == w.ammoId }?.let { load ->
+                NumberField(stringResource(R.string.label_rifle_velocity), w.muzzleVelocities[load.id].orEmpty(), "m/s", optional = true) {
+                    w = w.withMeasuredVelocity(load, it)
+                }
+                Text(
+                    velocitySource(w, load),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             NumberField(stringResource(R.string.label_zero_range), w.zeroRangeM, "m") { w = w.copy(zeroRangeM = it) }
             FieldRow { m ->
                 NumberField(stringResource(R.string.label_temperature), w.zeroTemperatureC, "°C", m) { w = w.copy(zeroTemperatureC = it) }
@@ -102,6 +114,29 @@ fun WeaponEditor(
         )
     }
 }
+
+/** Where the load's reference velocity comes from, and how the test barrel compares with this rifle's barrel. */
+@Composable
+fun velocitySource(w: WeaponProfile, load: AmmoProfile): String {
+    val test = load.testBarrelCm.toNumber()?.takeIf { it > 0 }
+    val own = w.barrelLengthCm.toNumber()?.takeIf { it > 0 }
+    val reference = if (test != null) {
+        stringResource(R.string.reference_velocity_barrel, load.muzzleVelocity, fmtCm(test))
+    } else {
+        stringResource(R.string.reference_velocity, load.muzzleVelocity)
+    }
+    val comparison = when {
+        test == null -> stringResource(R.string.test_barrel_unknown)
+        own == null -> stringResource(R.string.barrel_unknown)
+        own == test -> stringResource(R.string.barrel_same)
+        own < test -> stringResource(R.string.barrel_shorter, fmtCm(own), fmtCm(test - own))
+        else -> stringResource(R.string.barrel_longer, fmtCm(own), fmtCm(own - test))
+    }
+    val used = if (w.measuredVelocity(load) != null) R.string.velocity_used_rifle else R.string.velocity_used_reference
+    return "$reference $comparison ${stringResource(used)}"
+}
+
+private fun fmtCm(v: Double): String = String.format(Locale.US, "%.1f", v).removeSuffix(".0")
 
 @Composable
 fun TextInput(label: String, value: String, onChange: (String) -> Unit) {
