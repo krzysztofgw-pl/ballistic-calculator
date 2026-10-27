@@ -217,15 +217,15 @@ fun TargetScreen(
                 NumberField(stringResource(R.string.label_target_speed), conditions.targetSpeedMps, "m/s", Modifier.weight(1f)) { v ->
                     update { it.copy(targetSpeedMps = v) }
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                     CompassDial(
                         markers = listOf(DialMarker(targetDirection, DialArrow.OUTWARD, MaterialTheme.colorScheme.primary, true)),
                         onChange = { v -> update { it.copy(targetDirectionDeg = v.roundToInt().mod(360).toString()) } },
                         centerText = "${targetDirection.roundToInt().mod(360)}°",
                         outerLabel = null,
                         stepDeg = 15.0,
-                        maxSize = 112.dp,
-                        modifier = Modifier.width(112.dp),
+                        maxSize = 180.dp,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                     Text(stringResource(R.string.label_target_course), style = MaterialTheme.typography.labelMedium)
                 }
