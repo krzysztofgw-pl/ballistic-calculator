@@ -179,7 +179,7 @@ fun TargetScreen(
             // Focusing the field empties it for a fresh entry; the last distance stays as the placeholder.
             NumberField(
                 stringResource(R.string.label_target_distance),
-                typed ?: dragged?.roundToInt()?.toString() ?: distance.roundToInt().toString(),
+                dragged?.roundToInt()?.toString() ?: typed ?: distance.roundToInt().toString(),
                 "m",
                 Modifier.width(116.dp).onFocusChanged { f ->
                     if (f.isFocused && typed == null) typed = "" else if (!f.isFocused) typed = null
