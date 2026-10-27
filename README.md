@@ -61,7 +61,7 @@ Every push builds an APK in GitHub Actions: **Actions** tab → latest run → `
 ### Release signing
 
 CI signs the APK with the key from the `SIGNING_KEYSTORE_BASE64` and `SIGNING_PASSWORD` repository secrets
-(alias `balistyka`). Without them it falls back to the debug key, and such APKs cannot update an installed
+(alias `kgwlabs-ballistics`). Without them it falls back to the debug key, and such APKs cannot update an installed
 release build.
 
 ### Firebase

@@ -30,7 +30,7 @@ android {
             create("release") {
                 storeFile = releaseKeystore
                 storePassword = releasePassword
-                keyAlias = "balistyka"
+                keyAlias = "kgwlabs-ballistics"
                 keyPassword = releasePassword
             }
         }
