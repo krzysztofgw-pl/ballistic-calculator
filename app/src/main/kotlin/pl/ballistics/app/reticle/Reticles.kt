@@ -3,6 +3,7 @@ package pl.ballistics.app.reticle
 import androidx.annotation.StringRes
 import pl.ballistics.app.R
 import pl.ballistics.app.data.AngularUnit
+import pl.ballistics.app.data.FocalPlane
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -22,6 +23,8 @@ sealed interface Mark {
  *
  * @param extent half-width of the visible field, in [unit].
  * @param family reticles that are the same design in MRAD and MOA share a family.
+ * @param focalPlane and [calibratedMagnification] are known for reticles of a specific scope;
+ *   picking the reticle sets them on the rifle.
  */
 data class Reticle(
     val id: String,
@@ -30,19 +33,19 @@ data class Reticle(
     val extent: Double,
     val marks: List<Mark>,
     @StringRes val family: Int = name,
+    val focalPlane: FocalPlane? = null,
+    val calibratedMagnification: Double? = null,
 )
 
 object Reticles {
     val all: List<Reticle> by lazy {
         val duplex = duplex()
-        val dls2 = dls2()
         listOf(
             mradHash(), moaHash(),
             mradTree(), moaTree(),
             milDot(),
             duplex, inUnit(duplex, "duplex-mrad", R.string.reticle_duplex_mrad, AngularUnit.MRAD),
             dls1(), dls3(),
-            dls2, inUnit(dls2, "dls-2-moa", R.string.reticle_dls_2_moa, AngularUnit.MOA),
             dlr3(),
         )
     }
@@ -68,7 +71,7 @@ object Reticles {
                 is Mark.Dot -> m.copy(x = m.x * k, y = m.y * k, r = m.r * k)
                 is Mark.Label -> m.copy(x = m.x * k, y = m.y * k)
             }
-        }, r.family)
+        }, r.family, r.focalPlane, r.calibratedMagnification)
     }
 
     private fun label(v: Double) = abs(v).let { if (it % 1.0 == 0.0) it.roundToInt().toString() else it.toString() }
@@ -171,7 +174,8 @@ object Reticles {
      * Delta publishes 0.2 and 1 MRAD markings, 0.005 MRAD lines and a 0.03 MRAD
      * centre point; the extent of the scale is drawn to the published diagram.
      */
-    private fun dls1() = Reticle("dls-1", R.string.reticle_dls_1, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_dls_1_3, marks = buildList<Mark> {
+    private fun dls1() = Reticle("dls-1", R.string.reticle_dls_1, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_dls_1_3,
+        focalPlane = FocalPlane.SFP, calibratedMagnification = 40.0, marks = buildList<Mark> {
         tickedCross(10.0, 10.0, 10.0, 5.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 5.0, tick = 0.25)
         add(Mark.Dot(0.0, 0.0, 0.015))
         add(Mark.Line(10.0, 0.0, 12.0, 0.0, Weight.HEAVY))
@@ -180,15 +184,9 @@ object Reticles {
         add(Mark.Line(0.0, 5.0, 0.0, 12.0, Weight.HEAVY))
     })
 
-    /** DLS-2: the same scope with a plain fine cross and an illuminated centre point. */
-    private fun dls2() = Reticle("dls-2", R.string.reticle_dls_2, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_dls_2, marks = buildList<Mark> {
-        add(Mark.Line(-10.0, 0.0, 10.0, 0.0))
-        add(Mark.Line(0.0, -10.0, 0.0, 10.0))
-        add(Mark.Dot(0.0, 0.0, 0.015))
-    })
-
     /** DLS-3: the DLS-1 layout scaled in MOA, with 1 and 5 MOA markings. */
-    private fun dls3() = Reticle("dls-3", R.string.reticle_dls_3, AngularUnit.MOA, 40.0, family = R.string.reticle_family_dls_1_3, marks = buildList<Mark> {
+    private fun dls3() = Reticle("dls-3", R.string.reticle_dls_3, AngularUnit.MOA, 40.0, family = R.string.reticle_family_dls_1_3,
+        focalPlane = FocalPlane.SFP, calibratedMagnification = 40.0, marks = buildList<Mark> {
         tickedCross(34.0, 34.0, 34.0, 17.0, minor = 1.0, half = 5.0, major = 5.0, labelEvery = 10.0, tick = 0.9)
         add(Mark.Dot(0.0, 0.0, 0.05))
         add(Mark.Line(34.0, 0.0, 40.0, 0.0, Weight.HEAVY))
@@ -198,12 +196,12 @@ object Reticles {
     })
 
     /**
-     * Delta Optical Stryker HD 3.5-21x44 DLR-3: MRAD, second focal plane,
-     * calibrated at 21x. Drawn from Delta's published diagram: a broken centre,
+     * Delta Optical Stryker HD 3.5-21x44 FFP DLR-3: MRAD, first focal plane, so the
+     * subtensions hold at every magnification. Drawn from Delta's published diagram: a broken centre,
      * 0.2 MRAD ticks out to 1, then 0.5 MRAD ticks, numbered at 5 and 10, a
      * T-bar at 3 MRAD up and heavy side posts from 5.5 MRAD.
      */
-    private fun dlr3() = Reticle("dlr-3", R.string.reticle_dlr_3, AngularUnit.MRAD, 10.5, buildList<Mark> {
+    private fun dlr3() = Reticle("dlr-3", R.string.reticle_dlr_3, AngularUnit.MRAD, 10.5, focalPlane = FocalPlane.FFP, marks = buildList<Mark> {
         // Broken centre: two short dashes on each arm around a fine dot.
         for ((from, to) in listOf(0.08 to 0.18, 0.26 to 0.34)) {
             add(Mark.Line(from, 0.0, to, 0.0)); add(Mark.Line(-from, 0.0, -to, 0.0))
