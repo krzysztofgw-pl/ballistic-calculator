@@ -123,6 +123,7 @@ object BulletLibrary {
             FactoryLoad("Hornady Match", "6.5 Creedmoor", bullet("Hornady", "ELD Match", 0.264, 140.0), 2710.0),
             FactoryLoad("Hornady Match", "6.5 Creedmoor", bullet("Hornady", "ELD Match", 0.264, 147.0), 2695.0),
             FactoryLoad("Hornady Precision Hunter", "6.5 Creedmoor", bullet("Hornady", "ELD-X", 0.264, 143.0), 2700.0),
+            FactoryLoad("Sellier & Bellot", "6.5 Creedmoor", bullet("Sellier & Bellot", "HPBT", 0.264, 142.0), 2624.7),
             FactoryLoad("Hornady Match", "6.5 PRC", bullet("Hornady", "ELD Match", 0.264, 147.0), 2910.0),
             FactoryLoad("Federal Gold Medal Match", ".308 Win", bullet("Sierra", "MatchKing HPBT", 0.308, 168.0), 2650.0),
             FactoryLoad("Federal Gold Medal Match", ".308 Win", bullet("Sierra", "MatchKing HPBT", 0.308, 175.0), 2600.0),
