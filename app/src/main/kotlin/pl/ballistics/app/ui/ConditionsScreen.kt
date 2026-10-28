@@ -1,10 +1,12 @@
 package pl.ballistics.app.ui
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -20,11 +22,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -286,33 +290,49 @@ private fun LatitudeInput(i: Conditions, update: ((Conditions) -> Conditions) ->
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val withPermission = rememberWithLocationPermission()
-    var status by remember { mutableStateOf<String?>(null) }
+    var reading by remember { mutableStateOf(false) }
+    var accuracyM by remember { mutableStateOf<Int?>(null) }
 
-    val latitude = i.latitudeDeg.toNumber()
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        NumberField(stringResource(R.string.label_latitude), i.latitudeDeg, "°", Modifier.weight(1f)) { v -> update { it.copy(latitudeDeg = v) } }
-        IconButton(onClick = {
-            withPermission {
-                scope.launch {
-                    status = context.getString(R.string.location_reading)
-                    val location = DeviceSensors.location(context)
-                    status = if (location == null) {
-                        context.getString(R.string.location_unavailable)
-                    } else {
-                        val lat = String.format(Locale.US, "%.2f", location.latitude)
-                        update { it.copy(latitudeDeg = lat) }
-                        context.getString(R.string.location_result, lat, location.accuracy.roundToInt().toString())
+    // The field holds the size of the latitude and the button its hemisphere, so south needs no minus key.
+    val raw = i.latitudeDeg.trim()
+    var south by remember { mutableStateOf(raw.startsWith("-")) }
+    LaunchedEffect(raw) { if (raw.isNotEmpty() && raw != "-") south = raw.startsWith("-") }
+    fun store(size: String, isSouth: Boolean) {
+        south = isSouth
+        update { it.copy(latitudeDeg = if (isSouth && size.isNotBlank()) "-$size" else size) }
+    }
+
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        NumberField(stringResource(R.string.label_latitude), raw.removePrefix("-"), "°", Modifier.weight(1f)) { v ->
+            accuracyM = null
+            if (v.startsWith("-")) store(v.removePrefix("-"), true) else store(v, south)
+        }
+        OutlinedButton(
+            onClick = { accuracyM = null; store(raw.removePrefix("-"), !south) },
+            contentPadding = PaddingValues(horizontal = 12.dp),
+        ) { Text(stringResource(if (south) R.string.hemisphere_south else R.string.hemisphere_north)) }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            IconButton(enabled = !reading, onClick = {
+                withPermission {
+                    scope.launch {
+                        reading = true
+                        val location = DeviceSensors.location(context)
+                        reading = false
+                        if (location == null) {
+                            accuracyM = null
+                            Toast.makeText(context, context.getString(R.string.location_unavailable), Toast.LENGTH_LONG).show()
+                        } else {
+                            val size = String.format(Locale.US, "%.2f", abs(location.latitude))
+                            store(size, location.latitude < 0)
+                            accuracyM = location.accuracy.roundToInt()
+                        }
                     }
                 }
+            }) {
+                if (reading) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                else Icon(Icons.Filled.LocationOn, stringResource(R.string.action_my_location))
             }
-        }) { Icon(Icons.Filled.LocationOn, stringResource(R.string.action_my_location)) }
+            accuracyM?.let { Text(stringResource(R.string.location_accuracy, it), style = MaterialTheme.typography.labelSmall) }
+        }
     }
-    latitude?.takeIf { abs(it) <= 90 }?.let {
-        val text = String.format(Locale.US, "%.2f", abs(it))
-        Text(
-            stringResource(if (it >= 0) R.string.latitude_north else R.string.latitude_south, text),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-    }
-    status?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
 }

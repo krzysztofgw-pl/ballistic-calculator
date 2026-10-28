@@ -186,11 +186,10 @@
     <string name="compass_true">Phone heading %1$s° (magnetic declination %2$s° applied).</string>
     <string name="compass_magnetic">Phone heading %1$s° magnetic: no location, so declination is not applied.</string>
     <string name="compass_unavailable">This phone has no compass sensor.</string>
-    <string name="location_reading">Getting your location…</string>
-    <string name="location_result">%1$s, from your location (± %2$s m).</string>
+    <string name="location_accuracy">±%1$d m</string>
     <string name="location_unavailable">No location: allow location access and turn on location services, or type the latitude.</string>
-    <string name="latitude_north">%1$s° N</string>
-    <string name="latitude_south">%1$s° S</string>
+    <string name="hemisphere_north">N</string>
+    <string name="hemisphere_south">S</string>
 
     <!-- Table -->
     <string name="col_range">m</string>
