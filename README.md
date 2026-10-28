@@ -60,7 +60,8 @@ range and step are set below it.
 
 ### Target
 Pick a distance to the metre with the slider, the arrows or by typing it (all in one row), and get the
-hold and the dial correction for it.
+hold and the dial correction for it. Per reticle, Settings chooses whether elevation and windage are dialed
+or held; with an axis dialed, the reticle shows the holds left after dialing for the chosen distance.
 - Moving target, switched on with a checkbox: its speed and its course on a small dial (up = away,
   right = to the right). The lead uses the time of
   flight to where the target will be, and its hold point is drawn on the reticle in blue.
@@ -84,7 +85,7 @@ hold and the dial correction for it.
 ### Settings
 The gear in the top bar: light, dark or system theme; keep the screen on; tabs and sub-tabs at the top
 or the bottom; QNH (default) or station pressure; whether location sets the latitude and the altitude;
-sync and backup.
+dial or hold for elevation and windage, per reticle; sync and backup.
 
 ### Sync and backup
 - Google sign-in with live sync through Cloud Firestore (newer change wins).

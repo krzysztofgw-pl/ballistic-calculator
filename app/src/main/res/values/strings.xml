@@ -231,6 +231,9 @@
     <string name="action_unlock_magnification">Beyond scope range</string>
     <string name="magnification_outside_range">Outside the scope\'s %1$s–%2$s× range</string>
     <string name="hold_on_reticle">Hold %2$s %5$s %1$s, %4$s %5$s %3$s</string>
+    <string name="dial_both">Dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
+    <string name="dial_elevation_hold_windage">Dial %1$s %2$s %3$s, hold %5$s %6$s %4$s</string>
+    <string name="hold_elevation_dial_windage">Hold %2$s %3$s %1$s, dial %4$s %5$s %6$s</string>
     <string name="or_dial">Or dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
     <string name="hold_outside_reticle">Hold point is outside the reticle: dial the turrets.</string>
     <string name="above_center">above center</string>
@@ -341,6 +344,11 @@
     <string name="compass_uncalibrated">The phone reports its compass as poorly calibrated. Move the phone in a figure-eight a few times, away from the rifle and other steel, then read again.</string>
     <string name="compass_inaccurate">The phone estimates its heading only to ±%1$d°. Calibrate it with a figure-eight motion, away from steel, then read again.</string>
     <string name="compass_disturbed">The phone measures a magnetic field of %1$d µT where the Earth\'s is %2$d µT: the compass is badly calibrated or something magnetic is close. Move away from the rifle and vehicles, make a figure-eight with the phone, then read again.</string>
+    <string name="section_corrections">Dial or hold, per reticle</string>
+    <string name="label_elevation">Elevation</string>
+    <string name="label_windage">Windage</string>
+    <string name="correction_dial">Dial</string>
+    <string name="correction_hold">Hold</string>
     <string name="section_measurements">Measurements and location</string>
     <string name="label_location_latitude">Location sets the latitude</string>
     <string name="label_location_altitude">Forecast sets the altitude (terrain height)</string>

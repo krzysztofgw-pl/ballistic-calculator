@@ -66,6 +66,7 @@ import pl.ballistics.app.lead
 import pl.ballistics.app.data.AngularUnit
 import pl.ballistics.app.data.Conditions
 import pl.ballistics.app.data.FocalPlane
+import pl.ballistics.app.data.UiSettings
 import pl.ballistics.app.toNumber
 import pl.ballistics.app.reticle.Mark
 import pl.ballistics.app.reticle.Reticle
@@ -89,6 +90,7 @@ private data class Hold(val point: TrajectoryPoint, val x: Double, val y: Double
 fun TargetScreen(
     result: CalcResult?,
     conditions: Conditions,
+    ui: UiSettings,
     update: ((Conditions) -> Conditions) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -162,12 +164,20 @@ fun TargetScreen(
     // In an FFP scope reticle and target scale together, so only the field of view changes.
     val scale = if (sfp) magnification / calMag else 1.0
     val field = if (sfp) reticle.extent else reticle.extent * maxMag / magnification
+    // What is dialed for the chosen distance moves every hold point by the same amount.
+    val correction = ui.correction(reticle.id)
+    val dialX = if (correction.dialWindage) (selected?.windageRad ?: 0.0) / reticle.unit.radians * scale else 0.0
+    val dialY = if (correction.dialElevation) (selected?.dropRad ?: 0.0) / reticle.unit.radians * scale else 0.0
     val holds = (points + listOfNotNull(selected?.takeIf { it !in points })).map { p ->
-        Hold(p, p.windageRad / reticle.unit.radians * scale, p.dropRad / reticle.unit.radians * scale)
+        Hold(p, p.windageRad / reticle.unit.radians * scale - dialX, p.dropRad / reticle.unit.radians * scale - dialY)
     }
     // A moving target sits on the mark that is the lead away from the impact, against its motion.
     val leadHold = current?.lead?.let { l ->
-        Hold(l.point, (l.point.windageRad - l.leadRad) / reticle.unit.radians * scale, l.point.dropRad / reticle.unit.radians * scale)
+        Hold(
+            l.point,
+            (l.point.windageRad - l.leadRad) / reticle.unit.radians * scale - dialX,
+            l.point.dropRad / reticle.unit.radians * scale - dialY,
+        )
     }
 
     Column(
@@ -237,24 +247,29 @@ fun TargetScreen(
             val unit = result.angularUnit
             val upDial = -p.dropRad / unit.radians
             val rightDial = -p.windageRad / unit.radians
-            Text(
-                stringResource(
-                    R.string.hold_on_reticle,
-                    stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center), h.y.absFmt(),
-                    stringResource(if (h.x >= 0) R.string.right else R.string.left), h.x.absFmt(),
-                    reticle.unit.label,
-                ),
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Text(
-                stringResource(
-                    R.string.or_dial,
-                    stringResource(if (upDial >= 0) R.string.up else R.string.down), upDial.absFmt(),
-                    stringResource(if (rightDial >= 0) R.string.right else R.string.left), rightDial.absFmt(),
-                    unit.label,
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            val up = stringResource(if (upDial >= 0) R.string.up else R.string.down)
+            val right = stringResource(if (rightDial >= 0) R.string.right else R.string.left)
+            val vertical = stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center)
+            val horizontal = stringResource(if (h.x >= 0) R.string.right else R.string.left)
+            val advice = when {
+                correction.dialElevation && correction.dialWindage -> stringResource(
+                    R.string.dial_both, up, upDial.absFmt(), right, rightDial.absFmt(), unit.label,
+                )
+                correction.dialElevation -> stringResource(
+                    R.string.dial_elevation_hold_windage, up, upDial.absFmt(), unit.label, horizontal, h.x.absFmt(), reticle.unit.label,
+                )
+                correction.dialWindage -> stringResource(
+                    R.string.hold_elevation_dial_windage, vertical, h.y.absFmt(), reticle.unit.label, right, rightDial.absFmt(), unit.label,
+                )
+                else -> stringResource(R.string.hold_on_reticle, vertical, h.y.absFmt(), horizontal, h.x.absFmt(), reticle.unit.label)
+            }
+            Text(advice, style = MaterialTheme.typography.titleSmall)
+            if (!correction.dialElevation && !correction.dialWindage) {
+                Text(
+                    stringResource(R.string.or_dial, up, upDial.absFmt(), right, rightDial.absFmt(), unit.label),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             if (abs(h.x) > reticle.extent || abs(h.y) > reticle.extent) {
                 Text(stringResource(R.string.hold_outside_reticle), color = MaterialTheme.colorScheme.error)
             }
