@@ -40,7 +40,7 @@ fun WatchPressureButton(update: ((Conditions) -> Conditions) -> Unit) {
                     is GarminPressure.Result.Pressure -> {
                         val hPa = String.format(Locale.US, "%.1f", result.hPa)
                         update { it.copy(pressureHpa = hPa, pressureIsQnh = false) }
-                        context.getString(R.string.watch_pressure_result, hPa, result.watch)
+                        context.getString(R.string.watch_pressure_result, hPa)
                     }
                     GarminPressure.Result.NoGarminConnect -> context.getString(R.string.watch_pressure_no_connect)
                     GarminPressure.Result.NoWatch -> context.getString(R.string.watch_pressure_no_watch)

@@ -36,6 +36,22 @@ workflow run.
 
 If the watch does not list the app, try the file for the other model.
 
+## Install from the Connect IQ store (beta)
+
+Garmin Connect can open only apps it installed itself, so with a sideloaded `.prg` the watch has to be
+opened by hand. A beta upload fixes that: a beta app is visible only to the account that uploaded it
+and is not reviewed by Garmin.
+
+1. Signing: the store accepts updates only with the same developer key. CI reads it from the
+   `CIQ_DEVELOPER_KEY_BASE64` secret (base64 of the DER key); keep the key safe, it cannot be replaced.
+2. Download `kgw-pressure.iq` from the `kgw-pressure-watch-app` artifact of a build that used that secret.
+3. Sign in at the [Connect IQ developer dashboard](https://apps.garmin.com/developer/) with the Garmin
+   account used in Garmin Connect, upload the `.iq`, tick **Beta app**, and fill in the name, a short
+   description, the version and the icon.
+4. Delete the sideloaded `KGW*.prg` / `*.PRG` from `GARMIN/APPS/` on the watch.
+5. Install the beta from the Connect IQ store in Garmin Connect (the app page link from the dashboard,
+   with `apps-developer.garmin.com` changed to `apps.garmin.com`, opens it on the phone).
+
 ## Build locally
 
 With the Connect IQ SDK and the Monkey C extension for VS Code: open this folder, run
