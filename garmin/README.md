@@ -6,7 +6,7 @@ not depend on the watch's altitude calibration. Temperature is not sent: a wrist
 
 ## How it works
 
-1. On the Conditions screen, tap **Pressure from Garmin watch** (shown when Garmin Connect is installed).
+1. On the Conditions screen, tap **Garmin** under the station pressure (shown when Garmin Connect is installed).
 2. The phone asks the watch to open Station Pressure; confirm on the watch.
 3. The watch sends its reading, and the phone fills in the pressure and switches it to station pressure.
 
