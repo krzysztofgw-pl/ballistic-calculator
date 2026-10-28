@@ -47,7 +47,7 @@ and is not reviewed by Garmin.
 2. Download `kgw-pressure.iq` from the `kgw-pressure-watch-app` artifact of a build that used that secret.
 3. Sign in at the [Connect IQ developer dashboard](https://apps.garmin.com/developer/) with the Garmin
    account used in Garmin Connect, upload the `.iq`, tick **Beta app**, and fill in the name, a short
-   description and the version. The store icons (128 × 128, 64-colour and 24-bit) and the 500 × 500 cover image are in `store/`.
+   description and the version. The store icons (128 × 128, 64-colour and 24-bit) the 500 × 500 cover image and the screen images are in `store/`.
 4. Delete the sideloaded `kgw-pressure-*.prg` from `GARMIN/APPS/` on the watch.
 5. Install the beta from the Connect IQ store in Garmin Connect (the app page link from the dashboard,
    with `apps-developer.garmin.com` changed to `apps.garmin.com`, opens it on the phone).
