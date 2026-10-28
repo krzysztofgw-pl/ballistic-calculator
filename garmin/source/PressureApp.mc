@@ -17,12 +17,18 @@ class PressureApp extends Application.AppBase {
     var pressurePa as Float or Null = null;
     var status as Symbol = :none;
     var closeTimer as Timer.Timer = new Timer.Timer();
+    // Display unit, as set by the phone app: "hPa", "mmHg" or "inHg". Readings always travel in Pa.
+    var unit as String = "hPa";
 
     function initialize() {
         AppBase.initialize();
     }
 
     function onStart(state as Dictionary or Null) as Void {
+        var stored = Application.Storage.getValue("unit");
+        if (stored instanceof String) {
+            unit = stored;
+        }
         Communications.registerForPhoneAppMessages(method(:onPhoneMessage));
         Sensor.enableSensorEvents(method(:onSensor));
         send();
@@ -43,6 +49,14 @@ class PressureApp extends Application.AppBase {
     }
 
     function onPhoneMessage(msg as Communications.PhoneAppMessage) as Void {
+        var data = msg.data;
+        if (data instanceof Dictionary) {
+            var requested = data["unit"];
+            if (requested instanceof String && !requested.equals(unit)) {
+                unit = requested;
+                Application.Storage.setValue("unit", unit);
+            }
+        }
         send();
     }
 
@@ -148,8 +162,17 @@ class PressureView extends WatchUi.View {
             dc.drawText(w / 2, h / 2, Graphics.FONT_MEDIUM, text(Rez.Strings.NoReading), center);
             return;
         }
-        dc.drawText(w / 2, h * 0.38, Graphics.FONT_NUMBER_MEDIUM, (pa / 100.0).format("%.1f"), center);
-        dc.drawText(w / 2, h * 0.56, Graphics.FONT_SMALL, "hPa", center);
+        var unit = app.unit;
+        var value = (pa / 100.0).format("%.1f");
+        if (unit.equals("mmHg")) {
+            value = (pa / 133.322).format("%.1f");
+        } else if (unit.equals("inHg")) {
+            value = (pa / 3386.389).format("%.2f");
+        } else {
+            unit = "hPa";
+        }
+        dc.drawText(w / 2, h * 0.38, Graphics.FONT_NUMBER_MEDIUM, value, center);
+        dc.drawText(w / 2, h * 0.56, Graphics.FONT_SMALL, unit, center);
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h * 0.66, Graphics.FONT_XTINY, text(Rez.Strings.Station), center);
 

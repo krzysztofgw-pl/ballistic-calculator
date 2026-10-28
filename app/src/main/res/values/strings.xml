@@ -144,13 +144,13 @@
     <string name="label_pressure_station">Station pressure</string>
     <string name="label_station_pressure">Station pressure (off: QNH)</string>
     <string name="action_watch_pressure">Pressure from Garmin watch</string>
-    <string name="watch_pressure_connecting">Opening KGW Pressure on the watch…</string>
-    <string name="watch_pressure_confirm">Confirm on the watch to open KGW Pressure.</string>
+    <string name="watch_pressure_connecting">Opening Station Pressure on the watch…</string>
+    <string name="watch_pressure_confirm">Confirm on the watch to open Station Pressure.</string>
     <string name="watch_pressure_result">Station pressure %1$s hPa from the watch.</string>
     <string name="watch_pressure_no_connect">Garmin Connect is not available on this phone.</string>
     <string name="watch_pressure_no_watch">No Garmin watch is connected. Check Bluetooth and Garmin Connect.</string>
-    <string name="watch_pressure_not_installed">KGW Pressure is not installed on the watch.</string>
-    <string name="watch_pressure_no_answer">The watch did not send a reading. Open KGW Pressure on the watch and try again.</string>
+    <string name="watch_pressure_not_installed">Station Pressure is not installed on the watch.</string>
+    <string name="watch_pressure_no_answer">The watch did not send a reading. Open Station Pressure on the watch and try again.</string>
     <string name="label_altitude">Altitude</string>
     <string name="unit_m_asl">m ASL</string>
     <string name="label_wind_speed">Speed</string>
