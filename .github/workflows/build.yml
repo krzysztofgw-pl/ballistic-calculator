@@ -53,19 +53,29 @@ jobs:
       - name: Build Connect IQ watch app
         env:
           IMAGE: ghcr.io/matco/connectiq-tester:latest
+          CIQ_KEY_BASE64: ${{ secrets.CIQ_DEVELOPER_KEY_BASE64 }}
         run: |
-          # A throwaway developer key is enough for sideloading; the phone finds the app by its id.
-          openssl genrsa -out "$RUNNER_TEMP/key.pem" 4096
-          openssl pkcs8 -topk8 -inform PEM -outform DER -in "$RUNNER_TEMP/key.pem" -out garmin/developer_key.der -nocrypt
+          # The store accepts updates only when they are signed with the same developer key, so the
+          # key comes from a secret. Without it a throwaway key still gives .prg files for sideloading.
+          if [ -n "$CIQ_KEY_BASE64" ]; then
+            printf '%s' "$CIQ_KEY_BASE64" | tr -d ' \t\r\n' | base64 -d > garmin/developer_key.der
+          else
+            echo "::warning::CIQ_DEVELOPER_KEY_BASE64 is not set: signing with a throwaway key, the .iq cannot go to the store."
+            openssl genrsa -out "$RUNNER_TEMP/key.pem" 4096
+            openssl pkcs8 -topk8 -inform PEM -outform DER -in "$RUNNER_TEMP/key.pem" -out garmin/developer_key.der -nocrypt
+          fi
           docker pull -q "$IMAGE"
-          echo "Devices in the image:"; docker run --rm --entrypoint ls "$IMAGE" /root/.Garmin/ConnectIQ/Devices | tr '\n' ' '; echo
           mkdir -p garmin/bin
+          monkeyc() { docker run --rm -v "$PWD/garmin:/app" -w /app --entrypoint monkeyc "$IMAGE" "$@"; }
           for device in $(grep -o 'product id="[^"]*"' garmin/manifest.xml | cut -d'"' -f2); do
-            docker run --rm -v "$PWD/garmin:/app" -w /app --entrypoint monkeyc "$IMAGE" \
-              -f monkey.jungle -d "$device" -o "bin/kgw-pressure-$device.prg" -y developer_key.der -r -w
+            monkeyc -f monkey.jungle -d "$device" -o "bin/kgw-pressure-$device.prg" -y developer_key.der -r -w
           done
+          # The package uploaded to the Connect IQ store, for every watch in the manifest.
+          monkeyc -e -f monkey.jungle -o bin/kgw-pressure.iq -y developer_key.der -r -w
           ls -la garmin/bin
       - uses: actions/upload-artifact@v6
         with:
           name: kgw-pressure-watch-app
-          path: garmin/bin/*.prg
+          path: |
+            garmin/bin/*.prg
+            garmin/bin/*.iq
