@@ -13,12 +13,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
       - name: Test solver
         run: ./gradlew :core:test
       - name: Prepare signing key
@@ -41,7 +41,7 @@ jobs:
         env:
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: ./gradlew :app:assembleRelease
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ballistics-apk
           path: app/build/outputs/apk/release/*.apk
@@ -49,7 +49,7 @@ jobs:
   watch-app:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build Connect IQ watch app
         env:
           IMAGE: ghcr.io/matco/connectiq-tester:latest
@@ -65,7 +65,7 @@ jobs:
               -f monkey.jungle -d "$device" -o "bin/kgw-pressure-$device.prg" -y developer_key.der -r -w
           done
           ls -la garmin/bin
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: kgw-pressure-watch-app
           path: garmin/bin/*.prg
