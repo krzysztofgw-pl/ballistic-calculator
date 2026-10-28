@@ -17,6 +17,9 @@ import kotlin.coroutines.resume
 object GarminPressure {
     /** The watch app's id from `garmin/manifest.xml`. */
     private const val APP_ID = "d8c4bc4d63d94a6cb0071345dc138c56"
+
+    /** The same id as a dashed UUID, the form Garmin's samples use; messages are matched on either. */
+    private const val APP_UUID = "d8c4bc4d-63d9-4a6c-b007-1345dc138c56"
     private const val CONNECT_PACKAGE = "com.garmin.android.apps.connectmobile"
 
     sealed interface Result {
@@ -24,7 +27,9 @@ object GarminPressure {
         data object NoGarminConnect : Result
         data object NoWatch : Result
         data object AppNotInstalled : Result
-        data object NoAnswer : Result
+
+        /** What Garmin Connect reported on the way, to tell where it stopped. */
+        data class NoAnswer(val details: String) : Result
     }
 
     fun garminConnectInstalled(context: Context): Boolean =
@@ -41,6 +46,7 @@ object GarminPressure {
         val ciq = ConnectIQ.getInstance(app, ConnectIQ.IQConnectType.WIRELESS)
         if (withTimeoutOrNull(10_000) { initialize(ciq, app) } != true) return Result.NoGarminConnect
         val iqApp = IQApp(APP_ID)
+        val apps = listOf(iqApp, IQApp(APP_UUID))
         val devices = mutableListOf<IQDevice>()
         try {
             devices += runCatching { ciq.connectedDevices.orEmpty() }.getOrDefault(emptyList())
@@ -48,27 +54,46 @@ object GarminPressure {
 
             val answer = CompletableDeferred<Result.Pressure>()
             var notInstalled = 0
+            val trace = linkedSetOf<String>()
             for (device in devices) {
                 runCatching {
-                    ciq.registerForAppEvents(device, iqApp) { d, _, message, status ->
-                        if (status != ConnectIQ.IQMessageStatus.SUCCESS) return@registerForAppEvents
+                    for (each in apps) ciq.registerForAppEvents(device, each) { d, _, message, status ->
+                        if (status != ConnectIQ.IQMessageStatus.SUCCESS) {
+                            trace += "received $status"
+                            return@registerForAppEvents
+                        }
+                        if (pascals(message) == null) trace += "received $message"
                         pascals(message)?.let { answer.complete(Result.Pressure(it / 100.0, d.friendlyName.orEmpty())) }
                     }
                     ciq.openApplication(device, iqApp) { _, _, status ->
+                        trace += "open $status"
                         when (status) {
                             ConnectIQ.IQOpenApplicationStatus.PROMPT_SHOWN_ON_DEVICE -> onPrompt()
                             ConnectIQ.IQOpenApplicationStatus.APP_IS_NOT_INSTALLED -> notInstalled++
                             else -> Unit
                         }
                     }
-                    // A running app answers this; one that is starting sends its reading by itself.
-                    ciq.sendMessage(device, iqApp, mapOf("get" to 1, "unit" to unit)) { _, _, _ -> }
-                }
+                }.onFailure { trace += it.javaClass.simpleName }
             }
-            return withTimeoutOrNull(timeoutMs) { answer.await() }
-                ?: if (notInstalled == devices.size) Result.AppNotInstalled else Result.NoAnswer
+            // The app may still be starting when the first request arrives, and a request it misses is
+            // lost, so ask again every few seconds until a reading comes.
+            return withTimeoutOrNull(timeoutMs) {
+                while (!answer.isCompleted) {
+                    for (device in devices) {
+                        runCatching {
+                            for (each in apps) {
+                                ciq.sendMessage(device, each, mapOf("get" to 1, "unit" to unit)) { _, a, status ->
+                                    trace += "request ${if (a?.applicationId == APP_UUID) "uuid " else ""}$status"
+                                }
+                            }
+                        }.onFailure { trace += it.javaClass.simpleName }
+                    }
+                    withTimeoutOrNull(3_000) { answer.await() }
+                }
+                answer.await()
+            } ?: if (notInstalled == devices.size) Result.AppNotInstalled else Result.NoAnswer(trace.joinToString())
         } finally {
-            devices.forEach { runCatching { ciq.unregisterForApplicationEvents(it, iqApp) } }
+            for (device in devices) apps.forEach { runCatching { ciq.unregisterForApplicationEvents(device, it) } }
             runCatching { ciq.shutdown(app) }
         }
     }

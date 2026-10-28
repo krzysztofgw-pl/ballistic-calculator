@@ -45,7 +45,7 @@ fun WatchPressureButton(update: ((Conditions) -> Conditions) -> Unit) {
                     GarminPressure.Result.NoGarminConnect -> context.getString(R.string.watch_pressure_no_connect)
                     GarminPressure.Result.NoWatch -> context.getString(R.string.watch_pressure_no_watch)
                     GarminPressure.Result.AppNotInstalled -> context.getString(R.string.watch_pressure_not_installed)
-                    GarminPressure.Result.NoAnswer -> context.getString(R.string.watch_pressure_no_answer)
+                    is GarminPressure.Result.NoAnswer -> context.getString(R.string.watch_pressure_no_answer, result.details)
                 }
                 job = null
             }

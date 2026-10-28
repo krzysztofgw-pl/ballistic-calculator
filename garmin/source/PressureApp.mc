@@ -17,6 +17,9 @@ class PressureApp extends Application.AppBase {
     var pressurePa as Float or Null = null;
     var status as Symbol = :none;
     var closeTimer as Timer.Timer = new Timer.Timer();
+    // Garmin Connect may not be ready to relay as the app starts, so a failed send is retried.
+    var retryTimer as Timer.Timer = new Timer.Timer();
+    var attempts as Number = 0;
     // Display unit, as set by the phone app: "hPa", "mmHg" or "inHg". Readings always travel in Pa.
     var unit as String = "hPa";
 
@@ -31,11 +34,12 @@ class PressureApp extends Application.AppBase {
         }
         Communications.registerForPhoneAppMessages(method(:onPhoneMessage));
         Sensor.enableSensorEvents(method(:onSensor));
-        send();
+        retryTimer.start(method(:send), 1000, false);
     }
 
     function onStop(state as Dictionary or Null) as Void {
         closeTimer.stop();
+        retryTimer.stop();
         Sensor.enableSensorEvents(null);
     }
 
@@ -82,22 +86,33 @@ class PressureApp extends Application.AppBase {
     }
 
     function send() as Void {
+        attempts = 0;
+        transmit();
+    }
+
+    function transmit() as Void {
         var pa = read();
         pressurePa = pa;
+        closeTimer.stop();
+        retryTimer.stop();
         if (pa == null) {
             status = :none;
         } else {
-            closeTimer.stop();
             status = :sending;
+            attempts += 1;
             Communications.transmit({ "pa" => pa }, null, new SendListener(self));
         }
         WatchUi.requestUpdate();
     }
 
     function onSent(ok as Boolean) as Void {
-        status = ok ? :sent : :failed;
         if (ok) {
+            status = :sent;
             closeTimer.start(method(:close), 5000, false);
+        } else if (attempts < 6) {
+            retryTimer.start(method(:transmit), 2000, false);
+        } else {
+            status = :failed;
         }
         WatchUi.requestUpdate();
     }
