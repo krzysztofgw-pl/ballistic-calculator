@@ -43,7 +43,7 @@ Coriolis (latitude), spin drift and aerodynamic jump. Each tab keeps its scroll 
 - **Phone compass** for the azimuth, corrected for magnetic declination when the location is known. Each
   reading is checked: the phone's own calibration status and heading accuracy, and the measured field
   against the Earth's field at the location. A warning suggests a figure-eight calibration away from steel.
-- **Latitude** from the phone's location with one tap.
+- **Latitude** with an N/S button for the hemisphere, or from the phone's location with one tap (its accuracy shows under the pin).
 - **Pressure from a Garmin watch**: the barometer's station pressure, sent by a small Connect IQ watch
   app through Garmin Connect. See [garmin](garmin/README.md) for installing it.
 - **Wind from the forecast**: the hourly forecast for the phone's location
