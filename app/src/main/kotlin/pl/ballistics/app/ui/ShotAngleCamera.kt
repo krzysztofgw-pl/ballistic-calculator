@@ -17,6 +17,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +25,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,6 +76,7 @@ private data class CameraAxis(val elevationDeg: Double, val rollDeg: Double)
 private const val PREFS = "camera_angle"
 private const val KEY_TILT_UPRIGHT = "tilt_upright_deg"
 private const val KEY_TILT_SIDEWAYS = "tilt_sideways_deg"
+private const val KEY_HIDE_HELP = "hide_calibration_help"
 /** Starting zoom: on a phone with a telephoto lens the camera switches to it on its own. */
 private const val START_ZOOM = 10f
 
@@ -112,6 +118,7 @@ private fun ShotAngleCamera(onDismiss: () -> Unit, onAngle: (Double) -> Unit) {
     var camera by remember { mutableStateOf<Camera?>(null) }
     var zoom by remember { mutableFloatStateOf(1f) }
     var firstAim by remember { mutableStateOf<CameraAxis?>(null) }
+    var showHelp by remember { mutableStateOf(false) }
     val angle = axis?.let { it.elevationDeg + tiltAt(it.rollDeg) }
 
     DisposableEffect(Unit) {
@@ -179,10 +186,16 @@ private fun ShotAngleCamera(onDismiss: () -> Unit, onAngle: (Double) -> Unit) {
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { showHelp = true }) {
+                        Icon(Icons.Filled.Info, stringResource(R.string.camera_calibration_title), tint = Color.White)
+                    }
                     OutlinedButton(onClick = {
                         val now = axis ?: return@OutlinedButton
                         val first = firstAim
-                        if (first == null) {
+                        if (first == null && !prefs.getBoolean(KEY_HIDE_HELP, false)) {
+                            // The first tap explains the two aims; the next one starts.
+                            showHelp = true
+                        } else if (first == null) {
                             firstAim = now
                         } else {
                             // Same point, so the true angles are equal: e1 + tilt(r1) = e2 + tilt(r2). A portrait
@@ -221,7 +234,31 @@ private fun ShotAngleCamera(onDismiss: () -> Unit, onAngle: (Double) -> Unit) {
                 )
             }
         }
+        if (showHelp) CalibrationHelp(prefs.getBoolean(KEY_HIDE_HELP, false)) { hide ->
+            prefs.edit().putBoolean(KEY_HIDE_HELP, hide).apply()
+            showHelp = false
+        }
     }
+}
+
+/** How the two-aim calibration works, with a choice not to show it before calibrating again. */
+@Composable
+private fun CalibrationHelp(hidden: Boolean, onClose: (hide: Boolean) -> Unit) {
+    var hide by remember { mutableStateOf(hidden) }
+    AlertDialog(
+        onDismissRequest = { onClose(hide) },
+        title = { Text(stringResource(R.string.camera_calibration_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.camera_calibration_help))
+                Row(Modifier.clickable { hide = !hide }, verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(hide, onCheckedChange = { hide = it })
+                    Text(stringResource(R.string.action_dont_show_again))
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { onClose(hide) }) { Text(stringResource(R.string.action_close)) } },
+    )
 }
 
 /** The back camera's axis from the gravity sensor (the accelerometer where there is none), smoothed over about half a second. */

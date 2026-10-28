@@ -179,6 +179,9 @@
     <string name="camera_angle_note">Accuracy depends on the phone\'s sensors, typically within 0.5–1°. Calibrating (two aims at one point, the second with the phone turned over) removes the camera\'s tilt in the phone, not the sensor\'s own error.</string>
     <string name="camera_angle_calibration">Calibration: portrait %1$s°, landscape %2$s°.</string>
     <string name="action_calibrate">Calibrate</string>
+    <string name="camera_calibration_title">Calibration</string>
+    <string name="camera_calibration_help">The camera sits slightly tilted in the phone body, which shifts every reading by the same amount. Two aims at one point remove it:\n\n1. Hold the phone as you will measure (portrait or landscape), ideally resting on something steady, and put the crosshair on a distant, sharp point.\n2. Tap Calibrate.\n3. Turn the phone over: portrait upside down, or landscape the other way round. Put the crosshair on the same point.\n4. Tap again.\n\nPortrait and landscape are calibrated separately and kept on this phone. The sensor\'s own error (typically 0.5–1°) stays.</string>
+    <string name="action_dont_show_again">Don\'t show again</string>
     <string name="camera_calibrate_flip">Turn the phone over, aim again, tap</string>
     <string name="camera_calibrate_failed">For the second aim, turn the phone over: portrait upside down, or landscape the other way round.</string>
     <string name="action_use_angle">Use %1$s°</string>
