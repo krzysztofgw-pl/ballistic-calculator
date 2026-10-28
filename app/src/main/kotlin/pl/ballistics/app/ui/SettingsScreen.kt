@@ -8,8 +8,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -35,9 +37,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import pl.ballistics.app.R
+import pl.ballistics.app.data.Correction
 import pl.ballistics.app.data.SyncState
 import pl.ballistics.app.data.ThemeMode
 import pl.ballistics.app.data.UiSettings
+import pl.ballistics.app.reticle.Reticles
 import java.time.LocalDate
 
 /** Look and layout of the app, sync and backup. */
@@ -115,6 +119,23 @@ fun SettingsScreen(
                 }
             }
 
+            Section(stringResource(R.string.section_corrections)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Spacer(Modifier.weight(1f))
+                    Text(stringResource(R.string.label_elevation), Modifier.width(CHIP_WIDTH), style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.label_windage), Modifier.width(CHIP_WIDTH), style = MaterialTheme.typography.labelMedium)
+                }
+                Reticles.all.forEach { r ->
+                    val c = ui.correction(r.id)
+                    fun set(next: Correction) = onUi { it.copy(corrections = it.corrections + (r.id to next)) }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(stringResource(r.name), Modifier.weight(1f))
+                        DialOrHold(c.dialElevation) { set(c.copy(dialElevation = it)) }
+                        DialOrHold(c.dialWindage) { set(c.copy(dialWindage = it)) }
+                    }
+                }
+            }
+
             Section(stringResource(R.string.section_sync)) {
                 when (sync) {
                     SyncState.Unavailable -> Unit
@@ -143,6 +164,19 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+private val CHIP_WIDTH = 80.dp
+
+/** A chip that reads Dial when selected and Hold otherwise; a tap switches it. */
+@Composable
+private fun DialOrHold(dial: Boolean, onChange: (Boolean) -> Unit) {
+    FilterChip(
+        selected = dial,
+        onClick = { onChange(!dial) },
+        label = { Text(stringResource(if (dial) R.string.correction_dial else R.string.correction_hold)) },
+        modifier = Modifier.width(CHIP_WIDTH),
+    )
 }
 
 @Composable

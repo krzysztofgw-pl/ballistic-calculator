@@ -207,7 +207,20 @@ data class UiSettings(
     val locationSetsLatitude: Boolean = true,
     /** The forecast also sets the altitude, from the terrain height at the location. */
     val locationSetsAltitude: Boolean = false,
-)
+    /** Per reticle id: which corrections the target screen advises dialing; the rest are held. */
+    val corrections: Map<String, Correction> = emptyMap(),
+) {
+    fun correction(reticleId: String): Correction = corrections[reticleId] ?: Correction.defaultFor(reticleId)
+}
+
+/** Whether to dial each axis on the turrets or hold it on the reticle. */
+@Serializable
+data class Correction(val dialElevation: Boolean = false, val dialWindage: Boolean = false) {
+    companion object {
+        /** Tree reticles are made for holding both; on the others elevation is dialed and wind held. */
+        fun defaultFor(reticleId: String) = if (reticleId.endsWith("-tree")) Correction() else Correction(dialElevation = true)
+    }
+}
 
 /** Everything the app stores; also the export/import file format. */
 @Serializable
