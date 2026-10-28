@@ -50,7 +50,7 @@ object GarminPressure {
 
             val answer = CompletableDeferred<Result.Pressure>()
             var notInstalled = 0
-            val trace = mutableListOf<String>()
+            val trace = linkedSetOf<String>()
             for (device in devices) {
                 runCatching {
                     ciq.registerForAppEvents(device, iqApp) { d, _, message, status ->
@@ -69,12 +69,21 @@ object GarminPressure {
                             else -> Unit
                         }
                     }
-                    // A running app answers this; one that is starting sends its reading by itself.
-                    ciq.sendMessage(device, iqApp, mapOf("get" to 1, "unit" to unit)) { _, _, status -> trace += "request $status" }
                 }.onFailure { trace += it.javaClass.simpleName }
             }
-            return withTimeoutOrNull(timeoutMs) { answer.await() }
-                ?: if (notInstalled == devices.size) Result.AppNotInstalled else Result.NoAnswer(trace.joinToString())
+            // The app may still be starting when the first request arrives, and a request it misses is
+            // lost, so ask again every few seconds until a reading comes.
+            return withTimeoutOrNull(timeoutMs) {
+                while (!answer.isCompleted) {
+                    for (device in devices) {
+                        runCatching {
+                            ciq.sendMessage(device, iqApp, mapOf("get" to 1, "unit" to unit)) { _, _, status -> trace += "request $status" }
+                        }.onFailure { trace += it.javaClass.simpleName }
+                    }
+                    withTimeoutOrNull(3_000) { answer.await() }
+                }
+                answer.await()
+            } ?: if (notInstalled == devices.size) Result.AppNotInstalled else Result.NoAnswer(trace.joinToString())
         } finally {
             devices.forEach { runCatching { ciq.unregisterForApplicationEvents(it, iqApp) } }
             runCatching { ciq.shutdown(app) }
