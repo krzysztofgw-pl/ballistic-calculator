@@ -11,7 +11,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 
 /**
- * Station pressure from a Garmin watch's barometer, through the KGW Pressure Connect IQ app
+ * Station pressure from a Garmin watch's barometer, through the Station Pressure Connect IQ app
  * (source in `garmin/`) and Garmin Connect on the phone.
  */
 object GarminPressure {

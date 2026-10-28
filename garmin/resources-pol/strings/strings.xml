@@ -1,4 +1,5 @@
 <strings>
+    <string id="AppName">Station Pressure</string>
     <string id="Station">ciśnienie stacyjne</string>
     <string id="NoReading">brak odczytu barometru</string>
     <string id="Sending">wysyłanie…</string>

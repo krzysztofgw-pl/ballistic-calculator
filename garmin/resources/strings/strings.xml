@@ -1,5 +1,5 @@
 <strings>
-    <string id="AppName">KGW Pressure</string>
+    <string id="AppName">Station Pressure</string>
     <string id="Station">station pressure</string>
     <string id="NoReading">no barometer reading</string>
     <string id="Sending">sending…</string>

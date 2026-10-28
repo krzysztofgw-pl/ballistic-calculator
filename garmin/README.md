@@ -1,4 +1,4 @@
-# KGW Pressure (Connect IQ watch app)
+# Station Pressure (Connect IQ watch app)
 
 A minimal Garmin watch app that sends the barometer's **station pressure** to the Ballistics phone app.
 Station pressure is what the watch measures where you stand; it is not reduced to sea level, so it does
@@ -7,7 +7,7 @@ not depend on the watch's altitude calibration. Temperature is not sent: a wrist
 ## How it works
 
 1. On the Conditions screen, tap **Pressure from Garmin watch** (shown when Garmin Connect is installed).
-2. The phone asks the watch to open KGW Pressure; confirm on the watch.
+2. The phone asks the watch to open Station Pressure; confirm on the watch.
 3. The watch sends its reading, and the phone fills in the pressure and switches it to station pressure.
 
 The watch app also shows the pressure itself and sends it again when you press START. It runs only
@@ -17,7 +17,7 @@ through Garmin Connect on the phone (Connect IQ Mobile SDK), so the watch must b
 ## Languages
 
 The watch shows English, Polish, German, French, Spanish or Italian, following the watch's language
-(`resources-<lang>/strings/strings.xml`). The app name stays KGW Pressure everywhere, as the phone app refers to it.
+(`resources-<lang>/strings/strings.xml`). The app name stays Station Pressure everywhere, as the phone app refers to it.
 
 ## Install (sideload)
 
@@ -32,7 +32,7 @@ workflow run.
 
 1. Connect the watch to a computer with its USB cable (on a Mac use Garmin Express or OpenMTP).
 2. Copy the `.prg` into `GARMIN/APPS/` on the watch.
-3. Unplug; the app appears in the watch's app list as KGW Pressure.
+3. Unplug; the app appears in the watch's app list as Station Pressure.
 
 If the watch does not list the app, try the file for the other model.
 
@@ -47,8 +47,8 @@ and is not reviewed by Garmin.
 2. Download `kgw-pressure.iq` from the `kgw-pressure-watch-app` artifact of a build that used that secret.
 3. Sign in at the [Connect IQ developer dashboard](https://apps.garmin.com/developer/) with the Garmin
    account used in Garmin Connect, upload the `.iq`, tick **Beta app**, and fill in the name, a short
-   description, the version and the icon.
-4. Delete the sideloaded `KGW*.prg` / `*.PRG` from `GARMIN/APPS/` on the watch.
+   description and the version. The store icons (128 × 128, 64-colour and 24-bit) are in `store/`.
+4. Delete the sideloaded `kgw-pressure-*.prg` from `GARMIN/APPS/` on the watch.
 5. Install the beta from the Connect IQ store in Garmin Connect (the app page link from the dashboard,
    with `apps-developer.garmin.com` changed to `apps.garmin.com`, opens it on the phone).
 
