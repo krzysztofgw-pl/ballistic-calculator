@@ -14,6 +14,11 @@ The watch app also shows the pressure itself and sends it again when you press S
 while open (no background service) and closes itself 5 s after a reading reaches the phone. Messages go
 through Garmin Connect on the phone (Connect IQ Mobile SDK), so the watch must be paired there.
 
+## Languages
+
+The watch shows English, Polish, German, French, Spanish or Italian, following the watch's language
+(`resources-<lang>/strings/strings.xml`). The app name stays KGW Pressure everywhere, as the phone app refers to it.
+
 ## Install (sideload)
 
 GitHub Actions builds one `.prg` per watch model; download the `kgw-pressure-watch-app` artifact from the

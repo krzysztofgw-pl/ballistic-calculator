@@ -1,0 +1,8 @@
+<strings>
+    <string id="Station">Stationsdruck</string>
+    <string id="NoReading">kein Barometerwert</string>
+    <string id="Sending">senden…</string>
+    <string id="Sent">an Telefon gesendet</string>
+    <string id="NotSent">Telefon nicht erreichbar</string>
+    <string id="Hint">START: erneut senden</string>
+</strings>
