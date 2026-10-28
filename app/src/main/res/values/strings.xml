@@ -145,7 +145,7 @@
     <string name="label_pressure_station">Station pressure</string>
     <string name="label_station_pressure">Station pressure (off: QNH)</string>
     <string name="section_devices">External devices</string>
-    <string name="label_garmin_watch">Pressure from a Garmin watch (off: hidden)</string>
+    <string name="label_garmin_watch">Pressure from a Garmin watch</string>
     <string name="action_watch_pressure_short">Garmin</string>
     <string name="watch_pressure_problem">No pressure from the watch</string>
     <string name="watch_pressure_connecting">Opening Station Pressure on the watch…</string>
@@ -183,9 +183,12 @@
     <string name="camera_angle_calibration">Calibration: portrait %1$s°, landscape %2$s°.</string>
     <string name="action_calibrate">Calibrate</string>
     <string name="camera_calibration_title">Calibration</string>
-    <string name="camera_calibration_help">The camera sits slightly tilted in the phone body, which shifts every reading by the same amount. Two aims at one point remove it:\n\n1. Hold the phone as you will measure (portrait or landscape), ideally resting on something steady, and put the crosshair on a distant, sharp point.\n2. Tap Calibrate.\n3. Turn the phone over: portrait upside down, or landscape the other way round. Put the crosshair on the same point.\n4. Tap again.\n\nPortrait and landscape are calibrated separately and kept on this phone. The sensor\'s own error (typically 0.5–1°) stays.</string>
+    <string name="camera_calibration_help">The camera sits slightly tilted in the phone body, which shifts every reading by the same amount. Two aims at one point remove it:\n\n1. Hold the phone as you will measure (portrait or landscape), ideally resting on something steady, and put the crosshair on a distant, sharp point.\n2. Tap Calibrate: the first aim is kept and ✓ 1/2 shows.\n3. Turn the phone over: portrait upside down, or landscape the other way round. Put the crosshair on the same point.\n4. Tap again.\n\nPortrait and landscape are calibrated separately and kept on this phone. The sensor\'s own error (typically 0.5–1°) stays.</string>
     <string name="action_dont_show_again">Don\'t show again</string>
-    <string name="camera_calibrate_flip">Turn the phone over, aim again, tap</string>
+    <string name="camera_calibrate_flip">Turned over: aim, tap</string>
+    <string name="camera_calibrate_first_kept">✓ 1/2</string>
+    <string name="camera_calibrated_portrait">Calibrated for portrait: %1$s°</string>
+    <string name="camera_calibrated_landscape">Calibrated for landscape: %1$s°</string>
     <string name="camera_calibrate_failed">For the second aim, turn the phone over: portrait upside down, or landscape the other way round.</string>
     <string name="action_use_angle">Use %1$s°</string>
     <string name="camera_zoom">%1$s×</string>

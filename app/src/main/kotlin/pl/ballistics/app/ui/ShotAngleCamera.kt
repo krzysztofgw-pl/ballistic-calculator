@@ -25,7 +25,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -129,7 +132,8 @@ private fun ShotAngleCamera(onDismiss: () -> Unit, onAngle: (Double) -> Unit) {
     }
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Box(Modifier.fillMaxSize().background(Color.Black)) {
+        Column(Modifier.fillMaxSize().background(Color.Black)) {
+          Box(Modifier.weight(1f).fillMaxWidth()) {
             AndroidView(
                 factory = { ctx ->
                     PreviewView(ctx).apply {
@@ -161,9 +165,17 @@ private fun ShotAngleCamera(onDismiss: () -> Unit, onAngle: (Double) -> Unit) {
                 drawLine(red, Offset(c.x, c.y - arm), Offset(c.x, c.y - gap), w)
                 drawLine(red, Offset(c.x, c.y + gap), Offset(c.x, c.y + arm), w)
             }
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).size(64.dp)
+                    .background(Color(0x66000000), CircleShape),
+            ) {
+                Icon(Icons.Filled.Close, stringResource(R.string.action_cancel), tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(40.dp))
+            }
+          }
 
             Column(
-                Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(Color(0xB0000000)).padding(16.dp),
+                Modifier.fillMaxWidth().padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -192,33 +204,38 @@ private fun ShotAngleCamera(onDismiss: () -> Unit, onAngle: (Double) -> Unit) {
                     OutlinedButton(onClick = {
                         val now = axis ?: return@OutlinedButton
                         val first = firstAim
-                        if (first == null && !prefs.getBoolean(KEY_HIDE_HELP, false)) {
-                            // The first tap explains the two aims; the next one starts.
-                            showHelp = true
-                        } else if (first == null) {
+                        if (first == null) {
+                            // The first aim is kept at once; the first time, how to go on is explained.
                             firstAim = now
+                            if (!prefs.getBoolean(KEY_HIDE_HELP, false)) showHelp = true
                         } else {
                             // Same point, so the true angles are equal: e1 + tilt(r1) = e2 + tilt(r2). A portrait
                             // pair (upright, upside down) gives the upright tilt, a landscape pair the sideways one.
                             val c = cos(Math.toRadians(first.rollDeg)) - cos(Math.toRadians(now.rollDeg))
                             val sn = sin(Math.toRadians(first.rollDeg)) - sin(Math.toRadians(now.rollDeg))
-                            when {
+                            val result = when {
                                 abs(c) >= 1.5 -> {
                                     tiltUpright = (now.elevationDeg - first.elevationDeg - tiltSideways * sn) / c
                                     prefs.edit().putFloat(KEY_TILT_UPRIGHT, tiltUpright.toFloat()).apply()
+                                    context.getString(R.string.camera_calibrated_portrait, String.format(Locale.US, "%+.2f", tiltUpright))
                                 }
                                 abs(sn) >= 1.5 -> {
                                     tiltSideways = (now.elevationDeg - first.elevationDeg - tiltUpright * c) / sn
                                     prefs.edit().putFloat(KEY_TILT_SIDEWAYS, tiltSideways.toFloat()).apply()
+                                    context.getString(R.string.camera_calibrated_landscape, String.format(Locale.US, "%+.2f", tiltSideways))
                                 }
-                                else -> Toast.makeText(context, context.getString(R.string.camera_calibrate_failed), Toast.LENGTH_LONG).show()
+                                else -> context.getString(R.string.camera_calibrate_failed)
                             }
+                            Toast.makeText(context, result, Toast.LENGTH_LONG).show()
                             firstAim = null
                         }
                     }) {
                         Text(stringResource(if (firstAim == null) R.string.action_calibrate else R.string.camera_calibrate_flip), color = Color.White)
                     }
-                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel), color = Color.White) }
+                    if (firstAim != null) {
+                        // Marks that the first of the two aims is kept.
+                        Text(stringResource(R.string.camera_calibrate_first_kept), color = Color(0xFF81C784), style = MaterialTheme.typography.labelLarge)
+                    }
                     Button(enabled = angle != null, onClick = { angle?.let(onAngle) }) {
                         Text(stringResource(R.string.action_use_angle, angle?.let { String.format(Locale.US, "%.1f", it) } ?: "—"))
                     }
