@@ -209,6 +209,8 @@ data class UiSettings(
     val locationSetsLatitude: Boolean = true,
     /** The forecast also sets the altitude, from the terrain height at the location. */
     val locationSetsAltitude: Boolean = false,
+    /** Offer reading the station pressure from a Garmin watch on the conditions screen. */
+    val garminWatch: Boolean = false,
     /** Per reticle design (Reticles.designKey): which corrections the target screen advises dialing; the rest are held. */
     val corrections: Map<String, Correction> = emptyMap(),
 ) {

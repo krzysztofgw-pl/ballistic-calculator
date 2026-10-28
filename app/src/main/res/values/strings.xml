@@ -144,7 +144,10 @@
     <string name="label_pressure_qnh">Pressure (QNH)</string>
     <string name="label_pressure_station">Station pressure</string>
     <string name="label_station_pressure">Station pressure (off: QNH)</string>
-    <string name="action_watch_pressure">Pressure from Garmin watch</string>
+    <string name="section_devices">External devices</string>
+    <string name="label_garmin_watch">Pressure from a Garmin watch (off: hidden)</string>
+    <string name="action_watch_pressure_short">Garmin</string>
+    <string name="watch_pressure_problem">No pressure from the watch</string>
     <string name="watch_pressure_connecting">Opening Station Pressure on the watch…</string>
     <string name="watch_pressure_confirm">Confirm on the watch to open Station Pressure.</string>
     <string name="watch_pressure_result">Station pressure %1$s hPa from the watch.</string>

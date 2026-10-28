@@ -119,6 +119,10 @@ fun SettingsScreen(
                 }
             }
 
+            Section(stringResource(R.string.section_devices)) {
+                SwitchRow(stringResource(R.string.label_garmin_watch), ui.garminWatch) { v -> onUi { it.copy(garminWatch = v) } }
+            }
+
             Collapsible(stringResource(R.string.section_corrections)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Spacer(Modifier.weight(1f))
