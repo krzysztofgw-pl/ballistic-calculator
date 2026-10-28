@@ -74,6 +74,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    // Station pressure from a Garmin watch (see garmin/).
+    implementation("com.garmin.connectiq:ciq-companion-app-sdk:2.2.0@aar")
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-auth")
