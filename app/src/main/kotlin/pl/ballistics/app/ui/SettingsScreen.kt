@@ -119,17 +119,18 @@ fun SettingsScreen(
                 }
             }
 
-            Section(stringResource(R.string.section_corrections)) {
+            Collapsible(stringResource(R.string.section_corrections)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Spacer(Modifier.weight(1f))
                     Text(stringResource(R.string.label_elevation), Modifier.width(CHIP_WIDTH), style = MaterialTheme.typography.labelMedium)
                     Text(stringResource(R.string.label_windage), Modifier.width(CHIP_WIDTH), style = MaterialTheme.typography.labelMedium)
                 }
-                Reticles.all.forEach { r ->
-                    val c = ui.correction(r.id)
-                    fun set(next: Correction) = onUi { it.copy(corrections = it.corrections + (r.id to next)) }
+                Reticles.designs.forEach { r ->
+                    val key = Reticles.designKey(r)
+                    val c = ui.correction(key)
+                    fun set(next: Correction) = onUi { it.copy(corrections = it.corrections + (key to next)) }
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(stringResource(r.name), Modifier.weight(1f))
+                        Text(stringResource(r.family), Modifier.weight(1f))
                         DialOrHold(c.dialElevation) { set(c.copy(dialElevation = it)) }
                         DialOrHold(c.dialWindage) { set(c.copy(dialWindage = it)) }
                     }

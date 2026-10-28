@@ -165,7 +165,7 @@ fun TargetScreen(
     val scale = if (sfp) magnification / calMag else 1.0
     val field = if (sfp) reticle.extent else reticle.extent * maxMag / magnification
     // What is dialed for the chosen distance moves every hold point by the same amount.
-    val correction = ui.correction(reticle.id)
+    val correction = ui.correction(Reticles.designKey(reticle))
     val dialX = if (correction.dialWindage) (selected?.windageRad ?: 0.0) / reticle.unit.radians * scale else 0.0
     val dialY = if (correction.dialElevation) (selected?.dropRad ?: 0.0) / reticle.unit.radians * scale else 0.0
     val holds = (points + listOfNotNull(selected?.takeIf { it !in points })).map { p ->

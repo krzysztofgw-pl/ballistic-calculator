@@ -52,6 +52,12 @@ object Reticles {
 
     fun byId(id: String): Reticle = all.find { it.id == id } ?: all.first()
 
+    /** One reticle per design, whatever its unit: the first listed version stands for the design. */
+    val designs: List<Reticle> get() = all.distinctBy { it.family }
+
+    /** The id that settings for [reticle]'s design are stored under, the same for its MRAD and MOA versions. */
+    fun designKey(reticle: Reticle): String = all.first { it.family == reticle.family }.id
+
     /** One entry per design, in [unit] when the design comes in it. */
     fun families(unit: AngularUnit): List<Reticle> =
         all.groupBy { it.family }.values.map { v -> v.find { it.unit == unit } ?: v.first() }

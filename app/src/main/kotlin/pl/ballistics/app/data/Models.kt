@@ -207,7 +207,7 @@ data class UiSettings(
     val locationSetsLatitude: Boolean = true,
     /** The forecast also sets the altitude, from the terrain height at the location. */
     val locationSetsAltitude: Boolean = false,
-    /** Per reticle id: which corrections the target screen advises dialing; the rest are held. */
+    /** Per reticle design (Reticles.designKey): which corrections the target screen advises dialing; the rest are held. */
     val corrections: Map<String, Correction> = emptyMap(),
 ) {
     fun correction(reticleId: String): Correction = corrections[reticleId] ?: Correction.defaultFor(reticleId)
