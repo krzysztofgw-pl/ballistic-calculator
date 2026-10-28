@@ -24,7 +24,9 @@ object GarminPressure {
         data object NoGarminConnect : Result
         data object NoWatch : Result
         data object AppNotInstalled : Result
-        data object NoAnswer : Result
+
+        /** What Garmin Connect reported on the way, to tell where it stopped. */
+        data class NoAnswer(val details: String) : Result
     }
 
     fun garminConnectInstalled(context: Context): Boolean =
@@ -48,13 +50,19 @@ object GarminPressure {
 
             val answer = CompletableDeferred<Result.Pressure>()
             var notInstalled = 0
+            val trace = mutableListOf<String>()
             for (device in devices) {
                 runCatching {
                     ciq.registerForAppEvents(device, iqApp) { d, _, message, status ->
-                        if (status != ConnectIQ.IQMessageStatus.SUCCESS) return@registerForAppEvents
+                        if (status != ConnectIQ.IQMessageStatus.SUCCESS) {
+                            trace += "received $status"
+                            return@registerForAppEvents
+                        }
+                        if (pascals(message) == null) trace += "received $message"
                         pascals(message)?.let { answer.complete(Result.Pressure(it / 100.0, d.friendlyName.orEmpty())) }
                     }
                     ciq.openApplication(device, iqApp) { _, _, status ->
+                        trace += "open $status"
                         when (status) {
                             ConnectIQ.IQOpenApplicationStatus.PROMPT_SHOWN_ON_DEVICE -> onPrompt()
                             ConnectIQ.IQOpenApplicationStatus.APP_IS_NOT_INSTALLED -> notInstalled++
@@ -62,11 +70,11 @@ object GarminPressure {
                         }
                     }
                     // A running app answers this; one that is starting sends its reading by itself.
-                    ciq.sendMessage(device, iqApp, mapOf("get" to 1, "unit" to unit)) { _, _, _ -> }
-                }
+                    ciq.sendMessage(device, iqApp, mapOf("get" to 1, "unit" to unit)) { _, _, status -> trace += "request $status" }
+                }.onFailure { trace += it.javaClass.simpleName }
             }
             return withTimeoutOrNull(timeoutMs) { answer.await() }
-                ?: if (notInstalled == devices.size) Result.AppNotInstalled else Result.NoAnswer
+                ?: if (notInstalled == devices.size) Result.AppNotInstalled else Result.NoAnswer(trace.joinToString())
         } finally {
             devices.forEach { runCatching { ciq.unregisterForApplicationEvents(it, iqApp) } }
             runCatching { ciq.shutdown(app) }
