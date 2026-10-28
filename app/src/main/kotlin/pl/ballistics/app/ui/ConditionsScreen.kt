@@ -87,7 +87,12 @@ fun ConditionsScreen(
 
         Section(stringResource(R.string.section_shot)) {
             FieldRow { m ->
-                NumberField(stringResource(R.string.label_look_angle), i.lookAngleDeg, "°", m) { v -> update { it.copy(lookAngleDeg = v) } }
+                Row(m, verticalAlignment = Alignment.CenterVertically) {
+                    NumberField(stringResource(R.string.label_look_angle), i.lookAngleDeg, "°", Modifier.weight(1f)) { v ->
+                        update { it.copy(lookAngleDeg = v) }
+                    }
+                    ShotAngleButton { deg -> update { it.copy(lookAngleDeg = String.format(Locale.US, "%.1f", deg)) } }
+                }
                 NumberField(stringResource(R.string.label_cant), i.cantDeg, "°", m) { v -> update { it.copy(cantDeg = v) } }
             }
         }

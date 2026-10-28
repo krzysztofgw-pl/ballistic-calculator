@@ -178,6 +178,17 @@
     <string name="forecast_attribution">Weather data by Open-Meteo.com (CC BY 4.0). Speed is the mean of the hourly values, direction the mean wind vector. A forecast is a starting point; read the wind on the range.</string>
     <string name="wind_true_bearing">From the line of fire: %1$s° (%2$s o\'clock). True bearing: %3$s° %4$s, with the shot azimuth %5$s°.</string>
     <string name="label_look_angle">Shot angle</string>
+    <string name="action_measure_angle">Measure the shot angle with the camera</string>
+    <string name="camera_angle_note">Accuracy depends on the phone\'s sensors, typically within 0.5–1°. Calibrating (two aims at one point, the second with the phone turned over) removes the camera\'s tilt in the phone, not the sensor\'s own error.</string>
+    <string name="camera_angle_calibration">Calibration: portrait %1$s°, landscape %2$s°.</string>
+    <string name="action_calibrate">Calibrate</string>
+    <string name="camera_calibration_title">Calibration</string>
+    <string name="camera_calibration_help">The camera sits slightly tilted in the phone body, which shifts every reading by the same amount. Two aims at one point remove it:\n\n1. Hold the phone as you will measure (portrait or landscape), ideally resting on something steady, and put the crosshair on a distant, sharp point.\n2. Tap Calibrate.\n3. Turn the phone over: portrait upside down, or landscape the other way round. Put the crosshair on the same point.\n4. Tap again.\n\nPortrait and landscape are calibrated separately and kept on this phone. The sensor\'s own error (typically 0.5–1°) stays.</string>
+    <string name="action_dont_show_again">Don\'t show again</string>
+    <string name="camera_calibrate_flip">Turn the phone over, aim again, tap</string>
+    <string name="camera_calibrate_failed">For the second aim, turn the phone over: portrait upside down, or landscape the other way round.</string>
+    <string name="action_use_angle">Use %1$s°</string>
+    <string name="camera_zoom">%1$s×</string>
     <string name="label_cant">Cant</string>
     <string name="label_table_range">Table range</string>
     <string name="label_table_step">Step</string>
