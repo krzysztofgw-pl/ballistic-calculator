@@ -235,7 +235,6 @@
     <string name="advice_windage">Windage: %1$s</string>
     <string name="advice_dial">dial %1$s %2$s %3$s</string>
     <string name="advice_hold">hold %1$s %2$s %3$s</string>
-    <string name="advice_dial_then_hold">dial %1$s %2$s %3$s, then hold %4$s %5$s %6$s</string>
     <string name="or_dial">Or dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
     <string name="hold_outside_reticle">Hold point is outside the reticle: dial the turrets.</string>
     <string name="above_center">above center</string>

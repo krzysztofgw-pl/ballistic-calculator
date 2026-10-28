@@ -62,8 +62,7 @@ range and step are set below it.
 ### Target
 Pick a distance to the metre with the slider, the arrows or by typing it (all in one row), and get the
 hold and the dial correction for it. Per reticle design (MRAD and MOA versions together), Settings chooses whether elevation and windage are dialed
-or held. Dial corrections are whole clicks and holds are to 0.05; whatever the clicks leave over is
-advised as a hold, and the reticle shows the holds left after dialing for the chosen distance.
+or held. Dial corrections are whole clicks and holds are to 0.05; the reticle shows the holds left after dialing for the chosen distance.
 - Moving target, switched on with a checkbox: its speed and its course on a small dial (up = away,
   right = to the right). The lead uses the time of
   flight to where the target will be, and its hold point is drawn on the reticle in blue.

@@ -172,7 +172,7 @@ fun TargetScreen(
     fun clicks(v: Double) = click?.let { (v / it).roundToInt() * it } ?: v
     val upDial = clicks(-(selected?.dropRad ?: 0.0) / turret.radians)
     val rightDial = clicks(-(selected?.windageRad ?: 0.0) / turret.radians)
-    // What is dialed moves every hold point by the same amount; what the clicks leave over stays as a hold.
+    // What is dialed moves every hold point by the same amount.
     val correction = ui.correction(Reticles.designKey(reticle))
     val dialX = if (correction.dialWindage) -rightDial * turret.radians / reticle.unit.radians * scale else 0.0
     val dialY = if (correction.dialElevation) -upDial * turret.radians / reticle.unit.radians * scale else 0.0
@@ -258,20 +258,16 @@ fun TargetScreen(
             val horizontal = stringResource(if (h.x >= 0) R.string.right else R.string.left)
             val holdY = h.y.holdFmt()
             val holdX = h.x.holdFmt()
-            // Each axis: dial whole clicks (and hold what they leave over), or hold on the reticle.
-            val elevation = when {
-                !correction.dialElevation -> stringResource(R.string.advice_hold, holdY, reticle.unit.label, vertical)
-                (abs(h.y) / 0.05).roundToInt() == 0 -> stringResource(R.string.advice_dial, up, upDial.dialFmt(click), turret.label)
-                else -> stringResource(
-                    R.string.advice_dial_then_hold, up, upDial.dialFmt(click), turret.label, holdY, reticle.unit.label, vertical,
-                )
+            // Each axis: dial whole clicks or hold on the reticle; what the clicks leave over is under half a click.
+            val elevation = if (correction.dialElevation) {
+                stringResource(R.string.advice_dial, up, upDial.dialFmt(click), turret.label)
+            } else {
+                stringResource(R.string.advice_hold, holdY, reticle.unit.label, vertical)
             }
-            val windage = when {
-                !correction.dialWindage -> stringResource(R.string.advice_hold, holdX, reticle.unit.label, horizontal)
-                (abs(h.x) / 0.05).roundToInt() == 0 -> stringResource(R.string.advice_dial, right, rightDial.dialFmt(click), turret.label)
-                else -> stringResource(
-                    R.string.advice_dial_then_hold, right, rightDial.dialFmt(click), turret.label, holdX, reticle.unit.label, horizontal,
-                )
+            val windage = if (correction.dialWindage) {
+                stringResource(R.string.advice_dial, right, rightDial.dialFmt(click), turret.label)
+            } else {
+                stringResource(R.string.advice_hold, holdX, reticle.unit.label, horizontal)
             }
             Text(stringResource(R.string.advice_elevation, elevation), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(R.string.advice_windage, windage), style = MaterialTheme.typography.titleSmall)
