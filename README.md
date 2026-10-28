@@ -85,7 +85,7 @@ or held. Dial corrections are whole clicks and holds are to 0.05; the reticle sh
 
 ### Settings
 The gear in the top bar: light, dark or system theme; keep the screen on; tabs and sub-tabs at the top
-or the bottom; QNH (default) or station pressure; whether location sets the latitude and the altitude;
+or the bottom; QNH (default) or station pressure; pressure from a Garmin watch; whether location sets the latitude and the altitude;
 dial or hold for elevation and windage, per reticle; sync and backup.
 
 ### Sync and backup

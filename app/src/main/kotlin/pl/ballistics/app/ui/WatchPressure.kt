@@ -38,8 +38,8 @@ import pl.ballistics.app.data.GarminPressure
 import java.util.Locale
 
 /**
- * Fills in the station pressure from a Garmin watch's barometer. Shown only when Garmin Connect is
- * installed, since the reading travels through it.
+ * Fills in the station pressure from a Garmin watch's barometer, through Garmin Connect. Shown when
+ * the watch is switched on in Settings; without Garmin Connect it reports that as its failure.
  */
 @Composable
 fun WatchPressureButton(update: ((Conditions) -> Conditions) -> Unit) {
@@ -48,7 +48,6 @@ fun WatchPressureButton(update: ((Conditions) -> Conditions) -> Unit) {
     var error by remember { mutableStateOf<String?>(null) }
     var showError by remember { mutableStateOf(false) }
     var job by remember { mutableStateOf<Job?>(null) }
-    if (!remember { GarminPressure.garminConnectInstalled(context) }) return
 
     fun toast(text: String) = Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
     // As wide as the pressure field above it. Progress and the reading show as toasts; a failure leaves a

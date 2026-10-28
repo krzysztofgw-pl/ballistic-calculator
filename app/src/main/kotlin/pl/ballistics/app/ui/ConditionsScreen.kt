@@ -82,7 +82,7 @@ fun ConditionsScreen(
                     update { it.copy(altitudeM = v) }
                 }
             }
-            WatchPressureButton(update)
+            if (ui.garminWatch) WatchPressureButton(update)
         }
 
         Section(stringResource(R.string.section_shot)) {
