@@ -32,9 +32,10 @@ object GarminPressure {
 
     /**
      * Opens the watch app (the watch asks to confirm) and waits for its reading. [onPrompt] is called
-     * when the watch shows that prompt, so the user can be told to accept it.
+     * when the watch shows that prompt, so the user can be told to accept it. The watch shows its reading
+     * in [unit] ("hPa", "mmHg" or "inHg"), the app's pressure unit; the reading itself travels in Pa.
      */
-    suspend fun read(context: Context, timeoutMs: Long = 45_000, onPrompt: () -> Unit = {}): Result {
+    suspend fun read(context: Context, unit: String = "hPa", timeoutMs: Long = 45_000, onPrompt: () -> Unit = {}): Result {
         if (!garminConnectInstalled(context)) return Result.NoGarminConnect
         val app = context.applicationContext
         val ciq = ConnectIQ.getInstance(app, ConnectIQ.IQConnectType.WIRELESS)
@@ -61,7 +62,7 @@ object GarminPressure {
                         }
                     }
                     // A running app answers this; one that is starting sends its reading by itself.
-                    ciq.sendMessage(device, iqApp, mapOf("get" to 1)) { _, _, _ -> }
+                    ciq.sendMessage(device, iqApp, mapOf("get" to 1, "unit" to unit)) { _, _, _ -> }
                 }
             }
             return withTimeoutOrNull(timeoutMs) { answer.await() }

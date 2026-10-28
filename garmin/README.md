@@ -10,7 +10,8 @@ not depend on the watch's altitude calibration. Temperature is not sent: a wrist
 2. The phone asks the watch to open Station Pressure; confirm on the watch.
 3. The watch sends its reading, and the phone fills in the pressure and switches it to station pressure.
 
-The watch app also shows the pressure itself and sends it again when you press START. It runs only
+The watch app also shows the pressure itself, in the unit the phone app asks for (hPa, mmHg or inHg; the reading
+always travels in Pa), and sends it again when you press START. It runs only
 while open (no background service) and closes itself 5 s after a reading reaches the phone. Messages go
 through Garmin Connect on the phone (Connect IQ Mobile SDK), so the watch must be paired there.
 

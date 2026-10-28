@@ -1,9 +1,9 @@
 <strings>
     <string id="AppName">Station Pressure</string>
-    <string id="Station">station pressure</string>
+    <string id="Station">Station pressure</string>
     <string id="NoReading">no barometer reading</string>
-    <string id="Sending">sending…</string>
-    <string id="Sent">sent to phone</string>
-    <string id="NotSent">phone not reachable</string>
-    <string id="Hint">START: send again</string>
+    <string id="Sending">TRANSMITTING…</string>
+    <string id="Sent">TRANSMITTED</string>
+    <string id="NotSent">NOT TRANSMITTED</string>
+    <string id="Hint">START: refresh</string>
 </strings>

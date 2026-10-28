@@ -2,8 +2,8 @@
     <string id="AppName">Station Pressure</string>
     <string id="Station">Stationsdruck</string>
     <string id="NoReading">kein Barometerwert</string>
-    <string id="Sending">senden…</string>
-    <string id="Sent">an Telefon gesendet</string>
-    <string id="NotSent">Telefon nicht erreichbar</string>
-    <string id="Hint">START: erneut senden</string>
+    <string id="Sending">ÜBERTRAGE…</string>
+    <string id="Sent">ÜBERTRAGEN</string>
+    <string id="NotSent">NICHT ÜBERTRAGEN</string>
+    <string id="Hint">START: aktualisieren</string>
 </strings>
