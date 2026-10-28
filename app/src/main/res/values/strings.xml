@@ -57,6 +57,7 @@
     <string name="label_click_value">Click value</string>
     <string name="label_reticle">Reticle</string>
     <string name="label_focal_plane">Focal plane</string>
+    <string name="label_reticle_graduation">Reticle scale step</string>
     <string name="label_calibrated_mag">Reticle true at</string>
     <string name="label_min_mag">Min magnification</string>
     <string name="label_max_mag">Max magnification</string>

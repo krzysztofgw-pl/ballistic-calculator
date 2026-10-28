@@ -101,7 +101,9 @@ fun TargetScreen(
     val weapon = result.weapon
     val own = Reticles.byId(weapon.reticleId)
     var previewId by remember(weapon.id) { mutableStateOf(own.id) }
-    val reticle = Reticles.byId(previewId)
+    // The rifle's own reticle is drawn with its scope's scale step; a previewed one as designed.
+    val graduation = weapon.reticleGraduation.toNumber()?.takeIf { previewId == own.id }
+    val reticle = remember(previewId, graduation) { Reticles.byId(previewId, graduation) }
     val sfp = weapon.focalPlane == FocalPlane.SFP
     val maxMag = weapon.maxMagnification.toNumber()?.takeIf { it > 1 } ?: 25.0
     val minMag = weapon.minMagnification.toNumber()?.takeIf { it > 0 && it < maxMag } ?: 1.0

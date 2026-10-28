@@ -78,10 +78,17 @@ fun WeaponEditor(
             ReticleChoice(stringResource(R.string.label_reticle), Reticles.byId(w.reticleId), w.angularUnit, { stringResource(it.family) }) {
                 w = w.copy(
                     reticleId = it.id,
+                    reticleGraduation = "",
                     focalPlane = it.focalPlane ?: w.focalPlane,
                     calibratedMagnification = it.calibratedMagnification?.let { m -> if (m % 1.0 == 0.0) m.toInt().toString() else m.toString() }
                         ?: w.calibratedMagnification,
                 )
+            }
+            Reticles.byId(w.reticleId).takeIf { Reticles.canRegraduate(it) }?.let { r ->
+                NumberField(
+                    stringResource(R.string.label_reticle_graduation), w.reticleGraduation, r.unit.label, optional = true,
+                    placeholder = r.graduation?.let { g -> if (g % 1.0 == 0.0) g.toInt().toString() else g.toString() },
+                ) { w = w.copy(reticleGraduation = it) }
             }
             Choice(stringResource(R.string.label_focal_plane), w.focalPlane, FocalPlane.entries, { stringResource(it.label) }) { w = w.copy(focalPlane = it) }
             FieldRow { m ->

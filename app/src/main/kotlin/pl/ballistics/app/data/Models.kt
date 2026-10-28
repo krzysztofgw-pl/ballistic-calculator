@@ -45,6 +45,8 @@ data class WeaponProfile(
     val clickValue: String = "0.1",
     val sightHeightCm: String = "4.5",
     val reticleId: String = "mrad-hash",
+    /** The finest step of the scope's reticle scale, in the reticle's unit; blank uses the reticle's own. */
+    val reticleGraduation: String = "",
     val focalPlane: FocalPlane = FocalPlane.FFP,
     /** SFP only: magnification at which the reticle subtensions are true. */
     val calibratedMagnification: String = "10",

@@ -23,6 +23,7 @@ sealed interface Mark {
  *
  * @param extent half-width of the visible field, in [unit].
  * @param family reticles that are the same design in MRAD and MOA share a family.
+ * @param graduation the finest scale step, in [unit]; null for a reticle without a scale.
  * @param focalPlane and [calibratedMagnification] are known for reticles of a specific scope;
  *   picking the reticle sets them on the rifle.
  */
@@ -35,6 +36,7 @@ data class Reticle(
     @StringRes val family: Int = name,
     val focalPlane: FocalPlane? = null,
     val calibratedMagnification: Double? = null,
+    val graduation: Double? = null,
 )
 
 object Reticles {
@@ -51,6 +53,26 @@ object Reticles {
     }
 
     fun byId(id: String): Reticle = all.find { it.id == id } ?: all.first()
+
+    /** Reticles whose scale can be redrawn with another step, by id. */
+    private val regraduate: Map<String, (Double) -> Reticle> = mapOf(
+        "mrad-hash" to ::mradHash, "moa-hash" to ::moaHash,
+        "mrad-tree" to ::mradTree, "moa-tree" to ::moaTree,
+        "dls-1" to ::dls1, "dls-3" to ::dls3, "dlr-3" to ::dlr3,
+    )
+
+    fun canRegraduate(reticle: Reticle) = reticle.id in regraduate
+
+    /**
+     * [id]'s reticle with its scale drawn every [graduation] instead of the design's step, for a scope
+     * whose reticle is finer or coarser. Steps under a tenth of the design's are ignored.
+     */
+    fun byId(id: String, graduation: Double?): Reticle {
+        val base = byId(id)
+        val build = regraduate[base.id] ?: return base
+        val g = graduation?.takeIf { base.graduation != null && it >= base.graduation / 10 && it <= base.extent } ?: return base
+        return if (abs(g - base.graduation!!) < 1e-9) base else build(g)
+    }
 
     /** One reticle per design, whatever its unit: the first listed version stands for the design. */
     val designs: List<Reticle> get() = all.distinctBy { it.family }
@@ -77,7 +99,7 @@ object Reticles {
                 is Mark.Dot -> m.copy(x = m.x * k, y = m.y * k, r = m.r * k)
                 is Mark.Label -> m.copy(x = m.x * k, y = m.y * k)
             }
-        }, r.family, r.focalPlane, r.calibratedMagnification)
+        }, r.family, r.focalPlane, r.calibratedMagnification, r.graduation)
     }
 
     private fun label(v: Double) = abs(v).let { if (it % 1.0 == 0.0) it.roundToInt().toString() else it.toString() }
@@ -118,8 +140,8 @@ object Reticles {
         add(Mark.Line(0.0, -from, 0.0, -to, Weight.HEAVY))
     }
 
-    private fun mradHash() = Reticle("mrad-hash", R.string.reticle_mrad_hash, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_hash, marks = buildList<Mark> {
-        tickedCross(10.0, 10.0, 10.0, 6.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 2.0, tick = 0.3)
+    private fun mradHash(g: Double = 0.2) = Reticle("mrad-hash", R.string.reticle_mrad_hash, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_hash, graduation = g, marks = buildList<Mark> {
+        tickedCross(10.0, 10.0, 10.0, 6.0, minor = g, half = 0.5, major = 1.0, labelEvery = 2.0, tick = 0.3)
         add(Mark.Line(10.0, 0.0, 12.0, 0.0, Weight.HEAVY))
         add(Mark.Line(-10.0, 0.0, -12.0, 0.0, Weight.HEAVY))
         add(Mark.Line(0.0, -10.0, 0.0, -12.0, Weight.HEAVY))
@@ -127,8 +149,8 @@ object Reticles {
     })
 
     /** Holdover grid: a dot every 1 mil, rows widening with drop, like modern "tree" reticles. */
-    private fun mradTree() = Reticle("mrad-tree", R.string.reticle_mrad_tree, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_tree, marks = buildList<Mark> {
-        tickedCross(10.0, 10.0, 12.0, 6.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 2.0, tick = 0.25)
+    private fun mradTree(g: Double = 0.2) = Reticle("mrad-tree", R.string.reticle_mrad_tree, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_tree, graduation = g, marks = buildList<Mark> {
+        tickedCross(10.0, 10.0, 12.0, 6.0, minor = g, half = 0.5, major = 1.0, labelEvery = 2.0, tick = 0.25)
         for (row in 1..11) {
             val y = -row.toDouble()
             val width = minOf(1 + row / 2, 6)
@@ -144,7 +166,7 @@ object Reticles {
         add(Mark.Line(0.0, 6.0, 0.0, 12.0, Weight.HEAVY))
     })
 
-    private fun milDot() = Reticle("mil-dot", R.string.reticle_mil_dot, AngularUnit.MRAD, 8.0, buildList<Mark> {
+    private fun milDot() = Reticle("mil-dot", R.string.reticle_mil_dot, AngularUnit.MRAD, 8.0, graduation = 1.0, marks = buildList<Mark> {
         add(Mark.Line(-5.0, 0.0, 5.0, 0.0))
         add(Mark.Line(0.0, -5.0, 0.0, 5.0))
         for (k in 1..4) {
@@ -155,13 +177,13 @@ object Reticles {
         posts(5.0, 8.0)
     })
 
-    private fun moaHash() = Reticle("moa-hash", R.string.reticle_moa_hash, AngularUnit.MOA, 40.0, family = R.string.reticle_family_hash, marks = buildList<Mark> {
-        tickedCross(30.0, 30.0, 34.0, 20.0, minor = 2.0, half = 10.0, major = 10.0, labelEvery = 10.0, tick = 1.0)
+    private fun moaHash(g: Double = 2.0) = Reticle("moa-hash", R.string.reticle_moa_hash, AngularUnit.MOA, 40.0, family = R.string.reticle_family_hash, graduation = g, marks = buildList<Mark> {
+        tickedCross(30.0, 30.0, 34.0, 20.0, minor = g, half = 10.0, major = 10.0, labelEvery = 10.0, tick = 1.0)
         posts(34.0, 40.0)
     })
 
-    private fun moaTree() = Reticle("moa-tree", R.string.reticle_moa_tree, AngularUnit.MOA, 40.0, family = R.string.reticle_family_tree, marks = buildList<Mark> {
-        tickedCross(30.0, 30.0, 38.0, 20.0, minor = 2.0, half = 10.0, major = 10.0, labelEvery = 10.0, tick = 0.9)
+    private fun moaTree(g: Double = 2.0) = Reticle("moa-tree", R.string.reticle_moa_tree, AngularUnit.MOA, 40.0, family = R.string.reticle_family_tree, graduation = g, marks = buildList<Mark> {
+        tickedCross(30.0, 30.0, 38.0, 20.0, minor = g, half = 10.0, major = 10.0, labelEvery = 10.0, tick = 0.9)
         for (row in 1..9) {
             val y = -4.0 * row
             val width = minOf(1 + row / 2, 6)
@@ -180,9 +202,9 @@ object Reticles {
      * Delta publishes 0.2 and 1 MRAD markings, 0.005 MRAD lines and a 0.03 MRAD
      * centre point; the extent of the scale is drawn to the published diagram.
      */
-    private fun dls1() = Reticle("dls-1", R.string.reticle_dls_1, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_dls_1_3,
-        focalPlane = FocalPlane.SFP, calibratedMagnification = 40.0, marks = buildList<Mark> {
-        tickedCross(10.0, 10.0, 10.0, 5.0, minor = 0.2, half = 0.5, major = 1.0, labelEvery = 5.0, tick = 0.25)
+    private fun dls1(g: Double = 0.2) = Reticle("dls-1", R.string.reticle_dls_1, AngularUnit.MRAD, 12.0, family = R.string.reticle_family_dls_1_3,
+        focalPlane = FocalPlane.SFP, calibratedMagnification = 40.0, graduation = g, marks = buildList<Mark> {
+        tickedCross(10.0, 10.0, 10.0, 5.0, minor = g, half = 0.5, major = 1.0, labelEvery = 5.0, tick = 0.25)
         add(Mark.Dot(0.0, 0.0, 0.015))
         add(Mark.Line(10.0, 0.0, 12.0, 0.0, Weight.HEAVY))
         add(Mark.Line(-10.0, 0.0, -12.0, 0.0, Weight.HEAVY))
@@ -191,9 +213,9 @@ object Reticles {
     })
 
     /** DLS-3: the DLS-1 layout scaled in MOA, with 1 and 5 MOA markings. */
-    private fun dls3() = Reticle("dls-3", R.string.reticle_dls_3, AngularUnit.MOA, 40.0, family = R.string.reticle_family_dls_1_3,
-        focalPlane = FocalPlane.SFP, calibratedMagnification = 40.0, marks = buildList<Mark> {
-        tickedCross(34.0, 34.0, 34.0, 17.0, minor = 1.0, half = 5.0, major = 5.0, labelEvery = 10.0, tick = 0.9)
+    private fun dls3(g: Double = 1.0) = Reticle("dls-3", R.string.reticle_dls_3, AngularUnit.MOA, 40.0, family = R.string.reticle_family_dls_1_3,
+        focalPlane = FocalPlane.SFP, calibratedMagnification = 40.0, graduation = g, marks = buildList<Mark> {
+        tickedCross(34.0, 34.0, 34.0, 17.0, minor = g, half = 5.0, major = 5.0, labelEvery = 10.0, tick = 0.9)
         add(Mark.Dot(0.0, 0.0, 0.05))
         add(Mark.Line(34.0, 0.0, 40.0, 0.0, Weight.HEAVY))
         add(Mark.Line(-34.0, 0.0, -40.0, 0.0, Weight.HEAVY))
@@ -204,10 +226,10 @@ object Reticles {
     /**
      * Delta Optical Stryker HD 3.5-21x44 FFP DLR-3: MRAD, first focal plane, so the
      * subtensions hold at every magnification. Drawn from Delta's published diagram: a broken centre,
-     * 0.2 MRAD ticks out to 1, then 0.5 MRAD ticks, numbered at 5 and 10, a
+     * 0.2 MRAD ticks out to 1 ([g] when the scope's reticle differs), then 0.5 MRAD ticks, numbered at 5 and 10, a
      * T-bar at 3 MRAD up and heavy side posts from 5.5 MRAD.
      */
-    private fun dlr3() = Reticle("dlr-3", R.string.reticle_dlr_3, AngularUnit.MRAD, 10.5, focalPlane = FocalPlane.FFP, marks = buildList<Mark> {
+    private fun dlr3(g: Double = 0.2) = Reticle("dlr-3", R.string.reticle_dlr_3, AngularUnit.MRAD, 10.5, focalPlane = FocalPlane.FFP, graduation = g, marks = buildList<Mark> {
         // Broken centre: two short dashes on each arm around a fine dot.
         for ((from, to) in listOf(0.08 to 0.18, 0.26 to 0.34)) {
             add(Mark.Line(from, 0.0, to, 0.0)); add(Mark.Line(-from, 0.0, -to, 0.0))
@@ -222,7 +244,9 @@ object Reticles {
             abs(v - v.roundToInt()) < 1e-6 -> 0.16
             else -> 0.08
         }
-        val stops = listOf(0.6, 0.8) + generateSequence(1.0) { it + 0.5 }.takeWhile { it <= 10.0 + 1e-9 }
+        // Fine ticks every [g] between the broken centre and 1 MRAD, then every 0.5.
+        val fine = generateSequence(g) { it + g }.takeWhile { it < 1.0 - 1e-9 }.filter { it > 0.42 }.toList()
+        val stops = fine + generateSequence(1.0) { it + 0.5 }.takeWhile { it <= 10.0 + 1e-9 }
         for (v in stops) {
             val l = len(v)
             if (v <= 5.0 + 1e-9) {

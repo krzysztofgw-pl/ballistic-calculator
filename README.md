@@ -13,7 +13,8 @@ your scope's reticle, and syncs everything to the cloud.
 ## Features
 
 ### Profiles
-- **Rifles**: name, barrel length, scope (turret unit MRAD or MOA, click value, reticle, first or second focal plane,
+- **Rifles**: name, barrel length, scope (turret unit MRAD or MOA, click value, reticle and its scale step when the scope's differs
+  from the design (e.g. 0.1 MRAD), first or second focal plane,
   calibration and maximum magnification), sight height, zero range and the load it is zeroed with.
 - **Sight height helper**: compute it from a caliper measurement, or estimate it from the objective diameter,
   ring height and rail.
@@ -60,7 +61,7 @@ range and step are set below it.
 
 ### Target
 Pick a distance to the metre with the slider, the arrows or by typing it (all in one row), and get the
-hold and the dial correction for it. Per reticle, Settings chooses whether elevation and windage are dialed
+hold and the dial correction for it. Per reticle design (MRAD and MOA versions together), Settings chooses whether elevation and windage are dialed
 or held; with an axis dialed, the reticle shows the holds left after dialing for the chosen distance.
 - Moving target, switched on with a checkbox: its speed and its course on a small dial (up = away,
   right = to the right). The lead uses the time of
