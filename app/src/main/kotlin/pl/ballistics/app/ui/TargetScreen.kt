@@ -101,7 +101,9 @@ fun TargetScreen(
     val weapon = result.weapon
     val own = Reticles.byId(weapon.reticleId)
     var previewId by remember(weapon.id) { mutableStateOf(own.id) }
-    val reticle = Reticles.byId(previewId)
+    // The rifle's own reticle is drawn with its scope's scale step; a previewed one as designed.
+    val graduation = weapon.reticleGraduation.toNumber()?.takeIf { previewId == own.id }
+    val reticle = remember(previewId, graduation) { Reticles.byId(previewId, graduation) }
     val sfp = weapon.focalPlane == FocalPlane.SFP
     val maxMag = weapon.maxMagnification.toNumber()?.takeIf { it > 1 } ?: 25.0
     val minMag = weapon.minMagnification.toNumber()?.takeIf { it > 0 && it < maxMag } ?: 1.0
@@ -164,10 +166,16 @@ fun TargetScreen(
     // In an FFP scope reticle and target scale together, so only the field of view changes.
     val scale = if (sfp) magnification / calMag else 1.0
     val field = if (sfp) reticle.extent else reticle.extent * maxMag / magnification
-    // What is dialed for the chosen distance moves every hold point by the same amount.
-    val correction = ui.correction(reticle.id)
-    val dialX = if (correction.dialWindage) (selected?.windageRad ?: 0.0) / reticle.unit.radians * scale else 0.0
-    val dialY = if (correction.dialElevation) (selected?.dropRad ?: 0.0) / reticle.unit.radians * scale else 0.0
+    // Turret corrections for the chosen distance, in whole clicks (in the turret unit).
+    val turret = result.angularUnit
+    val click = result.clickValue
+    fun clicks(v: Double) = click?.let { (v / it).roundToInt() * it } ?: v
+    val upDial = clicks(-(selected?.dropRad ?: 0.0) / turret.radians)
+    val rightDial = clicks(-(selected?.windageRad ?: 0.0) / turret.radians)
+    // What is dialed moves every hold point by the same amount.
+    val correction = ui.correction(Reticles.designKey(reticle))
+    val dialX = if (correction.dialWindage) -rightDial * turret.radians / reticle.unit.radians * scale else 0.0
+    val dialY = if (correction.dialElevation) -upDial * turret.radians / reticle.unit.radians * scale else 0.0
     val holds = (points + listOfNotNull(selected?.takeIf { it !in points })).map { p ->
         Hold(p, p.windageRad / reticle.unit.radians * scale - dialX, p.dropRad / reticle.unit.radians * scale - dialY)
     }
@@ -244,29 +252,28 @@ fun TargetScreen(
 
         selected?.let { p ->
             val h = holds.first { it.point == p }
-            val unit = result.angularUnit
-            val upDial = -p.dropRad / unit.radians
-            val rightDial = -p.windageRad / unit.radians
             val up = stringResource(if (upDial >= 0) R.string.up else R.string.down)
             val right = stringResource(if (rightDial >= 0) R.string.right else R.string.left)
             val vertical = stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center)
             val horizontal = stringResource(if (h.x >= 0) R.string.right else R.string.left)
-            val advice = when {
-                correction.dialElevation && correction.dialWindage -> stringResource(
-                    R.string.dial_both, up, upDial.absFmt(), right, rightDial.absFmt(), unit.label,
-                )
-                correction.dialElevation -> stringResource(
-                    R.string.dial_elevation_hold_windage, up, upDial.absFmt(), unit.label, horizontal, h.x.absFmt(), reticle.unit.label,
-                )
-                correction.dialWindage -> stringResource(
-                    R.string.hold_elevation_dial_windage, vertical, h.y.absFmt(), reticle.unit.label, right, rightDial.absFmt(), unit.label,
-                )
-                else -> stringResource(R.string.hold_on_reticle, vertical, h.y.absFmt(), horizontal, h.x.absFmt(), reticle.unit.label)
+            val holdY = h.y.holdFmt()
+            val holdX = h.x.holdFmt()
+            // Each axis: dial whole clicks or hold on the reticle; what the clicks leave over is under half a click.
+            val elevation = if (correction.dialElevation) {
+                stringResource(R.string.advice_dial, up, upDial.dialFmt(click), turret.label)
+            } else {
+                stringResource(R.string.advice_hold, holdY, reticle.unit.label, vertical)
             }
-            Text(advice, style = MaterialTheme.typography.titleSmall)
+            val windage = if (correction.dialWindage) {
+                stringResource(R.string.advice_dial, right, rightDial.dialFmt(click), turret.label)
+            } else {
+                stringResource(R.string.advice_hold, holdX, reticle.unit.label, horizontal)
+            }
+            Text(stringResource(R.string.advice_elevation, elevation), style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.advice_windage, windage), style = MaterialTheme.typography.titleSmall)
             if (!correction.dialElevation && !correction.dialWindage) {
                 Text(
-                    stringResource(R.string.or_dial, up, upDial.absFmt(), right, rightDial.absFmt(), unit.label),
+                    stringResource(R.string.or_dial, up, upDial.dialFmt(click), right, rightDial.dialFmt(click), turret.label),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -279,8 +286,8 @@ fun TargetScreen(
             Text(
                 stringResource(
                     R.string.moving_hold,
-                    stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center), h.y.absFmt(),
-                    stringResource(if (h.x >= 0) R.string.right else R.string.left), h.x.absFmt(),
+                    stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center), h.y.holdFmt(),
+                    stringResource(if (h.x >= 0) R.string.right else R.string.left), h.x.holdFmt(),
                     reticle.unit.label,
                     stringResource(if (l.leadM >= 0) R.string.right else R.string.left), abs(l.leadM).fmt(2),
                 ),
@@ -388,7 +395,14 @@ internal fun ReticleChoice(
 
 private fun Double.fmt(decimals: Int) = "%.${decimals}f".format(this)
 private fun Double.magFmt() = if (abs(this - roundToInt()) < 0.05) roundToInt().toString() else fmt(1)
-private fun Double.absFmt() = abs(this).fmt(1)
+/** A hold, to the nearest 0.05 of the reticle unit. */
+private fun Double.holdFmt() = ((abs(this) / 0.05).roundToInt() * 0.05).fmt(2)
+
+/** A turret correction, with as many decimals as the click value needs. */
+private fun Double.dialFmt(click: Double?): String {
+    val decimals = click?.let { c -> (0..3).firstOrNull { d -> abs(c * Math.pow(10.0, d.toDouble()) - (c * Math.pow(10.0, d.toDouble())).roundToInt()) < 1e-6 } } ?: 1
+    return abs(this).fmt(decimals)
+}
 
 @Composable
 private fun ReticleView(

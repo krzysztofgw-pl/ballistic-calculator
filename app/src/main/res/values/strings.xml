@@ -57,6 +57,7 @@
     <string name="label_click_value">Click value</string>
     <string name="label_reticle">Reticle</string>
     <string name="label_focal_plane">Focal plane</string>
+    <string name="label_reticle_graduation">Reticle scale step</string>
     <string name="label_calibrated_mag">Reticle true at</string>
     <string name="label_min_mag">Min magnification</string>
     <string name="label_max_mag">Max magnification</string>
@@ -230,10 +231,10 @@
     <string name="magnification_value">Magnification %1$s×</string>
     <string name="action_unlock_magnification">Beyond scope range</string>
     <string name="magnification_outside_range">Outside the scope\'s %1$s–%2$s× range</string>
-    <string name="hold_on_reticle">Hold %2$s %5$s %1$s, %4$s %5$s %3$s</string>
-    <string name="dial_both">Dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
-    <string name="dial_elevation_hold_windage">Dial %1$s %2$s %3$s, hold %5$s %6$s %4$s</string>
-    <string name="hold_elevation_dial_windage">Hold %2$s %3$s %1$s, dial %4$s %5$s %6$s</string>
+    <string name="advice_elevation">Elevation: %1$s</string>
+    <string name="advice_windage">Windage: %1$s</string>
+    <string name="advice_dial">dial %1$s %2$s %3$s</string>
+    <string name="advice_hold">hold %1$s %2$s %3$s</string>
     <string name="or_dial">Or dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
     <string name="hold_outside_reticle">Hold point is outside the reticle: dial the turrets.</string>
     <string name="above_center">above center</string>
