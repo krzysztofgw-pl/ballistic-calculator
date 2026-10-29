@@ -145,6 +145,16 @@
     <string name="label_pressure_station">Station pressure</string>
     <string name="label_station_pressure">Station pressure (off: QNH)</string>
     <string name="section_devices">External devices</string>
+    <string name="section_about">About</string>
+    <string name="app_version">Version %1$s</string>
+    <string name="action_check_update">Check for update</string>
+    <string name="action_install">Install</string>
+    <string name="action_later">Later</string>
+    <string name="update_available">Build %1$d is available</string>
+    <string name="update_failed">Update failed</string>
+    <string name="toast_up_to_date">This is the latest build</string>
+    <string name="toast_allow_installs">Allow installing apps from this source, then install again</string>
+    <string name="toast_downloading_update">Downloading build %1$d…</string>
     <string name="label_garmin_watch">Pressure from a Garmin watch</string>
     <string name="action_watch_pressure_short">Garmin</string>
     <string name="watch_pressure_problem">No pressure from the watch</string>

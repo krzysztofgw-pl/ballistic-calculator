@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +58,7 @@ fun SettingsScreen(
     onSignOut: () -> Unit,
     onExport: () -> String,
     onImport: (String) -> Boolean,
+    onCheckUpdate: () -> Unit,
     onClose: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -165,6 +167,14 @@ fun SettingsScreen(
                     OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) }) {
                         Text(stringResource(R.string.action_import))
                     }
+                }
+            }
+
+            Section(stringResource(R.string.section_about)) {
+                val version = remember { context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty() }
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.app_version, version), Modifier.weight(1f))
+                    OutlinedButton(onClick = onCheckUpdate) { Text(stringResource(R.string.action_check_update)) }
                 }
             }
         }
