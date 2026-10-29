@@ -138,26 +138,41 @@ Requires Android 8.0 (API 26) or newer. Builds signed with the release key updat
 Coming from a build signed with a different key or an older package name, export your profiles first,
 uninstall the old app, then import them.
 
+### Web app (iPhone and other phones)
+
+Every build of `main` also publishes a web version to <https://krzysztofgw-pl.github.io/ballistics-calculator/>.
+It runs the same solver, compiled to JavaScript, and covers profiles, conditions, the table and the target
+screen, with the shot angle measured through the camera. On an iPhone open the link in Safari and tap
+**Share → Add to Home Screen**: it then opens full screen like an app and works offline. Profiles are kept
+in the browser; **Settings → Export / Import** uses the same file as the Android app, so profiles move
+between the two. Garmin pressure, the forecast, reticles and cloud sync are Android only for now.
+
+GitHub Pages has to be enabled once: repository **Settings → Pages → Source: GitHub Actions**.
+
 ## Project layout
 
 | Path | Contents |
 |---|---|
-| `core/` | Ballistic solver, pure Kotlin/JVM with no Android dependencies, and its tests |
+| `core/` | Ballistic solver in Kotlin Multiplatform (JVM for Android, JS for the web), and its tests |
 | `app/` | Android app in Jetpack Compose (Material 3) |
 | `app/.../data/` | Profiles, bullet library, local storage, Firebase sync |
 | `app/.../reticle/` | Reticle definitions |
 | `app/.../ui/` | Screens: Profiles, Conditions, Table, Target, editors |
-| `.github/workflows/build.yml` | CI: solver tests and signed release APK |
+| `web/` | Web app (PWA): Kotlin/JS on the DOM, manifest and service worker in `src/jsMain/resources` |
+| `.github/workflows/build.yml` | CI: solver tests, signed release APK, web app on GitHub Pages |
 
 All UI text lives in `app/src/main/res/values/strings.xml`; translations are added as `values-xx` folders.
+The web app keeps its text in `web/src/jsMain/kotlin/pl/ballistics/web/Strings.kt`.
 
 ## Building
 
 Requires JDK 17.
 
 ```bash
-./gradlew :core:test           # solver tests, no Android SDK needed
-./gradlew :app:assembleRelease # APK, needs the Android SDK
+./gradlew :core:allTests             # solver tests on the JVM and Node.js, no Android SDK needed
+./gradlew :app:assembleRelease       # APK, needs the Android SDK
+./gradlew :web:jsBrowserDistribution # web app in web/build/dist/js/productionExecutable
+./gradlew :web:jsBrowserDevelopmentRun --continuous # web app at http://localhost:8080 with reload
 ```
 
 The `app` module is included only when an Android SDK is configured (`local.properties` or `ANDROID_HOME`),
