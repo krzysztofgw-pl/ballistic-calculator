@@ -40,11 +40,35 @@ jobs:
       - name: Build APK
         env:
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          BUILD_NUMBER: ${{ github.run_number }}
         run: ./gradlew :app:assembleRelease
       - uses: actions/upload-artifact@v6
         with:
           name: ballistics-apk
           path: app/build/outputs/apk/release/*.apk
+
+  # Every build of main becomes a pre-release, so the APK has a plain download link
+  # (and Obtainium can follow the repository for updates).
+  release:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          name: ballistics-apk
+          path: apk
+      - name: Publish pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: build-${{ github.run_number }}
+          NOTES: ${{ github.event.head_commit.message }}
+        run: |
+          mv apk/*.apk "apk/ballistics-${{ github.run_number }}.apk"
+          gh release create "$TAG" apk/*.apk --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --title "Build ${{ github.run_number }}" --notes "$NOTES"
 
   watch-app:
     runs-on: ubuntu-latest

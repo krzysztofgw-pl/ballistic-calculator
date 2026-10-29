@@ -123,8 +123,16 @@ sight height helper.
 
 ## Installing
 
-1. Open the **Actions** tab, pick the latest successful run on `main` and download the `ballistics-apk` artifact.
-2. Unzip it and install the APK (allow installs from unknown sources when asked).
+Every build of `main` is published as a pre-release with the signed APK attached.
+
+1. Open [Releases](https://github.com/krzysztofgw-pl/ballistics-calculator/releases), take the newest
+   `Build N` and download `ballistics-N.apk`.
+2. Install it (allow installs from unknown sources when asked).
+
+To get updates without visiting GitHub, add the repository URL to [Obtainium](https://obtainium.imranr.dev/)
+with **Include prereleases** turned on.
+
+Pull request builds are not released; their APK is the `ballistics-apk` artifact of the run in the **Actions** tab.
 
 Requires Android 8.0 (API 26) or newer. Builds signed with the release key update each other in place.
 Coming from a build signed with a different key or an older package name, export your profiles first,
