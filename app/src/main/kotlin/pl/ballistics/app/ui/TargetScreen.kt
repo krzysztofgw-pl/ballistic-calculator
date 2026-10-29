@@ -1,6 +1,7 @@
 package pl.ballistics.app.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.widthIn
@@ -227,30 +228,19 @@ fun TargetScreen(
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, stringResource(R.string.action_farther))
             }
         }
-        Row(
-            Modifier.fillMaxWidth().clickable { update { it.copy(targetMoving = !it.targetMoving) } },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Checkbox(conditions.targetMoving, onCheckedChange = { v -> update { it.copy(targetMoving = v) } })
-            Text(stringResource(R.string.label_moving_target))
-        }
-        if (conditions.targetMoving) {
-            // The course is set on a small dial: up is away from the shooter, right is to the right.
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        // The speed shares the row with the switch, so the reticle keeps its room.
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                Modifier.clickable { update { it.copy(targetMoving = !it.targetMoving) } }.padding(end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Checkbox(conditions.targetMoving, onCheckedChange = { v -> update { it.copy(targetMoving = v) } })
+                Text(stringResource(R.string.label_moving_target))
+            }
+            if (conditions.targetMoving) {
+                Spacer(Modifier.width(12.dp))
                 NumberField(stringResource(R.string.label_target_speed), conditions.targetSpeedMps, "m/s", Modifier.weight(1f)) { v ->
                     update { it.copy(targetSpeedMps = v) }
-                }
-                Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    CompassDial(
-                        markers = listOf(DialMarker(targetDirection, DialArrow.OUTWARD, MaterialTheme.colorScheme.primary, true)),
-                        onChange = { v -> update { it.copy(targetDirectionDeg = v.roundToInt().mod(360).toString()) } },
-                        centerText = "${targetDirection.roundToInt().mod(360)}°",
-                        outerLabel = null,
-                        stepDeg = 15.0,
-                        maxSize = 120.dp,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Text(stringResource(R.string.label_target_course), style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
@@ -329,6 +319,27 @@ fun TargetScreen(
                 CornerLabel(stringResource(R.string.label_elevation), a.elevation, Color.Unspecified, Modifier.align(Alignment.TopStart))
                 CornerLabel(stringResource(R.string.label_windage), a.windage, Color.Unspecified, Modifier.align(Alignment.TopEnd), TextAlign.End)
                 a.moving?.let { CornerLabel(stringResource(R.string.label_moving), it, Color(0xFF1E88E5), Modifier.align(Alignment.BottomStart)) }
+            }
+            // The course is set on a small dial in the free corner: up is away from the shooter, right is to the right.
+            if (conditions.targetMoving) {
+                Surface(
+                    Modifier.align(Alignment.BottomEnd),
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                ) {
+                    Column(Modifier.padding(4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        CompassDial(
+                            markers = listOf(DialMarker(targetDirection, DialArrow.OUTWARD, MaterialTheme.colorScheme.primary, true)),
+                            onChange = { v -> update { it.copy(targetDirectionDeg = v.roundToInt().mod(360).toString()) } },
+                            centerText = "${targetDirection.roundToInt().mod(360)}°",
+                            outerLabel = null,
+                            stepDeg = 15.0,
+                            maxSize = 96.dp,
+                            modifier = Modifier.size(96.dp),
+                        )
+                        Text(stringResource(R.string.label_target_course), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
             }
         }
         advice?.let { a ->
