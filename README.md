@@ -123,14 +123,12 @@ sight height helper.
 
 ## Installing
 
-Every build of `main` is published as a pre-release with the signed APK attached.
+Every build of `main` is published as the latest release with the signed APK attached. The newest APK
+is always at <https://github.com/krzysztofgw-pl/ballistics-calculator/releases/latest/download/ballistics.apk>:
+open it in the phone's browser (a home-screen shortcut makes it one tap) and install it, allowing installs
+from unknown sources when asked.
 
-1. Open [Releases](https://github.com/krzysztofgw-pl/ballistics-calculator/releases), take the newest
-   `Build N` and download `ballistics-N.apk`.
-2. Install it (allow installs from unknown sources when asked).
-
-To get updates without visiting GitHub, add the repository URL to [Obtainium](https://obtainium.imranr.dev/)
-with **Include prereleases** turned on.
+To get updates without visiting GitHub, add the repository URL to [Obtainium](https://obtainium.imranr.dev/).
 
 Pull request builds are not released; their APK is the `ballistics-apk` artifact of the run in the **Actions** tab.
 

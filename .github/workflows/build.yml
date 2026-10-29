@@ -47,8 +47,8 @@ jobs:
           name: ballistics-apk
           path: app/build/outputs/apk/release/*.apk
 
-  # Every build of main becomes a pre-release, so the APK has a plain download link
-  # (and Obtainium can follow the repository for updates).
+  # Every build of main becomes the latest release. The asset keeps one name, so
+  # releases/latest/download/ballistics.apk always gives the newest APK.
   release:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -60,15 +60,15 @@ jobs:
         with:
           name: ballistics-apk
           path: apk
-      - name: Publish pre-release
+      - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: build-${{ github.run_number }}
           NOTES: ${{ github.event.head_commit.message }}
         run: |
-          mv apk/*.apk "apk/ballistics-${{ github.run_number }}.apk"
-          gh release create "$TAG" apk/*.apk --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --prerelease --title "Build ${{ github.run_number }}" --notes "$NOTES"
+          mv apk/*.apk apk/ballistics.apk
+          gh release create "$TAG" apk/ballistics.apk --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --latest --title "Build ${{ github.run_number }}" --notes "$NOTES"
 
   watch-app:
     runs-on: ubuntu-latest
