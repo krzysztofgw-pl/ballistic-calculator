@@ -1,6 +1,11 @@
 package pl.ballistics.app.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -242,7 +247,7 @@ fun TargetScreen(
                         centerText = "${targetDirection.roundToInt().mod(360)}°",
                         outerLabel = null,
                         stepDeg = 15.0,
-                        maxSize = 180.dp,
+                        maxSize = 120.dp,
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Text(stringResource(R.string.label_target_course), style = MaterialTheme.typography.labelMedium)
@@ -250,51 +255,6 @@ fun TargetScreen(
             }
         }
 
-        selected?.let { p ->
-            val h = holds.first { it.point == p }
-            val up = stringResource(if (upDial >= 0) R.string.up else R.string.down)
-            val right = stringResource(if (rightDial >= 0) R.string.right else R.string.left)
-            val vertical = stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center)
-            val horizontal = stringResource(if (h.x >= 0) R.string.right else R.string.left)
-            val holdY = h.y.holdFmt()
-            val holdX = h.x.holdFmt()
-            // Each axis: dial whole clicks or hold on the reticle; what the clicks leave over is under half a click.
-            val elevation = if (correction.dialElevation) {
-                stringResource(R.string.advice_dial, up, upDial.dialFmt(click), turret.label)
-            } else {
-                stringResource(R.string.advice_hold, holdY, reticle.unit.label, vertical)
-            }
-            val windage = if (correction.dialWindage) {
-                stringResource(R.string.advice_dial, right, rightDial.dialFmt(click), turret.label)
-            } else {
-                stringResource(R.string.advice_hold, holdX, reticle.unit.label, horizontal)
-            }
-            Text(stringResource(R.string.advice_elevation, elevation), style = MaterialTheme.typography.titleSmall)
-            Text(stringResource(R.string.advice_windage, windage), style = MaterialTheme.typography.titleSmall)
-            if (!correction.dialElevation && !correction.dialWindage) {
-                Text(
-                    stringResource(R.string.or_dial, up, upDial.dialFmt(click), right, rightDial.dialFmt(click), turret.label),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-            if (abs(h.x) > reticle.extent || abs(h.y) > reticle.extent) {
-                Text(stringResource(R.string.hold_outside_reticle), color = MaterialTheme.colorScheme.error)
-            }
-        }
-        leadHold?.let { h ->
-            val l = current?.lead ?: return@let
-            Text(
-                stringResource(
-                    R.string.moving_hold,
-                    stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center), h.y.holdFmt(),
-                    stringResource(if (h.x >= 0) R.string.right else R.string.left), h.x.holdFmt(),
-                    reticle.unit.label,
-                    stringResource(if (l.leadM >= 0) R.string.right else R.string.left), abs(l.leadM).fmt(2),
-                ),
-                style = MaterialTheme.typography.titleSmall,
-                color = Color(0xFF1E88E5),
-            )
-        }
         if (selected == null) {
             if (outOfReach) {
                 Text(stringResource(R.string.target_out_of_reach, distance.roundToInt()), color = MaterialTheme.colorScheme.error)
@@ -303,25 +263,78 @@ fun TargetScreen(
             }
         }
 
-        ReticleView(
-            reticle, holds, selected, leadHold, field,
-            Modifier.fillMaxWidth().aspectRatio(1f).pointerInput(weapon.id) {
-                // Two-finger pinch only, so a one-finger drag still scrolls the screen.
-                awaitEachGesture {
-                    awaitFirstDown(requireUnconsumed = false)
-                    do {
-                        val event = awaitPointerEvent()
-                        if (event.changes.count { it.pressed } >= 2) {
-                            val zoom = event.calculateZoom()
-                            if (zoom != 1f) {
-                                magnification = (magnification * zoom).coerceIn(currentRange)
-                                event.changes.forEach { it.consume() }
+        // The advice sits in the corners the round lens leaves free, so the reticle stays in view.
+        val advice = selected?.let { p ->
+            val h = holds.first { it.point == p }
+            val up = stringResource(if (upDial >= 0) R.string.up else R.string.down)
+            val right = stringResource(if (rightDial >= 0) R.string.right else R.string.left)
+            val vertical = stringResource(if (h.y <= 0) R.string.below_center else R.string.above_center)
+            val horizontal = stringResource(if (h.x >= 0) R.string.right else R.string.left)
+            // Each axis: dial whole clicks or hold on the reticle; what the clicks leave over is under half a click.
+            val elevation = if (correction.dialElevation) {
+                stringResource(R.string.advice_dial, up, upDial.dialFmt(click), turret.label)
+            } else {
+                stringResource(R.string.advice_hold, h.y.holdFmt(), reticle.unit.label, vertical)
+            }
+            val windage = if (correction.dialWindage) {
+                stringResource(R.string.advice_dial, right, rightDial.dialFmt(click), turret.label)
+            } else {
+                stringResource(R.string.advice_hold, h.x.holdFmt(), reticle.unit.label, horizontal)
+            }
+            // On a moving target the dialed elevation stands; only the lead is held, sideways.
+            val moving = leadHold?.let { m ->
+                val l = current?.lead ?: return@let null
+                val parts = listOfNotNull(
+                    if (correction.dialElevation) null else stringResource(
+                        R.string.hold_part, m.y.holdFmt(), reticle.unit.label,
+                        stringResource(if (m.y <= 0) R.string.below_center else R.string.above_center),
+                    ),
+                    stringResource(
+                        R.string.hold_part, m.x.holdFmt(), reticle.unit.label,
+                        stringResource(if (m.x >= 0) R.string.right else R.string.left),
+                    ),
+                )
+                stringResource(
+                    R.string.moving_hold, parts.joinToString(", "),
+                    stringResource(if (l.leadM >= 0) R.string.right else R.string.left), abs(l.leadM).fmt(2),
+                )
+            }
+            val orDial = if (!correction.dialElevation && !correction.dialWindage) {
+                stringResource(R.string.or_dial, up, upDial.dialFmt(click), right, rightDial.dialFmt(click), turret.label)
+            } else null
+            Advice(elevation, windage, moving, orDial, abs(h.x) > reticle.extent || abs(h.y) > reticle.extent)
+        }
+
+        Box(Modifier.fillMaxWidth().aspectRatio(1f)) {
+            ReticleView(
+                reticle, holds, selected, leadHold, field,
+                Modifier.fillMaxSize().pointerInput(weapon.id) {
+                    // Two-finger pinch only, so a one-finger drag still scrolls the screen.
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false)
+                        do {
+                            val event = awaitPointerEvent()
+                            if (event.changes.count { it.pressed } >= 2) {
+                                val zoom = event.calculateZoom()
+                                if (zoom != 1f) {
+                                    magnification = (magnification * zoom).coerceIn(currentRange)
+                                    event.changes.forEach { it.consume() }
+                                }
                             }
-                        }
-                    } while (event.changes.any { it.pressed })
-                }
-            },
-        )
+                        } while (event.changes.any { it.pressed })
+                    }
+                },
+            )
+            advice?.let { a ->
+                CornerLabel(stringResource(R.string.label_elevation), a.elevation, Color.Unspecified, Modifier.align(Alignment.TopStart))
+                CornerLabel(stringResource(R.string.label_windage), a.windage, Color.Unspecified, Modifier.align(Alignment.TopEnd), TextAlign.End)
+                a.moving?.let { CornerLabel(stringResource(R.string.label_moving), it, Color(0xFF1E88E5), Modifier.align(Alignment.BottomStart)) }
+            }
+        }
+        advice?.let { a ->
+            a.orDial?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+            if (a.outside) Text(stringResource(R.string.hold_outside_reticle), color = MaterialTheme.colorScheme.error)
+        }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(R.string.magnification_value, magnification.toDouble().magFmt()),
@@ -402,6 +415,19 @@ private fun Double.holdFmt() = ((abs(this) / 0.05).roundToInt() * 0.05).fmt(2)
 private fun Double.dialFmt(click: Double?): String {
     val decimals = click?.let { c -> (0..3).firstOrNull { d -> abs(c * Math.pow(10.0, d.toDouble()) - (c * Math.pow(10.0, d.toDouble())).roundToInt()) < 1e-6 } } ?: 1
     return abs(this).fmt(decimals)
+}
+
+private class Advice(val elevation: String, val windage: String, val moving: String?, val orDial: String?, val outside: Boolean)
+
+/** A short title over its value, on a pale plate so it reads over the lens edge. */
+@Composable
+private fun CornerLabel(title: String, value: String, color: Color, modifier: Modifier, align: TextAlign = TextAlign.Start) {
+    Surface(modifier.widthIn(max = 168.dp), shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)) {
+        Column(Modifier.padding(horizontal = 6.dp, vertical = 3.dp)) {
+            Text(title, Modifier.fillMaxWidth(), style = MaterialTheme.typography.labelSmall, textAlign = align, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(value, Modifier.fillMaxWidth(), style = MaterialTheme.typography.labelLarge, textAlign = align, color = color)
+        }
+    }
 }
 
 @Composable
