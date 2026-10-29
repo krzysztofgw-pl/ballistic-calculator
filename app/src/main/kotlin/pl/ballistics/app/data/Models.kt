@@ -211,6 +211,8 @@ data class UiSettings(
     val locationSetsAltitude: Boolean = false,
     /** Offer reading the station pressure from a Garmin watch on the conditions screen. */
     val garminWatch: Boolean = false,
+    /** Look for a newer release each time the app starts. */
+    val checkUpdateOnStart: Boolean = false,
     /** Per reticle design (Reticles.designKey): which corrections the target screen advises dialing; the rest are held. */
     val corrections: Map<String, Correction> = emptyMap(),
 ) {

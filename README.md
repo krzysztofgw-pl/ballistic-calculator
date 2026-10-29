@@ -123,8 +123,16 @@ sight height helper.
 
 ## Installing
 
-1. Open the **Actions** tab, pick the latest successful run on `main` and download the `ballistics-apk` artifact.
-2. Unzip it and install the APK (allow installs from unknown sources when asked).
+Every build of `main` is published as the latest release with the signed APK attached. The newest APK
+is always at <https://github.com/krzysztofgw-pl/ballistics-calculator/releases/latest/download/ballistics.apk>:
+open it in the phone's browser (a home-screen shortcut makes it one tap) and install it, allowing installs
+from unknown sources when asked.
+
+After that the app updates itself: **Settings → About → Check for update** looks at the latest release and
+offers to install a newer build, and **Check for update on start** (off by default) does the same at launch. Android asks once to allow installs
+from the app.
+
+Pull request builds are not released; their APK is the `ballistics-apk` artifact of the run in the **Actions** tab.
 
 Requires Android 8.0 (API 26) or newer. Builds signed with the release key update each other in place.
 Coming from a build signed with a different key or an older package name, export your profiles first,

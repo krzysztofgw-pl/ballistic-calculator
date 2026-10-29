@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +72,10 @@ fun App(vm: MainViewModel = viewModel()) {
     var tab by rememberSaveable { mutableIntStateOf(2) }
     var editor by remember { mutableStateOf<Editor?>(null) }
     val saved = rememberSaveableStateHolder()
+    val updater = rememberAppUpdater()
+    // Keyed on the setting, so it still runs when the saved settings load after the first frame.
+    LaunchedEffect(data.ui.checkUpdateOnStart) { if (data.ui.checkUpdateOnStart) updater.checkOnStart() }
+    AppUpdateDialogs(updater)
 
     when (val e = editor) {
         is Editor.Weapon -> {
@@ -109,6 +114,7 @@ fun App(vm: MainViewModel = viewModel()) {
                 onSignOut = vm::signOut,
                 onExport = vm::exportData,
                 onImport = vm::importData,
+                onCheckUpdate = { updater.check(asked = true) },
                 onClose = { editor = null },
             )
             return

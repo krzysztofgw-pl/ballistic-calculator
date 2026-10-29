@@ -21,8 +21,10 @@ android {
         applicationId = "com.kgwlabs.ballistics"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0"
+        // CI numbers each build, so a newer APK always installs over an older one.
+        val build = System.getenv("BUILD_NUMBER")?.toIntOrNull()
+        versionCode = build?.plus(100) ?: 2
+        versionName = "0.2.0" + (build?.let { "-build.$it" } ?: "")
     }
 
     signingConfigs {
