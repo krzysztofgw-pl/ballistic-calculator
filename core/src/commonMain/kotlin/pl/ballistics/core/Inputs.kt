@@ -1,5 +1,6 @@
 package pl.ballistics.core
 
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -58,7 +59,7 @@ data class Wind(
     companion object {
         /** Clock notation: 12 = from the target, 3 = from the right. */
         fun fromClock(speedMps: Double, hour: Double, untilRangeM: Double = Double.POSITIVE_INFINITY) =
-            Wind(speedMps, hour / 12.0 * 2 * Math.PI, untilRangeM = untilRangeM)
+            Wind(speedMps, hour / 12.0 * 2 * PI, untilRangeM = untilRangeM)
     }
 }
 

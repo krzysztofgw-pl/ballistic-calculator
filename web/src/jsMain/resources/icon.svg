@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <!-- The Android launcher icon (app/src/main/res/drawable/ic_launcher_*.xml), enlarged for iOS, which shows the whole square. -->
+  <defs>
+    <radialGradient id="bg" cx="54" cy="46" r="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#33433A"/>
+      <stop offset="1" stop-color="#141B17"/>
+    </radialGradient>
+  </defs>
+  <rect width="108" height="108" fill="url(#bg)"/>
+  <g transform="translate(54 54) scale(1.45) translate(-54 -54)" fill="none" stroke-linecap="butt">
+    <path d="M54,27a27,27 0 1,1 0,54a27,27 0 1,1 0,-54" stroke="#EDE8DA" stroke-width="2.6"/>
+    <path d="M27,54H36M72,54H81M54,27V36M54,72V81" stroke="#EDE8DA" stroke-width="4"/>
+    <path d="M36,54H50M58,54H72M54,36V50M54,58V72" stroke="#EDE8DA" stroke-width="1.4"/>
+    <path d="M51,61H57M51,66H57M52,71H56M47,54V57M61,54V57M42,54V56M66,54V56" stroke="#EDE8DA" stroke-width="1.2"/>
+    <path d="M30,47Q47,44 54,66" stroke="#FF7043" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M54,66m-3.6,0a3.6,3.6 0 1,0 7.2,0a3.6,3.6 0 1,0 -7.2,0" fill="#FF3D00"/>
+  </g>
+</svg>

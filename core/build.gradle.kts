@@ -1,20 +1,21 @@
 plugins {
-    kotlin("jvm")
+    kotlin("multiplatform")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
+// The solver is shared: the JVM target serves the Android app, the JS target the web app (see web/).
 kotlin {
-    compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-}
+    jvm {
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        testRuns["test"].executionTask.configure { useJUnitPlatform() }
+    }
+    // Tests run on Node.js; the web app bundles the solver for the browser itself.
+    js {
+        nodejs()
+    }
 
-dependencies {
-    testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
+    sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+    }
 }

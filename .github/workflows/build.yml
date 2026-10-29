@@ -20,7 +20,8 @@ jobs:
           java-version: 17
       - uses: gradle/actions/setup-gradle@v5
       - name: Test solver
-        run: ./gradlew :core:test
+        # On the JVM (Android app) and on Node.js (web app).
+        run: ./gradlew :core:allTests
       - name: Prepare signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
@@ -69,6 +70,41 @@ jobs:
           mv apk/*.apk apk/ballistics.apk
           gh release create "$TAG" apk/ballistics.apk --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --latest --title "Build ${{ github.run_number }}" --notes "$NOTES"
+
+  # The web app (PWA) for phones without Android, e.g. an iPhone.
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Build web app
+        run: ./gradlew :web:jsBrowserDistribution
+      - name: Stamp the offline cache with the build
+        # A new cache name makes phones drop the old copy once the new build is fetched.
+        run: sed -i "s/ballistics-v1/ballistics-${{ github.run_number }}/" web/build/dist/js/productionExecutable/sw.js
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: web/build/dist/js/productionExecutable
+
+  # Main builds of the web app go to GitHub Pages:
+  # https://krzysztofgw-pl.github.io/ballistics-calculator/
+  pages:
+    needs: web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
 
   watch-app:
     runs-on: ubuntu-latest
