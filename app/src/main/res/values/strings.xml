@@ -248,8 +248,6 @@
     <string name="magnification_value">Magnification %1$s×</string>
     <string name="action_unlock_magnification">Beyond scope range</string>
     <string name="magnification_outside_range">Outside the scope\'s %1$s–%2$s× range</string>
-    <string name="advice_elevation">Elevation: %1$s</string>
-    <string name="advice_windage">Windage: %1$s</string>
     <string name="advice_dial">dial %1$s %2$s %3$s</string>
     <string name="advice_hold">hold %1$s %2$s %3$s</string>
     <string name="or_dial">Or dial %1$s %2$s %5$s, %3$s %4$s %5$s</string>
@@ -297,7 +295,9 @@
     <string name="action_farther">1 m farther</string>
     <string name="label_moving_target">Moving target</string>
     <string name="label_target_speed">Target speed</string>
-    <string name="moving_hold">Moving: hold %2$s %5$s %1$s, %4$s %5$s %3$s (lead %6$s %7$s m)</string>
+    <string name="moving_hold">hold %1$s (lead %2$s %3$s m)</string>
+    <string name="hold_part">%1$s %2$s %3$s</string>
+    <string name="label_moving">Moving</string>
     <string name="target_out_of_reach">The bullet does not reach %1$d m.</string>
     <string name="chart_wind_speed">Wind correction (%1$s) by wind speed (m/s)</string>
     <string name="chart_wind_direction">Wind correction (%1$s) by wind direction (o\'clock)</string>
