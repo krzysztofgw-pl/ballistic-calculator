@@ -128,8 +128,8 @@ is always at <https://github.com/krzysztofgw-pl/ballistics-calculator/releases/l
 open it in the phone's browser (a home-screen shortcut makes it one tap) and install it, allowing installs
 from unknown sources when asked.
 
-After that the app updates itself: on start it checks the latest release and offers to install a newer
-build, and **Settings → About → Check for update** checks on demand. Android asks once to allow installs
+After that the app updates itself: **Settings → About → Check for update** looks at the latest release and
+offers to install a newer build, and **Check for update on start** (off by default) does the same at launch. Android asks once to allow installs
 from the app.
 
 Pull request builds are not released; their APK is the `ballistics-apk` artifact of the run in the **Actions** tab.

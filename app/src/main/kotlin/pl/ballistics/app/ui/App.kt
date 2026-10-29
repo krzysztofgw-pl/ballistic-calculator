@@ -73,7 +73,8 @@ fun App(vm: MainViewModel = viewModel()) {
     var editor by remember { mutableStateOf<Editor?>(null) }
     val saved = rememberSaveableStateHolder()
     val updater = rememberAppUpdater()
-    LaunchedEffect(Unit) { updater.checkOnStart() }
+    // Keyed on the setting, so it still runs when the saved settings load after the first frame.
+    LaunchedEffect(data.ui.checkUpdateOnStart) { if (data.ui.checkUpdateOnStart) updater.checkOnStart() }
     AppUpdateDialogs(updater)
 
     when (val e = editor) {

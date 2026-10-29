@@ -176,6 +176,9 @@ fun SettingsScreen(
                     Text(stringResource(R.string.app_version, version), Modifier.weight(1f))
                     OutlinedButton(onClick = onCheckUpdate) { Text(stringResource(R.string.action_check_update)) }
                 }
+                SwitchRow(stringResource(R.string.label_check_update_on_start), ui.checkUpdateOnStart) { v ->
+                    onUi { it.copy(checkUpdateOnStart = v) }
+                }
             }
         }
     }
